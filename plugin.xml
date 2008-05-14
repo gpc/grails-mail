@@ -1,0 +1,26 @@
+<plugin name='mail' version='0.1-ALPHA'>
+  <author>Graeme Rocher</author>
+  <authorEmail>graeme@g2one.com</authorEmail>
+  <title>Provides Mail support to a running Grails application</title>
+  <description>This plug-in provides a MailService class as well as configuring the necessary beans within
+the Spring ApplicationContext.
+
+It also adds a "sendMail" method to all controller classes. A typical example usage is:
+
+sendMail {
+    to "fred@g2one.com","ginger@g2one.com"
+    from "john@g2one.com"
+    cc "marge@g2one.com", "ed@g2one.com"
+    bcc "joe@g2one.com"
+    subject "Hello John"
+    text "this is some text"
+}
+
+</description>
+  <documentation>http://grails.org/Mail+Plugin</documentation>
+  <resources>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>org.grails.mail.MailService</resource>
+  </resources>
+</plugin>
