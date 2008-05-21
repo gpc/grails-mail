@@ -22,6 +22,7 @@ import javax.mail.internet.MimeMessage
 import org.springframework.mail.MailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMailMessage
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 /**
  *
@@ -40,17 +41,23 @@ class MailService {
         callable.call()
 
         def message = messageBuilder.createMessage()
-        message.sentDate = new Date()
+        initMessage(message)
         sendMail message
         return message
     }
 
+    protected initMessage(message) {
+        message.sentDate = new Date()
+        message.from =  ConfigurationHolder.config.grails.mail.default.from        
+    }
+    
     protected sendMail(message) {
         if(message) {
             if(message instanceof MimeMailMessage) {
                 MimeMailMessage msg = message
                 if(mailSender instanceof JavaMailSender) {
                     mailSender.send((MimeMessage)msg.getMimeMessage())
+                    if (log.traceEnabled) log.trace("Sent mail re: [${message.subject}] from [${message.from}] to [${message.to}]")
                 }
                 else {
                     throw new GrailsMailException("MimeMessages require an instance of 'org.springframework.mail.javamail.JavaMailSender' to be configured!")
