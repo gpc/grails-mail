@@ -48,9 +48,8 @@ class MailService {
 
     protected initMessage(message) {
         message.sentDate = new Date()
-        message.from =  ConfigurationHolder.config.grails.mail.default.from        
     }
-    
+
     protected sendMail(message) {
         if(message) {
             if(message instanceof MimeMailMessage) {
@@ -88,6 +87,7 @@ class MailMessageBuilder {
             else {
                 message = new SimpleMailMessage()
             }
+            message.from = ConfigurationHolder.config.grails.mail.default.from
         }
         return message
     }

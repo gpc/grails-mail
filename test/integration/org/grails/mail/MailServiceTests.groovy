@@ -37,13 +37,13 @@ class MailServiceTests extends GroovyTestCase {
             to "fred@g2one.com"
             title "Hello John"
             body 'this is some text'
+            from 'king@g2one.com'
         }
-
-
 
         assertEquals "Hello John", message.getSubject()        
         assertEquals 'this is some text', message.getText()
         assertEquals 'fred@g2one.com', message.to[0]
+        assertEquals 'king@g2one.com', message.from
     }
 
     void testSendToMultipleRecipients() {
