@@ -1,6 +1,8 @@
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
 class MailGrailsPlugin {
+
+    def observe = ['controllers']
     def version = "0.2-SNAPSHOT"
     def author = "Graeme Rocher"
     def authorEmail = "graeme@g2one.com"
@@ -44,8 +46,16 @@ sendMail {
     }
    
     def doWithApplicationContext = { applicationContext ->
-        application.controllerClasses*.metaClass*.sendMail = { Closure callable ->
-             applicationContext.mailService?.sendMail(callable)
+        configureSendMail(application, applicationContext)
+    }
+
+    def onChange = {event ->
+        configureSendMail(event.application, event.ctx)
+    }
+
+    def configureSendMail(application, applicationContext) {
+        application.controllerClasses*.metaClass*.sendMail = {Closure callable ->
+            applicationContext.mailService?.sendMail(callable)
         }
     }
 }
