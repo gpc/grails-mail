@@ -1,4 +1,4 @@
-<plugin name='mail' version='0.2-SNAPSHOT'>
+<plugin name='mail' version='0.1'>
   <author>Graeme Rocher</author>
   <authorEmail>graeme@g2one.com</authorEmail>
   <title>Provides Mail support to a running Grails application</title>
@@ -23,4 +23,5 @@ sendMail {
     <resource>UrlMappings</resource>
     <resource>org.grails.mail.MailService</resource>
   </resources>
+  <dependencies />
 </plugin>
