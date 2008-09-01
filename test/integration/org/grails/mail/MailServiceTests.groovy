@@ -22,6 +22,12 @@ import org.springframework.mail.MailSender
 import org.springframework.mail.MailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMailMessage
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+import org.springframework.web.context.support.WebApplicationContextUtils
+import org.springframework.web.context.request.RequestContextHolder
+import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
+
 
 class MailServiceTests extends GroovyTestCase {
 
@@ -111,5 +117,28 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals '<b>Hello</b> World', message.getMimeMessage().getContent()                
     }
 
+    void testSendMailView() {
+        def mailService = new MailService()
+
+        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
+        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
+        
+        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
+
+        // stub send method
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+
+        mailService.mailSender = mailSender
+
+        MimeMailMessage message = mailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body(view:'/emails/test', model:[msg:'hello'])
+        }
+
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()                
+    }
 }
 
