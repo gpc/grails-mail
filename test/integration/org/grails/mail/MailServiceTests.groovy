@@ -134,11 +134,69 @@ class MailServiceTests extends GroovyTestCase {
         MimeMailMessage message = mailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
-            body(view:'/emails/test', model:[msg:'hello'])
+            body(view:'/_testemails/test', model:[msg:'hello'])
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()                
+    }
+
+
+    void testSendMailViewWithTags() {
+        def mailService = new MailService()
+
+        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
+        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
+        
+        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
+
+        // stub send method
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+
+        mailService.mailSender = mailSender
+
+        MimeMailMessage message = mailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body(view:'/_testemails/tagtest', model:[condition:true])
+        }
+
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertEquals 'Condition is true', message.getMimeMessage().getContent().trim()                
+
+        message = mailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body(view:'/_testemails/tagtest', model:[condition:false])
+        }
+
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertEquals '', message.getMimeMessage().getContent().trim()                
+    }
+
+    void testSendMailViewNoModel() {
+        def mailService = new MailService()
+
+        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
+        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
+        
+        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
+
+        // stub send method
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+
+        mailService.mailSender = mailSender
+
+        MimeMailMessage message = mailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body(view:'/_testemails/test')
+        }
+
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertEquals 'Message is: null', message.getMimeMessage().getContent().trim()                
     }
 }
 

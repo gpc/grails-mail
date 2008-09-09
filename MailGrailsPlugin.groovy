@@ -3,7 +3,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 class MailGrailsPlugin {
 
     def observe = ['controllers']
-    def version = "0.1"
+    def version = "0.2-SNAPSHOT"
     def author = "Graeme Rocher"
     def authorEmail = "graeme@g2one.com"
     def title = "Provides Mail support to a running Grails application"
