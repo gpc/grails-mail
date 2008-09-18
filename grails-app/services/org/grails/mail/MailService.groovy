@@ -204,8 +204,9 @@ class MailMessageBuilder {
 	    finally {
 	        requestAttributes.setOut(originalOut)
 	    }
-	    if (HTML_CONTENTTYPES.contains(t.metaInfo)) {
-	        html(out) // @todo Spring mail helper will not set correct mime type if we give it XHTML
+
+	    if (HTML_CONTENTTYPES.contains(t.metaInfo.contentType)) {
+	        html(out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
         } else {
             text(out)
         }

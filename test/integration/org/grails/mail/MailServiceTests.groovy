@@ -111,10 +111,10 @@ class MailServiceTests extends GroovyTestCase {
             html '<b>Hello</b> World'
         }
 
-
-
         assertEquals "Hello John", message.getMimeMessage().getSubject()
-        assertEquals '<b>Hello</b> World', message.getMimeMessage().getContent()                
+        // This isn't working - because no DataHandler available for unit tests?
+        //assertTrue message.mimeMessage.contentType.startsWith('text/html')
+        assertEquals '<b>Hello</b> World', message.getMimeMessage().getContent()   
     }
 
     void testSendMailView() {
@@ -138,10 +138,36 @@ class MailServiceTests extends GroovyTestCase {
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertTrue message.mimeMessage.contentType.startsWith('text/plain')
         assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()                
     }
 
+    void testSendMailViewHTML() {
+        def mailService = new MailService()
 
+        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
+        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
+        
+        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
+
+        // stub send method
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+
+        mailService.mailSender = mailSender
+
+        MimeMailMessage message = mailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body(view:'/_testemails/testhtml', model:[msg:'hello'])
+        }
+
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        // This isn't working - because no DataHandler available for unit tests?
+        //assertTrue message.mimeMessage.contentType.startsWith('text/html')
+        assertEquals '<b>Message is: hello</b>', message.getMimeMessage().getContent().trim()                
+    }
+    
     void testSendMailViewWithTags() {
         def mailService = new MailService()
 
@@ -172,6 +198,7 @@ class MailServiceTests extends GroovyTestCase {
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertTrue message.getMimeMessage().getContentType()?.startsWith('text/plain')
         assertEquals '', message.getMimeMessage().getContent().trim()                
     }
 
@@ -196,6 +223,7 @@ class MailServiceTests extends GroovyTestCase {
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertTrue message.getMimeMessage().getContentType()?.startsWith('text/plain')
         assertEquals 'Message is: null', message.getMimeMessage().getContent().trim()                
     }
 }
