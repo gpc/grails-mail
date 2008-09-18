@@ -22,5 +22,6 @@ sendMail {
     <resource>DataSource</resource>
     <resource>UrlMappings</resource>
     <resource>org.grails.mail.MailService</resource>
+    <resource>org.grails.mail.PlainTextMailTagLib</resource>
   </resources>
 </plugin>
