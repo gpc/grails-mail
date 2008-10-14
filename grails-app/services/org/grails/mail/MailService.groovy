@@ -30,6 +30,9 @@ import org.codehaus.groovy.grails.web.servlet.DefaultGrailsApplicationAttributes
 import org.codehaus.groovy.grails.commons.GrailsResourceUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import org.springframework.mock.web.*
+import org.springframework.web.context.support.*
+import org.codehaus.groovy.grails.web.context.*
 
 /**
  *
@@ -168,10 +171,22 @@ class MailMessageBuilder {
         assert templateName
 
         def engine = mailService.groovyPagesTemplateEngine
-        def requestAttributes = RequestContextHolder.currentRequestAttributes()
-        def grailsAttributes = new DefaultGrailsApplicationAttributes(requestAttributes.request.servletContext);
+        def requestAttributes = RequestContextHolder.getRequestAttributes()
+		boolean unbindRequest = false
+		
+		// outside of an executing request, establish a mock version
+		if(!requestAttributes) {
+			def servletContext  = ServletContextHolder.getServletContext()
+			def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
+			requestAttributes = grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
+			unbindRequest = true
+		}
+		def servletContext = requestAttributes.request.servletContext 
+		def request = requestAttributes.request 
+
+        def grailsAttributes = new DefaultGrailsApplicationAttributes(servletContext);
         // See if the application has the view for it
-        def uri = getMailViewUri(templateName, requestAttributes.request)
+        def uri = getMailViewUri(templateName, request)
 
         def r = engine.getResourceForUri(uri)
         // Try plugin view if not found in application
@@ -203,6 +218,9 @@ class MailMessageBuilder {
 	    } 
 	    finally {
 	        requestAttributes.setOut(originalOut)
+			if(unbindRequest) {
+				RequestContextHolder.setRequestAttributes(null)
+			}
 	    }
 
 	    if (HTML_CONTENTTYPES.contains(t.metaInfo.contentType)) {
