@@ -1,13 +1,13 @@
-<plugin name='mail' version='0.5'>
+<plugin name='mail' version='0.6-SNAPSHOT'>
   <author>Graeme Rocher</author>
   <authorEmail>graeme@g2one.com</authorEmail>
   <title>Provides Mail support to a running Grails application</title>
   <documentation>http://grails.org/Mail+Plugin</documentation>
   <resources>
-    <resource>DataSource</resource>
     <resource>UrlMappings</resource>
-    <resource>org.grails.mail.MailService</resource>
+    <resource>DataSource</resource>
     <resource>org.grails.mail.PlainTextMailTagLib</resource>
+    <resource>org.grails.mail.MailService</resource>
   </resources>
   <dependencies />
 </plugin>
