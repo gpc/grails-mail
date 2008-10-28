@@ -27,6 +27,7 @@ import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.springframework.web.context.support.WebApplicationContextUtils
 import org.springframework.web.context.request.RequestContextHolder
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
+import javax.mail.Message
 
 
 class MailServiceTests extends GroovyTestCase {
@@ -225,6 +226,66 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertTrue message.getMimeMessage().getContentType()?.startsWith('text/plain')
         assertEquals 'Message is: null', message.getMimeMessage().getContent().trim()                
+    }
+
+    /**
+     * Tests the "headers" feature of the mail DSL. It should add the
+     * specified headers to the underlying MIME message.
+     */
+    void testSendMailWithHeaders() {
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+
+        def mailService = new MailService()
+        mailService.mailSender = mailSender
+
+        def message = mailService.sendMail {
+            headers "X-Mailing-List": "user@grails.codehaus.org",
+                    "Sender": "dilbert@somewhere.org"
+            to "fred@g2one.com"
+            subject "Hello Fred"
+            body 'How are you?'
+        }
+
+        def msg = message.mimeMessageHelper.mimeMessage
+        assertEquals "user@grails.codehaus.org", msg.getHeader("X-Mailing-List", ", ")
+        assertEquals "dilbert@somewhere.org", msg.getHeader("Sender", ", ")
+        assertEquals([ "fred@g2one.com" ], to(msg))
+        assertEquals "Hello Fred", msg.subject
+        assertEquals "How are you?", msg.content
+    }
+
+    /**
+     * Tests that the builder throws an exception if the user tries to
+     * specify custom headers with just a plain MailSender.
+     */
+    void testSendMailWithHeadersAndBasicMailSender() {
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+
+        def mailService = new MailService()
+
+        shouldFail(GrailsMailException) {
+            mailService.sendMail {
+                headers "Content-Type": "text/plain;charset=UTF-8",
+                        "Sender": "dilbert@somewhere.org"
+                to "fred@g2one.com"
+                subject "Hello Fred"
+                body 'How are you?'
+            }
+        }
+    }
+
+    private List to(MimeMessage msg) {
+        msg.getRecipients(Message.RecipientType.TO)*.toString()
+    }
+
+    private List cc(MimeMessage msg) {
+        msg.getRecipients(Message.RecipientType.CC)*.toString()
+    }
+
+    private List bcc(MimeMessage msg) {
+        msg.getRecipients(Message.RecipientType.BCC)*.toString()
     }
 }
 
