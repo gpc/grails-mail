@@ -15,14 +15,21 @@
  */
 package org.grails.mail
 
+import grails.util.GrailsWebUtil
 import javax.servlet.http.HttpServletRequest
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.codehaus.groovy.grails.commons.GrailsResourceUtils
+import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.servlet.DefaultGrailsApplicationAttributes
 import org.springframework.mail.MailMessage
 import org.springframework.mail.MailSender
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMailMessage
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.support.WebApplicationContextUtils
+
 
 /**
  * The builder that implements the mail DSL.
@@ -137,7 +144,7 @@ class MailMessageBuilder {
 		if(!requestAttributes) {
 			def servletContext  = ServletContextHolder.getServletContext()
 			def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-			requestAttributes = grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
+			requestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
 			unbindRequest = true
 		}
 		def servletContext = requestAttributes.request.servletContext
