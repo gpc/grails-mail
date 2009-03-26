@@ -156,7 +156,7 @@ class MailMessageBuilder {
 
         def r = engine.getResourceForUri(uri)
         // Try plugin view if not found in application
-        if ((!r || !r.exists()) && controllerName) {
+        if (!r || !r.exists()) {
             // Caution, this uses views/ always, whereas our app view resolution uses the PATH_TO_MAILVIEWS which may in future be orthogonal!
             def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
             String pathToView
