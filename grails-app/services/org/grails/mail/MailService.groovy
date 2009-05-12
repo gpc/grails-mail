@@ -53,11 +53,15 @@ class MailService {
 
     protected sendMail(message) {
         if(message) {
+            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
             if(message instanceof MimeMailMessage) {
                 MimeMailMessage msg = message
                 if(mailSender instanceof JavaMailSender) {
                     MimeMessage mimeMsg = msg.getMimeMessage()
-                    mailSender.send(mimeMsg)
+                    if (!config.grails.mail.disabled)
+                        mailSender.send(mimeMsg)
+                    else
+                        log.warn("Sending emails disabled by configuration option")
                     if (log.traceEnabled) log.trace("Sent mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()}")
 
         
@@ -67,7 +71,10 @@ class MailService {
                 }
             }
             else {
-                mailSender?.send(message)
+                if (!config.grails.mail.disabled)
+                    mailSender?.send(message)
+                else
+                    log.warn("Sending emails disabled by configuration option")
             }
         }
     }
