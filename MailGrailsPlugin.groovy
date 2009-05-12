@@ -19,7 +19,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 
 class MailGrailsPlugin {
 
-    def observe = ['controllers']
+    def observe = ['controllers','services']
     def version = "0.6-SNAPSHOT"
     def author = "Graeme Rocher"
     def authorEmail = "graeme@g2one.com"
@@ -80,8 +80,19 @@ sendMail {
     }
 
     def configureSendMail(application, applicationContext) {
-        application.controllerClasses*.metaClass*.sendMail = {Closure callable ->
+      //adding sendMail to controllers
+      application.controllerClasses*.metaClass*.sendMail = {Closure callable ->
+        applicationContext.mailService?.sendMail(callable)
+      }
+
+      //adding sendMail to all services, besides the mailService of the plugin
+      application.serviceClasses.each{
+        if(it.metaClass?.getTheClass()?.name
+        != applicationContext.mailService?.metaClass?.getTheClass()?.name){
+          it.metaClass*.sendMail = {Closure callable ->
             applicationContext.mailService?.sendMail(callable)
+          }
         }
+      }
     }
 }
