@@ -16,6 +16,7 @@
 
 package org.grails.mail
 
+import javax.mail.Message
 import javax.mail.internet.MimeMessage
 import org.springframework.mail.MailMessage
 import org.springframework.mail.MailSender
@@ -55,8 +56,11 @@ class MailService {
             if(message instanceof MimeMailMessage) {
                 MimeMailMessage msg = message
                 if(mailSender instanceof JavaMailSender) {
-                    mailSender.send((MimeMessage)msg.getMimeMessage())
-                    if (log.traceEnabled) log.trace("Sent mail re: [${message.subject}] from [${message.from}] to [${message.to}]")
+                    MimeMessage mimeMsg = msg.getMimeMessage()
+                    mailSender.send(mimeMsg)
+                    if (log.traceEnabled) log.trace("Sent mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()}")
+
+        
                 }
                 else {
                     throw new GrailsMailException("MimeMessages require an instance of 'org.springframework.mail.javamail.JavaMailSender' to be configured!")

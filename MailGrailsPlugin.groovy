@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.springframework.jndi.JndiObjectFactoryBean
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
 class MailGrailsPlugin {
@@ -44,9 +46,18 @@ sendMail {
 
     def doWithSpring = {
         def config = application.config.grails.mail
+
+        if (config.jndiName && !springConfig.containsBean("mailSession")) {
+            mailSession(JndiObjectFactoryBean) {
+                jndiName = config.jndiName
+            }
+        }
+ 
         mailSender(JavaMailSenderImpl) {
             host = config.host ?: "localhost"
             defaultEncoding = config.encoding ?: "utf-8"
+            if(config.jndiName)
+                session = ref('mailSession')
             if(config.port)
                 port = config.port
             if(config.username)
