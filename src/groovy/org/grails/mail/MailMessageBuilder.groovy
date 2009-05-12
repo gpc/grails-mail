@@ -74,6 +74,11 @@ class MailMessageBuilder {
             getMessage().to = args as String[]
         }
     }
+    void to(List args) {
+        if(args) {
+            getMessage().to = args as String[]
+        }
+    }
     void title(title) {
         subject(title)
     }
@@ -120,12 +125,19 @@ class MailMessageBuilder {
     void bcc(Object[] args) {
         getMessage().bcc = args as String[]
     }
+    void bcc(List args) {
+        getMessage().bcc = args as String[]
+    }
     void cc(String cc) {
         getMessage().cc = [cc] as String[]
     }
     void cc(Object[] args) {
         getMessage().cc = args as String[]
     }
+    void cc(List args) {
+        getMessage().cc = args as String[]
+    }
+
     void replyTo(String replyTo) {
         getMessage().replyTo = replyTo
     }

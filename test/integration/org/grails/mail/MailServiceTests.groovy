@@ -71,6 +71,44 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals "ginger@g2one.com", message.getTo()[1]
     }
 
+    void testSendToMultipleRecipientsUsingList() {
+       def mailService = new MailService()
+
+       def message = mailService.sendMail {
+           to (["fred@g2one.com","ginger@g2one.com"])
+           title "Hello John"
+           body 'this is some text'
+       }
+        assertEquals "fred@g2one.com", message.getTo()[0]
+        assertEquals "ginger@g2one.com", message.getTo()[1]
+    }
+
+    void testSendToMultipleCCRecipientsUsingList() {
+       def mailService = new MailService()
+
+       def message = mailService.sendMail {
+           to 'joe@g2one.com'
+           cc (["fred@g2one.com","ginger@g2one.com"])
+           title "Hello John"
+           body 'this is some text'
+       }
+        assertEquals "fred@g2one.com", message.cc[0]
+        assertEquals "ginger@g2one.com", message.cc[1]
+    }
+
+    void testSendToMultipleBCCRecipientsUsingList() {
+       def mailService = new MailService()
+
+       def message = mailService.sendMail {
+           to ("joe@g2one.com")
+           bcc (["fred@g2one.com","ginger@g2one.com"])
+           title "Hello John"
+           body 'this is some text'
+       }
+        assertEquals "fred@g2one.com", message.bcc[0]
+        assertEquals "ginger@g2one.com", message.bcc[1]
+    }
+
     void testSendToMultipleRecipientsAndCC() {
        def mailService = new MailService()
 
