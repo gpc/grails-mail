@@ -58,6 +58,8 @@ class MailMessageBuilder {
                 message = new SimpleMailMessage()
             }
             message.from = ConfigurationHolder.config.grails.mail.default.from
+            if (ConfigurationHolder.config.grails.mail.overrideAddress)
+                message.from = ConfigurationHolder.config.grails.mail.overrideAddress
         }
         return message
     }
@@ -66,16 +68,23 @@ class MailMessageBuilder {
 
     void to(String recip) {
         if(recip) {
+            if (ConfigurationHolder.config.grails.mail.overrideAddress)
+                recip = ConfigurationHolder.config.grails.mail.overrideAddress
             getMessage().to = [recip] as String[]
         }
     }
     void to(Object[] args) {
         if(args) {
+			if (ConfigurationHolder.config.grails.mail.overrideAddress)
+			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+
             getMessage().to = args as String[]
         }
     }
     void to(List args) {
         if(args) {
+			if (ConfigurationHolder.config.grails.mail.overrideAddress)
+			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }	
             getMessage().to = args as String[]
         }
     }
@@ -120,21 +129,39 @@ class MailMessageBuilder {
         }
     }
     void bcc(String bcc) {
+	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
+            bcc = ConfigurationHolder.config.grails.mail.overrideAddress
+    
         getMessage().bcc = [bcc] as String[]
     }
     void bcc(Object[] args) {
+		if (ConfigurationHolder.config.grails.mail.overrideAddress)
+		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+	
         getMessage().bcc = args as String[]
     }
     void bcc(List args) {
+		if (ConfigurationHolder.config.grails.mail.overrideAddress)
+		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+	
         getMessage().bcc = args as String[]
     }
     void cc(String cc) {
+	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
+            cc = ConfigurationHolder.config.grails.mail.overrideAddress
+	
         getMessage().cc = [cc] as String[]
     }
     void cc(Object[] args) {
+		if (ConfigurationHolder.config.grails.mail.overrideAddress)
+		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+	
         getMessage().cc = args as String[]
     }
     void cc(List args) {
+		if (ConfigurationHolder.config.grails.mail.overrideAddress)
+		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+	
         getMessage().cc = args as String[]
     }
 
