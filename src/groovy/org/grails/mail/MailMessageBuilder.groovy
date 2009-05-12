@@ -29,6 +29,7 @@ import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMailMessage
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
+import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
 
 
 /**
@@ -161,7 +162,7 @@ class MailMessageBuilder {
             def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
             String pathToView
             if (plugin) {
-                pathToView = '/plugins/'+plugin.name+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'+templateName
+                pathToView = '/plugins/'+GCU.getScriptName(plugin.name)+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'+templateName
             }
 
             if (pathToView != null) {
@@ -198,30 +199,25 @@ class MailMessageBuilder {
 
 	protected String getMailViewUri(String viewName, HttpServletRequest request) {
 
-        StringBuffer buf = new StringBuffer(PATH_TO_MAILVIEWS);
-
+        def buf = new StringBuilder(PATH_TO_MAILVIEWS)
+		
         if(viewName.startsWith("/")) {
-           String tmp = viewName.substring(1,viewName.length());
+           def tmp = viewName[1..-1]
            if(tmp.indexOf('/') > -1) {
-        	   buf.append('/');
-        	   buf.append(tmp.substring(0,tmp.lastIndexOf('/')));
-        	   buf.append("/");
-        	   buf.append(tmp.substring(tmp.lastIndexOf('/') + 1,tmp.length()));
+			   def i = tmp.lastIndexOf('/')
+        	   buf << "/${tmp[0..i]}/${tmp[(i+1)..-1]}"
            }
            else {
-        	   buf.append("/");
-        	   buf.append(viewName.substring(1,viewName.length()));
+        	   buf << "/${viewName[1..-1]}"
            }
         }
         else {
            if (!request) throw new IllegalArgumentException(
                "Mail views cannot be loaded from relative view paths where there is no current HTTP request")
-           def grailsAttributes = new DefaultGrailsApplicationAttributes(request.servletContext);
-           buf.append(grailsAttributes.getControllerUri(request))
-                .append("/")
-                .append(viewName);
+           def grailsAttributes = new DefaultGrailsApplicationAttributes(request.servletContext)
+           buf << "${grailsAttributes.getControllerUri(request)}/${viewName}"
 
         }
-        return buf.append(".gsp").toString();
+        return buf.append(".gsp").toString()
 	}
 }
