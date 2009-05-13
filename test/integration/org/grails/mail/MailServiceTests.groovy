@@ -35,6 +35,7 @@ class MailServiceTests extends GroovyTestCase {
     static transactional = false
 
     MailSender mailSender
+
     
     void testSendSimpleMessage() {
         def mailService = new MailService()

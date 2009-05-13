@@ -25,8 +25,8 @@ import org.codehaus.groovy.grails.web.servlet.DefaultGrailsApplicationAttributes
 import org.springframework.mail.MailMessage
 import org.springframework.mail.MailSender
 import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMailMessage
+import org.springframework.mail.javamail.*
+import org.springframework.core.io.*
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
@@ -73,6 +73,18 @@ class MailMessageBuilder {
             getMessage().to = [recip] as String[]
         }
     }
+
+	void attachBytes(String fileName, String contentType, byte[] bytes) {
+		def msg = getMessage()
+		if(msg instanceof MimeMailMessage) {
+			MimeMessageHelper message = new MimeMessageHelper(getMessage(), true, "UTF-8");
+		    message.addAttachment(fileName, new ByteArrayResource(bytes), contentType)			
+		}
+		else {
+			throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
+		}
+	}
+
     void to(Object[] args) {
         if(args) {
 			if (ConfigurationHolder.config.grails.mail.overrideAddress)
