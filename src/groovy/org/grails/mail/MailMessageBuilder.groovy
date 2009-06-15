@@ -70,7 +70,7 @@ class MailMessageBuilder {
         if(recip) {
             if (ConfigurationHolder.config.grails.mail.overrideAddress)
                 recip = ConfigurationHolder.config.grails.mail.overrideAddress
-            getMessage().to = [recip] as String[]
+            getMessage().setTo([recip] as String[])
         }
     }
 
@@ -88,16 +88,16 @@ class MailMessageBuilder {
     void to(Object[] args) {
         if(args) {
 			if (ConfigurationHolder.config.grails.mail.overrideAddress)
-			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
 
-            getMessage().to = args as String[]
+            getMessage().setTo(args as String[])
         }
     }
     void to(List args) {
         if(args) {
 			if (ConfigurationHolder.config.grails.mail.overrideAddress)
 			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }	
-            getMessage().to = args as String[]
+            getMessage().setTo(args as String[])
         }
     }
     void title(title) {
@@ -144,37 +144,37 @@ class MailMessageBuilder {
 	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
             bcc = ConfigurationHolder.config.grails.mail.overrideAddress
     
-        getMessage().bcc = [bcc] as String[]
+        getMessage().setBcc([bcc] as String[])
     }
     void bcc(Object[] args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
-		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
 	
-        getMessage().bcc = args as String[]
+        getMessage().setBcc(args as String[])
     }
     void bcc(List args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
 		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
 	
-        getMessage().bcc = args as String[]
+        getMessage().setBcc(args as String[])
     }
     void cc(String cc) {
 	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
             cc = ConfigurationHolder.config.grails.mail.overrideAddress
 	
-        getMessage().cc = [cc] as String[]
+        getMessage().setCc([cc] as String[])
     }
     void cc(Object[] args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
-		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
 	
-        getMessage().cc = args as String[]
+        getMessage().setCc(args as String[])
     }
     void cc(List args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
 		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
 	
-        getMessage().cc = args as String[]
+        getMessage().setCc(args as String[])
     }
 
     void replyTo(String replyTo) {
@@ -211,7 +211,7 @@ class MailMessageBuilder {
         if (!r || !r.exists()) {
             // Caution, this uses views/ always, whereas our app view resolution uses the PATH_TO_MAILVIEWS which may in future be orthogonal!
             def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
-            String pathToView
+            String pathToView = null
             if (plugin) {
                 pathToView = '/plugins/'+GCU.getScriptName(plugin.name)+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'+templateName
             }
