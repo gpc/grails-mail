@@ -1,4 +1,4 @@
-<plugin name='mail' version='0.6' grailsVersion='1.1.1 &gt; *'>
+<plugin name='mail' version='0.7' grailsVersion='1.1.1 &gt; *'>
   <author>Graeme Rocher</author>
   <authorEmail>graeme@g2one.com</authorEmail>
   <title>Provides Mail support to a running Grails application</title>
