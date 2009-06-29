@@ -213,7 +213,7 @@ class MailMessageBuilder {
             def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
             String pathToView = null
             if (plugin) {
-                pathToView = '/plugins/'+GCU.getScriptName(plugin.name)+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'+templateName
+                pathToView = '/plugins/'+GCU.getScriptName(plugin.name)+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'
             }
 
             if (pathToView != null) {
