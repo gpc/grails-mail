@@ -30,7 +30,7 @@ import org.springframework.core.io.*
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
-
+import org.apache.commons.logging.LogFactory
 
 /**
  * The builder that implements the mail DSL.
@@ -41,6 +41,8 @@ class MailMessageBuilder {
     static PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
     static HTML_CONTENTTYPES = ['text/html', 'text/xhtml']
 
+    private log = LogFactory.getLog(MailMessageBuilder.class);
+    
     MailSender mailSender
     MailService mailService
 
@@ -209,16 +211,31 @@ class MailMessageBuilder {
         def r = engine.getResourceForUri(uri)
         // Try plugin view if not found in application
         if (!r || !r.exists()) {
-            // Caution, this uses views/ always, whereas our app view resolution uses the PATH_TO_MAILVIEWS which may in future be orthogonal!
-            def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
-            String pathToView = null
-            if (plugin) {
-                pathToView = '/plugins/'+GCU.getScriptName(plugin.name)+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'
+            if (log.debugEnabled) {
+                log.debug "Could not locate email view ${templateName} at ${uri}, trying plugin"
             }
+            if (pluginName) {
+                // Caution, this uses views/ always, whereas our app view resolution uses the PATH_TO_MAILVIEWS which may in future be orthogonal!
+                def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
+                String pathToView = null
+                if (plugin) {
+                    pathToView = '/plugins/'+GCU.getScriptName(plugin.name)+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'
+                }
 
-            if (pathToView != null) {
-                uri = GrailsResourceUtils.WEB_INF +pathToView +templateName+".gsp";
-                r = engine.getResourceForUri(uri)
+                if (pathToView != null) {
+                    uri = GrailsResourceUtils.WEB_INF +pathToView +templateName+".gsp";
+                    r = engine.getResourceForUri(uri)
+                } else {
+                    if (log.errorEnabled) {
+                        log.error "Could not locate email view ${templateName} in plugin [$pluginName]"
+                    }
+                    throw new IllegalArgumentException("Could not locate email view ${templateName} in plugin [$pluginName]")
+                }
+            } else {
+                if (log.errorEnabled) {
+                    log.error "Could not locate email view ${templateName} at ${uri}, no pluginName specified so couldn't look there"
+                }
+                throw new IllegalArgumentException("Could not locate mail body ${templateName}. Is it in a plugin? If so you must pass the plugin name in the [plugin] variable")
             }
         }
         def t = engine.createTemplate( r )

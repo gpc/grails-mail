@@ -58,21 +58,24 @@ class MailService {
                 MimeMailMessage msg = message
                 if(mailSender instanceof JavaMailSender) {
                     MimeMessage mimeMsg = msg.getMimeMessage()
-                    if (!config.grails.mail.disabled)
+                    if (!config.grails.mail.disabled) {
+                        if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
                         mailSender.send(mimeMsg)
+                    }
                     else
                         log.warn("Sending emails disabled by configuration option")
-                    if (log.traceEnabled) log.trace("Sent mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()}")
-
-        
+                    if (log.traceEnabled) log.trace("Sent mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()}")        
                 }
                 else {
                     throw new GrailsMailException("MimeMessages require an instance of 'org.springframework.mail.javamail.JavaMailSender' to be configured!")
                 }
             }
             else {
-                if (!config.grails.mail.disabled)
+                if (!config.grails.mail.disabled) {
+                    if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
                     mailSender?.send(message)
+                    if (log.traceEnabled) log.trace("Sent mail re: [${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}")
+                }
                 else
                     log.warn("Sending emails disabled by configuration option")
             }

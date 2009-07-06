@@ -1,6 +1,6 @@
-<plugin name='mail' version='0.7.1' grailsVersion='1.1.1 &gt; *'>
+<plugin name='mail' version='0.8' grailsVersion='1.1.1 &gt; *'>
   <author>Graeme Rocher</author>
-  <authorEmail>graeme@g2one.com</authorEmail>
+  <authorEmail>graeme.rocher@springsource.com</authorEmail>
   <title>Provides Mail support to a running Grails application</title>
   <description>This plug-in provides a MailService class as well as configuring the necessary beans within
 the Spring ApplicationContext.
@@ -19,8 +19,8 @@ sendMail {
 </description>
   <documentation>http://grails.org/Mail+Plugin</documentation>
   <resources>
-    <resource>UrlMappings</resource>
     <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
     <resource>org.grails.mail.MailService</resource>
     <resource>org.grails.mail.PlainTextMailTagLib</resource>
   </resources>
