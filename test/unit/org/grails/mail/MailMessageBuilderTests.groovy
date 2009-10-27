@@ -21,6 +21,7 @@ import javax.mail.internet.MimeMessage
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSender
+import javax.mail.internet.MimeMultipart
 
 /**
  * Test case for {@link MailMessageBuilder}.
@@ -46,6 +47,25 @@ class MailMessageBuilderTests extends GroovyTestCase {
         super.tearDown()
     }
 
+	void testStreamCharBufferForGrails12() {
+		if(grails.util.GrailsUtil.grailsVersion.startsWith("1.2")) {
+			processDsl {
+	            to "fred@g2one.com"
+	            subject "Hello Fred"
+	
+				def text = getClass().classLoader.loadClass("org.codehaus.groovy.grails.web.util.StreamCharBuffer").newInstance()
+				text.writer << 'How are you?'
+	            body text
+	        }		
+
+	        def msg = testBuilder.createMessage().mimeMessage
+	        assertEquals 1, to(msg).size()
+	        assertEquals "fred@g2one.com", to(msg)[0].toString()
+	        assertEquals "Hello Fred", msg.subject
+	        assertEquals "How are you?", msg.content
+	        
+		}
+	}
     /**
      * Tests the basic elements of the mail DSL.
      */
@@ -125,6 +145,23 @@ class MailMessageBuilderTests extends GroovyTestCase {
                 body 'How are you?'
             }
         }
+    }
+
+    void testAttachment() {
+        processDsl {
+            multipart true
+            to "fred@g2one.com"
+            subject "Hello Fred"
+            body 'How are you?'
+            attachBytes "dummy.bin", "application/binary", "abcdef".bytes
+        }
+        def msg = testBuilder.createMessage().mimeMessage
+        assertTrue msg.content instanceof MimeMultipart
+        assertEquals 2, msg.content.count
+
+        def attachment = msg.content.getBodyPart(1)
+        assertEquals "abcdef", attachment.content.text
+        assertEquals "dummy.bin", attachment.fileName
     }
 
     private List to(MimeMessage msg) {

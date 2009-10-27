@@ -264,7 +264,7 @@ class MailServiceTests extends GroovyTestCase {
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertTrue message.getMimeMessage().getContentType()?.startsWith('text/plain')
-        assertEquals 'Message is: null', message.getMimeMessage().getContent().trim()                
+        assertEquals 'Message is:', message.getMimeMessage().getContent().trim()                
     }
 
     /**

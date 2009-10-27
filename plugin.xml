@@ -1,4 +1,4 @@
-<plugin name='mail' version='0.8' grailsVersion='1.1.1 &gt; *'>
+<plugin name='mail' version='0.9' grailsVersion='1.0 &gt; *'>
   <author>Graeme Rocher</author>
   <authorEmail>graeme.rocher@springsource.com</authorEmail>
   <title>Provides Mail support to a running Grails application</title>
@@ -24,5 +24,8 @@ sendMail {
     <resource>org.grails.mail.MailService</resource>
     <resource>org.grails.mail.PlainTextMailTagLib</resource>
   </resources>
-  <dependencies />
+  <dependencies>
+    <resolvers />
+  </dependencies>
+  <behavior />
 </plugin>

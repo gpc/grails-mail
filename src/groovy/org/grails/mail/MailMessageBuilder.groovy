@@ -45,6 +45,7 @@ class MailMessageBuilder {
     
     MailSender mailSender
     MailService mailService
+    boolean multipart = false // by default, we're sending non-multipart emails
 
     MailMessageBuilder(MailService svc, MailSender mailSender) {
         this.mailSender = mailSender
@@ -54,7 +55,8 @@ class MailMessageBuilder {
     private MailMessage getMessage() {
         if(!message) {
             if(mailSender instanceof JavaMailSender) {
-                message = new MimeMailMessage(mailSender.createMimeMessage() )
+                def helper = new MimeMessageHelper(mailSender.createMimeMessage(), multipart)
+                message = new MimeMailMessage(helper)
             }
             else {
                 message = new SimpleMailMessage()
@@ -68,19 +70,24 @@ class MailMessageBuilder {
 
     MailMessage createMessage() { getMessage() }
 
-    void to(String recip) {
+
+    void multipart(boolean multipart) {
+        this.multipart = multipart
+    }
+
+    void to(recip) {
         if(recip) {
             if (ConfigurationHolder.config.grails.mail.overrideAddress)
                 recip = ConfigurationHolder.config.grails.mail.overrideAddress
-            getMessage().setTo([recip] as String[])
+            getMessage().setTo([recip.toString()] as String[])
         }
     }
 
 	void attachBytes(String fileName, String contentType, byte[] bytes) {
 		def msg = getMessage()
 		if(msg instanceof MimeMailMessage) {
-			MimeMessageHelper message = new MimeMessageHelper(getMessage(), true, "UTF-8");
-		    message.addAttachment(fileName, new ByteArrayResource(bytes), contentType)			
+            assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
+            msg.mimeMessageHelper.addAttachment(fileName, new ByteArrayResource(bytes), contentType)
 		}
 		else {
 			throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
@@ -92,14 +99,14 @@ class MailMessageBuilder {
 			if (ConfigurationHolder.config.grails.mail.overrideAddress)
 			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
 
-            getMessage().setTo(args as String[])
+            getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
     void to(List args) {
         if(args) {
 			if (ConfigurationHolder.config.grails.mail.overrideAddress)
 			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }	
-            getMessage().setTo(args as String[])
+            getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
     void title(title) {
@@ -117,8 +124,8 @@ class MailMessageBuilder {
         }
 
         msg = msg.mimeMessageHelper.mimeMessage
-        hdrs.each { String name, String value ->
-            msg.setHeader(name, value)
+        hdrs.each { name, value ->
+            msg.setHeader(name.toString(), value?.toString())
         }
     }
     void body(body) {
@@ -128,9 +135,7 @@ class MailMessageBuilder {
         if (params.view) {
             // Here need to render it first, establish content type of virtual response / contentType model param
             renderMailView(params.view, params.model, params.plugin)
-        } else {
-            text(body)
-        }
+        } 
     }
     void text(body) {
         getMessage().text = body?.toString()
@@ -139,51 +144,51 @@ class MailMessageBuilder {
         def msg = getMessage()
         if(msg instanceof MimeMailMessage) {
             MimeMailMessage mm = msg
-            mm.getMimeMessageHelper().setText(text, true)
+            mm.getMimeMessageHelper().setText(text?.toString(), true)
         }
     }
-    void bcc(String bcc) {
+    void bcc(bcc) {
 	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
             bcc = ConfigurationHolder.config.grails.mail.overrideAddress
     
-        getMessage().setBcc([bcc] as String[])
+        getMessage().setBcc([bcc?.toString()] as String[])
     }
     void bcc(Object[] args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
 		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
 	
-        getMessage().setBcc(args as String[])
+        getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
     void bcc(List args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
 		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
 	
-        getMessage().setBcc(args as String[])
+        getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
-    void cc(String cc) {
+    void cc(cc) {
 	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
             cc = ConfigurationHolder.config.grails.mail.overrideAddress
 	
-        getMessage().setCc([cc] as String[])
+        getMessage().setCc([cc?.toString()] as String[])
     }
     void cc(Object[] args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
 		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
 	
-        getMessage().setCc(args as String[])
+        getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
     void cc(List args) {
 		if (ConfigurationHolder.config.grails.mail.overrideAddress)
 		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
 	
-        getMessage().setCc(args as String[])
+        getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
 
-    void replyTo(String replyTo) {
-        getMessage().replyTo = replyTo
+    void replyTo(replyTo) {
+        getMessage().replyTo = replyTo?.toString()
     }
-    void from(String from) {
-        getMessage().from = from
+    void from(from) {
+        getMessage().from = from?.toString()
     }
 
 	protected renderMailView(templateName, model, pluginName = null) {
