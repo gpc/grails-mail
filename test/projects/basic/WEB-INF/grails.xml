@@ -1,0 +1,20 @@
+<grails>
+  <resources>
+    <resource>com.piragua.greenmail.GreenmailController</resource>
+    <resource>org.grails.mail.MailService</resource>
+    <resource>org.grails.mail.PlainTextMailTagLib</resource>
+    <resource>BootStrap</resource>
+    <resource>BuildConfig</resource>
+    <resource>Config</resource>
+    <resource>DataSource</resource>
+    <resource>resources</resource>
+    <resource>UrlMappings</resource>
+    <resource>org.example.TestController</resource>
+    <resource>org.example.TestService</resource>
+  </resources>
+  <plugins>
+    <plugin>GebGrailsPlugin</plugin>
+    <plugin>HibernateGrailsPlugin</plugin>
+    <plugin>SpockGrailsPlugin</plugin>
+  </plugins>
+</grails>
