@@ -75,11 +75,17 @@ class MailMessageBuilder {
         this.multipart = multipart
     }
 
-    void to(recip) {
+    void to(String recip) {
+      if(recip) {
+        to([recip] as String[])
+      }
+    }
+
+    void to(String[] recip) {
         if(recip) {
             if (ConfigurationHolder.config.grails.mail.overrideAddress)
                 recip = ConfigurationHolder.config.grails.mail.overrideAddress
-            getMessage().setTo([recip.toString()] as String[])
+            getMessage().setTo(recip)
         }
     }
 
