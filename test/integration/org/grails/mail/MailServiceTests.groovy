@@ -28,6 +28,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils
 import org.springframework.web.context.request.RequestContextHolder
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
 import javax.mail.Message
+import org.springframework.core.io.FileSystemResource
 
 
 class MailServiceTests extends GroovyTestCase {
@@ -36,10 +37,10 @@ class MailServiceTests extends GroovyTestCase {
 
     MailSender mailSender
 
-    
+
     void testSendSimpleMessage() {
         def mailService = new MailService()
-        
+
 
         def message = mailService.sendMail {
             to "fred@g2one.com"
@@ -48,20 +49,20 @@ class MailServiceTests extends GroovyTestCase {
             from 'king@g2one.com'
         }
 
-        assertEquals "Hello John", message.getSubject()        
+        assertEquals "Hello John", message.getSubject()
         assertEquals 'this is some text', message.getText()
         assertEquals 'fred@g2one.com', message.to[0]
         assertEquals 'king@g2one.com', message.from
     }
 
     void testSendToMultipleRecipients() {
-       def mailService = new MailService()
+        def mailService = new MailService()
 
-       def message = mailService.sendMail {
-           to "fred@g2one.com","ginger@g2one.com"
-           title "Hello John"
-           body 'this is some text'
-       }
+        def message = mailService.sendMail {
+            to "fred@g2one.com", "ginger@g2one.com"
+            title "Hello John"
+            body 'this is some text'
+        }
 
 
 
@@ -73,54 +74,54 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendToMultipleRecipientsUsingList() {
-       def mailService = new MailService()
+        def mailService = new MailService()
 
-       def message = mailService.sendMail {
-           to (["fred@g2one.com","ginger@g2one.com"])
-           title "Hello John"
-           body 'this is some text'
-       }
+        def message = mailService.sendMail {
+            to(["fred@g2one.com", "ginger@g2one.com"])
+            title "Hello John"
+            body 'this is some text'
+        }
         assertEquals "fred@g2one.com", message.getTo()[0]
         assertEquals "ginger@g2one.com", message.getTo()[1]
     }
 
     void testSendToMultipleCCRecipientsUsingList() {
-       def mailService = new MailService()
+        def mailService = new MailService()
 
-       def message = mailService.sendMail {
-           to 'joe@g2one.com'
-           cc (["fred@g2one.com","ginger@g2one.com"])
-           title "Hello John"
-           body 'this is some text'
-       }
+        def message = mailService.sendMail {
+            to 'joe@g2one.com'
+            cc(["fred@g2one.com", "ginger@g2one.com"])
+            title "Hello John"
+            body 'this is some text'
+        }
         assertEquals "fred@g2one.com", message.cc[0]
         assertEquals "ginger@g2one.com", message.cc[1]
     }
 
     void testSendToMultipleBCCRecipientsUsingList() {
-       def mailService = new MailService()
+        def mailService = new MailService()
 
-       def message = mailService.sendMail {
-           to ("joe@g2one.com")
-           bcc (["fred@g2one.com","ginger@g2one.com"])
-           title "Hello John"
-           body 'this is some text'
-       }
+        def message = mailService.sendMail {
+            to("joe@g2one.com")
+            bcc(["fred@g2one.com", "ginger@g2one.com"])
+            title "Hello John"
+            body 'this is some text'
+        }
         assertEquals "fred@g2one.com", message.bcc[0]
         assertEquals "ginger@g2one.com", message.bcc[1]
     }
 
     void testSendToMultipleRecipientsAndCC() {
-       def mailService = new MailService()
+        def mailService = new MailService()
 
-       def message = mailService.sendMail {
-           to "fred@g2one.com","ginger@g2one.com"
-           from "john@g2one.com"
-           cc "marge@g2one.com", "ed@g2one.com"
-           bcc "joe@g2one.com"
-           title "Hello John"
-           body 'this is some text'
-       }
+        def message = mailService.sendMail {
+            to "fred@g2one.com", "ginger@g2one.com"
+            from "john@g2one.com"
+            cc "marge@g2one.com", "ed@g2one.com"
+            bcc "joe@g2one.com"
+            title "Hello John"
+            body 'this is some text'
+        }
 
 
 
@@ -154,7 +155,7 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         // This isn't working - because no DataHandler available for unit tests?
         //assertTrue message.mimeMessage.contentType.startsWith('text/html')
-        assertEquals '<b>Hello</b> World', message.getMimeMessage().getContent()   
+        assertEquals '<b>Hello</b> World', message.getMimeMessage().getContent()
     }
 
     void testSendMailView() {
@@ -162,7 +163,7 @@ class MailServiceTests extends GroovyTestCase {
 
         def ctx = RequestContextHolder.currentRequestAttributes().servletContext
         def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-        
+
         mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
 
         // stub send method
@@ -174,12 +175,12 @@ class MailServiceTests extends GroovyTestCase {
         MimeMailMessage message = mailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
-            body(view:'/_testemails/test', model:[msg:'hello'])
+            body(view: '/_testemails/test', model: [msg: 'hello'])
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertTrue message.mimeMessage.contentType.startsWith('text/plain')
-        assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()                
+        assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()
     }
 
     void testSendMailViewHTML() {
@@ -187,7 +188,7 @@ class MailServiceTests extends GroovyTestCase {
 
         def ctx = RequestContextHolder.currentRequestAttributes().servletContext
         def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-        
+
         mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
 
         // stub send method
@@ -199,21 +200,21 @@ class MailServiceTests extends GroovyTestCase {
         MimeMailMessage message = mailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
-            body(view:'/_testemails/testhtml', model:[msg:'hello'])
+            body(view: '/_testemails/testhtml', model: [msg: 'hello'])
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         // This isn't working - because no DataHandler available for unit tests?
         //assertTrue message.mimeMessage.contentType.startsWith('text/html')
-        assertEquals '<b>Message is: hello</b>', message.getMimeMessage().getContent().trim()                
+        assertEquals '<b>Message is: hello</b>', message.getMimeMessage().getContent().trim()
     }
-    
+
     void testSendMailViewWithTags() {
         def mailService = new MailService()
 
         def ctx = RequestContextHolder.currentRequestAttributes().servletContext
         def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-        
+
         mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
 
         // stub send method
@@ -225,21 +226,21 @@ class MailServiceTests extends GroovyTestCase {
         MimeMailMessage message = mailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
-            body(view:'/_testemails/tagtest', model:[condition:true])
+            body(view: '/_testemails/tagtest', model: [condition: true])
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
-        assertEquals 'Condition is true', message.getMimeMessage().getContent().trim()                
+        assertEquals 'Condition is true', message.getMimeMessage().getContent().trim()
 
         message = mailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
-            body(view:'/_testemails/tagtest', model:[condition:false])
+            body(view: '/_testemails/tagtest', model: [condition: false])
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertTrue message.getMimeMessage().getContentType()?.startsWith('text/plain')
-        assertEquals '', message.getMimeMessage().getContent().trim()                
+        assertEquals '', message.getMimeMessage().getContent().trim()
     }
 
     void testSendMailViewNoModel() {
@@ -247,7 +248,7 @@ class MailServiceTests extends GroovyTestCase {
 
         def ctx = RequestContextHolder.currentRequestAttributes().servletContext
         def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-        
+
         mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
 
         // stub send method
@@ -259,12 +260,12 @@ class MailServiceTests extends GroovyTestCase {
         MimeMailMessage message = mailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
-            body(view:'/_testemails/test')
+            body(view: '/_testemails/test')
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertTrue message.getMimeMessage().getContentType()?.startsWith('text/plain')
-        assertEquals 'Message is:', message.getMimeMessage().getContent().trim()                
+        assertEquals 'Message is:', message.getMimeMessage().getContent().trim()
     }
 
     /**
@@ -280,7 +281,7 @@ class MailServiceTests extends GroovyTestCase {
 
         def message = mailService.sendMail {
             headers "X-Mailing-List": "user@grails.codehaus.org",
-                    "Sender": "dilbert@somewhere.org"
+                "Sender": "dilbert@somewhere.org"
             to "fred@g2one.com"
             subject "Hello Fred"
             body 'How are you?'
@@ -289,7 +290,7 @@ class MailServiceTests extends GroovyTestCase {
         def msg = message.mimeMessageHelper.mimeMessage
         assertEquals "user@grails.codehaus.org", msg.getHeader("X-Mailing-List", ", ")
         assertEquals "dilbert@somewhere.org", msg.getHeader("Sender", ", ")
-        assertEquals([ "fred@g2one.com" ], to(msg))
+        assertEquals(["fred@g2one.com"], to(msg))
         assertEquals "Hello Fred", msg.subject
         assertEquals "How are you?", msg.content
     }
@@ -307,11 +308,94 @@ class MailServiceTests extends GroovyTestCase {
         shouldFail(GrailsMailException) {
             mailService.sendMail {
                 headers "Content-Type": "text/plain;charset=UTF-8",
-                        "Sender": "dilbert@somewhere.org"
+                    "Sender": "dilbert@somewhere.org"
                 to "fred@g2one.com"
                 subject "Hello Fred"
                 body 'How are you?'
             }
+        }
+    }
+
+    void testSendmailWithTranslations() {
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+
+        def mailService = new MailService()
+        mailService.mailSender = mailSender
+        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
+        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
+        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
+
+
+
+        def message = mailService.sendMail {
+            from 'neur0maner@gmail.com'
+            to "neur0maner@gmail.com"
+            locale 'en_US'
+            subject "Hello"
+            body(view: '/_testemails/i18ntest', model: [name: 'Luis'])
+        }
+        def msg = message.mimeMessageHelper.mimeMessage
+        final def slurper = new XmlSlurper()
+        def html = slurper.parseText(msg.content)
+        assertEquals 'Translate this: Luis', html.body.toString()
+
+        message = mailService.sendMail {
+            from 'neur0maner@gmail.com'
+            to "neur0maner@gmail.com"
+            locale Locale.FRENCH
+            subject "Hello"
+            body(view: '/_testemails/i18ntest', model: [name: 'Luis'])
+        }
+
+        msg = message.mimeMessageHelper.mimeMessage
+        html = slurper.parseText(msg.content)
+        assertEquals 'Traduis ceci: Luis', html.body.toString()
+    }
+
+    void testSendmailWithAttachments() {
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+        def mailService = new MailService()
+        mailService.mailSender = mailSender
+
+        def message = mailService.sendMail {
+            multipart true
+
+            to "fred@g2one.com", "ginger@g2one.com"
+            from "john@g2one.com"
+            cc "marge@g2one.com", "ed@g2one.com"
+            bcc "joe@g2one.com"
+            title "Hello John"
+            attachBytes('fileName','application/octet-stream','Hello World'.bytes)
+            html 'this is some text'
+        }
+        def content=message.mimeMessage.content
+        assertEquals 2, content.count
+        assertEquals 'Hello World',content.getBodyPart(1).inputStream.text
+
+
+        def tmpFile
+        try {                
+            message = mailService.sendMail {
+                multipart true
+
+                tmpFile=File.createTempFile('testSendmailWithAttachments',null)
+                tmpFile << 'Hello World'
+
+                to "fred@g2one.com", "ginger@g2one.com"
+                from "john@g2one.com"
+                cc "marge@g2one.com", "ed@g2one.com"
+                bcc "joe@g2one.com"
+                title "Hello John"
+                attachResource('fileName','application/octet-stream',new FileSystemResource(tmpFile))
+                html 'this is some text'
+            }
+            content=message.mimeMessage.content
+            assertEquals 2, content.count
+            assertEquals 'Hello World',content.getBodyPart(1).inputStream.text
+        } finally {
+            tmpFile?.delete()
         }
     }
 

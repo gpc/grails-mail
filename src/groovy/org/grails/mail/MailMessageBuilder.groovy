@@ -90,10 +90,6 @@ class MailMessageBuilder {
         attachResource(fileName, contentType, new ByteArrayResource(bytes))
 	}
 
-	void attachStream(String fileName, String contentType, InputStream stream) {
-        attachResource(fileName, contentType, new InputStreamResource(stream))
-	}
-
 	void attachResource(String fileName, String contentType, Resource res) {
 		def msg = getMessage()
 		if(msg instanceof MimeMailMessage) {
