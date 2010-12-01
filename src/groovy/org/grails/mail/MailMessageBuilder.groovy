@@ -87,10 +87,18 @@ class MailMessageBuilder {
     }
 
 	void attachBytes(String fileName, String contentType, byte[] bytes) {
+        attachResource(fileName, contentType, new ByteArrayResource(bytes))
+	}
+
+	void attachStream(String fileName, String contentType, InputStream stream) {
+        attachResource(fileName, contentType, new InputStreamResource(stream))
+	}
+
+	void attachResource(String fileName, String contentType, Resource res) {
 		def msg = getMessage()
 		if(msg instanceof MimeMailMessage) {
             assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
-            msg.mimeMessageHelper.addAttachment(fileName, new ByteArrayResource(bytes), contentType)
+            msg.mimeMessageHelper.addAttachment(fileName, res, contentType)
 		}
 		else {
 			throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
