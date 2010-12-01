@@ -31,12 +31,15 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
 import org.apache.commons.logging.LogFactory
+import org.springframework.web.servlet.i18n.FixedLocaleResolver
+import org.springframework.web.servlet.DispatcherServlet
 
 /**
  * The builder that implements the mail DSL.
  */
 class MailMessageBuilder {
     private MailMessage message
+    private Locale locale
 
     static PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
     static HTML_CONTENTTYPES = ['text/html', 'text/xhtml']
@@ -190,6 +193,21 @@ class MailMessageBuilder {
     void from(from) {
         getMessage().from = from?.toString()
     }
+    void locale(String localeStr) {
+        def split=localeStr.split('_')
+        String language=split[0]
+        if (split.length>1) {
+            String country=split[1]
+            locale=new Locale(language,country)
+        } else {
+            locale=new Locale(language)
+        }
+    }
+
+    void locale(Locale locale) {
+        this.locale=locale
+    }
+
 
 	protected renderMailView(templateName, model, pluginName = null) {
         if(!mailService.groovyPagesTemplateEngine) throw new IllegalStateException("Property [groovyPagesTemplateEngine] must be set!")
@@ -208,6 +226,9 @@ class MailMessageBuilder {
 		}
 		def servletContext = requestAttributes.request.servletContext
 		def request = requestAttributes.request
+        if (locale) {
+            request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE,new FixedLocaleResolver(defaultLocale:locale))
+        }
 
         def grailsAttributes = new DefaultGrailsApplicationAttributes(servletContext);
         // See if the application has the view for it
