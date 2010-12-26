@@ -94,6 +94,17 @@ class MailMessageBuilder {
 		}
 	}
 
+	void attachBytesInline(String contentId, String contentType, byte[] bytes) {
+		def msg = getMessage()
+		if(msg instanceof MimeMailMessage) {
+			assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
+			msg.mimeMessageHelper.addInline(contentId, new ByteArrayResource(bytes), contentType)
+		}
+		else {
+      		throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
+		}
+	}
+
     void to(Object[] args) {
         if(args) {
 			if (ConfigurationHolder.config.grails.mail.overrideAddress)
