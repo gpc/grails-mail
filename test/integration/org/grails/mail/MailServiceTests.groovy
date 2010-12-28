@@ -353,7 +353,7 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals 'Traduis ceci: Luis', html.body.toString()
     }
 
-    void testSendmailWithAttachments() {
+    void testSendmailWithByteArrayAttachment() {
         MailSender.metaClass.send = { SimpleMailMessage smm -> }
         JavaMailSender.metaClass.send = { MimeMessage mm -> }
         def mailService = new MailService()
@@ -367,20 +367,28 @@ class MailServiceTests extends GroovyTestCase {
             cc "marge@g2one.com", "ed@g2one.com"
             bcc "joe@g2one.com"
             title "Hello John"
-            attachBytes('fileName','application/octet-stream','Hello World'.bytes)
+            attachBytes 'fileName', 'text/plain', 'Hello World'.getBytes("US-ASCII")
             html 'this is some text'
         }
-        def content=message.mimeMessage.content
-        assertEquals 2, content.count
-        assertEquals 'Hello World',content.getBodyPart(1).inputStream.text
 
+        def content = message.mimeMessage.content
+        assertEquals 2, content.count
+        assertEquals 'Hello World', content.getBodyPart(1).inputStream.text
+        assertEquals 'Hello World', content.getBodyPart(1).inputStream.text
+    }
+
+    void testSendmailWithByteArrayAndResourceAttachments() {
+        MailSender.metaClass.send = { SimpleMailMessage smm -> }
+        JavaMailSender.metaClass.send = { MimeMessage mm -> }
+        def mailService = new MailService()
+        mailService.mailSender = mailSender
 
         def tmpFile
         try {                
-            message = mailService.sendMail {
+            def message = mailService.sendMail {
                 multipart true
 
-                tmpFile=File.createTempFile('testSendmailWithAttachments',null)
+                tmpFile = File.createTempFile('testSendmailWithAttachments',null)
                 tmpFile << 'Hello World'
 
                 to "fred@g2one.com", "ginger@g2one.com"
@@ -388,13 +396,17 @@ class MailServiceTests extends GroovyTestCase {
                 cc "marge@g2one.com", "ed@g2one.com"
                 bcc "joe@g2one.com"
                 title "Hello John"
-                attachResource('fileName','application/octet-stream',new FileSystemResource(tmpFile))
+                attachBytes 'fileName', 'text/plain', 'Dear John'.getBytes("US-ASCII")
+                attachResource 'fileName2', 'application/octet-stream', new FileSystemResource(tmpFile)
                 html 'this is some text'
             }
-            content=message.mimeMessage.content
-            assertEquals 2, content.count
-            assertEquals 'Hello World',content.getBodyPart(1).inputStream.text
-        } finally {
+
+            def content=message.mimeMessage.content
+            assertEquals 3, content.count
+            assertEquals 'Dear John',content.getBodyPart(1).inputStream.text
+            assertEquals 'Hello World',content.getBodyPart(2).inputStream.text
+        }
+        finally {
             tmpFile?.delete()
         }
     }
