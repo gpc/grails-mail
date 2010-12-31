@@ -43,105 +43,87 @@ class MailMessageContentRenderer {
     private log = LogFactory.getLog(MailMessageContentRenderer)
     
     def groovyPagesTemplateEngine
+    def groovyPagesUriService
         
     MailMessageContentRender render(Writer out, templateName, model, locale, pluginName = null) {
-        assert templateName
-
         def requestAttributes = RequestContextHolder.getRequestAttributes()
+        def controllerName = null
         boolean unbindRequest = false
-
-        // outside of an executing request, establish a mock version
-        if(!requestAttributes) {
-            def servletContext  = ServletContextHolder.getServletContext()
+        
+        if (requestAttributes) {
+            controllerName = requestAttributes.controllerName
+        } else {
+            // outside of an executing request, establish a mock version
+            def servletContext = ServletContextHolder.getServletContext()
             def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
             requestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
             unbindRequest = true
         }
-        def servletContext = requestAttributes.request.servletContext
+        
         def request = requestAttributes.request
+        
         if (locale) {
-            request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE,new FixedLocaleResolver(defaultLocale:locale))
+            request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: locale))
         }
 
-        def grailsAttributes = new DefaultGrailsApplicationAttributes(servletContext);
-        // See if the application has the view for it
-        def uri = getMailViewUri(templateName, request)
-
-        def r = groovyPagesTemplateEngine.getResourceForUri(uri)
-        // Try plugin view if not found in application
-        if (!r || !r.exists()) {
-            if (log.debugEnabled) {
-                log.debug "Could not locate email view ${templateName} at ${uri}, trying plugin"
-            }
-            if (pluginName) {
-                // Caution, this uses views/ always, whereas our app view resolution uses the PATH_TO_MAILVIEWS which may in future be orthogonal!
-                def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
-                String pathToView = null
-                if (plugin) {
-                    pathToView = '/plugins/'+GCU.getScriptName(plugin.name)+'-'+plugin.version+'/'+GrailsResourceUtils.GRAILS_APP_DIR+'/views'
-                }
-
-                if (pathToView != null) {
-                    uri = GrailsResourceUtils.WEB_INF +pathToView +templateName+".gsp";
-                    r = groovyPagesTemplateEngine.getResourceForUri(uri)
-                } else {
-                    if (log.errorEnabled) {
-                        log.error "Could not locate email view ${templateName} in plugin [$pluginName]"
-                    }
-                    throw new IllegalArgumentException("Could not locate email view ${templateName} in plugin [$pluginName]")
-                }
-            } else {
-                if (log.errorEnabled) {
-                    log.error "Could not locate email view ${templateName} at ${uri}, no pluginName specified so couldn't look there"
-                }
-                throw new IllegalArgumentException("Could not locate mail body ${templateName}. Is it in a plugin? If so you must pass the plugin name in the [plugin] variable")
-            }
-        }
-        def t = groovyPagesTemplateEngine.createTemplate( r )
-
+        def template = createTemplate(templateName, controllerName, pluginName)
         def originalOut = requestAttributes.getOut()
         requestAttributes.setOut(out)
+        
         try {
-            if(model instanceof Map) {
-                t.make( model ).writeTo(out)
+            if (model instanceof Map) {
+                template.make(model).writeTo(out)
+            } else {
+                template.make().writeTo(out)
             }
-            else {
-                t.make().writeTo(out)
-            }
-        }
-        finally {
+        } finally {
             requestAttributes.setOut(originalOut)
-            if(unbindRequest) {
+            if (unbindRequest) {
                 RequestContextHolder.setRequestAttributes(null)
             }
         }
 
-        new MailMessageContentRender(out, t.metaInfo.contentType)
+        new MailMessageContentRender(out, template.metaInfo.contentType)
     }
 
-    protected String getMailViewUri(String viewName, HttpServletRequest request) {
-
-        def buf = new StringBuilder(PATH_TO_MAILVIEWS)
+    protected createTemplate(String templateName, String controllerName, String pluginName) {
+        if (templateName.startsWith("/")) {
+            if (!controllerName) {
+                controllerName = ""
+            }
+        } else {
+            if (!controllerName) {
+                throw new IllegalArgumentException("Mail views cannot be loaded from relative view paths where there is no current HTTP request")
+            }
+        }
         
-        if(viewName.startsWith("/")) {
-           def tmp = viewName[1..-1]
-           if(tmp.indexOf('/') > -1) {
-               def i = tmp.lastIndexOf('/')
-               buf << "/${tmp[0..i]}/${tmp[(i+1)..-1]}"
-           }
-           else {
-               buf << "/${viewName[1..-1]}"
-           }
+        def contextPath = getContextPath(pluginName)
+        def templateUri = groovyPagesUriService.getDeployedViewURI(controllerName, templateName)
+        def uris = ["$contextPath$templateUri", "$contextPath/grails-app/views$templateUri"] as String[]
+        def template = groovyPagesTemplateEngine.createTemplateForUri(uris)
+        
+        if (!template) {
+            if (pluginName) {
+                throw new IllegalArgumentException("Could not locate email view ${templateName} in plugin [$pluginName]")
+            } else {
+                throw new IllegalArgumentException("Could not locate mail body ${templateName}. Is it in a plugin? If so you must pass the plugin name in the [plugin] variable")
+            }
         }
-        else {
-           if (!request) throw new IllegalArgumentException(
-               "Mail views cannot be loaded from relative view paths where there is no current HTTP request")
-           def grailsAttributes = new DefaultGrailsApplicationAttributes(request.servletContext)
-           buf << "${grailsAttributes.getControllerUri(request)}/${viewName}"
-
-        }
-        return buf.append(".gsp").toString()
+        
+        template
     }
     
+    protected getContextPath(pluginName) {
+        def contextPath = ""
+        
+        if (pluginName) {
+            def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
+            if (plugin && !plugin.isBasePlugin()) {
+                contextPath = plugin.pluginPath
+            }
+        }
+        
+        contextPath
+    }
     
 }
