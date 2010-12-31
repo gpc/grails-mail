@@ -40,6 +40,8 @@ class MailMessageBuilderTests extends GroovyTestCase {
                 createMimeMessage: {-> return new MimeMessage(Session.getInstance(new Properties())) }
         ] as JavaMailSender
         testBuilder = new MailMessageBuilder(mockService, mockSender)
+        
+        ConfigurationHolder.config.grails.mail.default.from = "test@grailsplugin.com"
     }
 
     void tearDown() {
@@ -47,25 +49,25 @@ class MailMessageBuilderTests extends GroovyTestCase {
         super.tearDown()
     }
 
-	void testStreamCharBufferForGrails12() {
-		if(grails.util.GrailsUtil.grailsVersion.startsWith("1.2")) {
-			processDsl {
-	            to "fred@g2one.com"
-	            subject "Hello Fred"
-	
-				def text = getClass().classLoader.loadClass("org.codehaus.groovy.grails.web.util.StreamCharBuffer").newInstance()
-				text.writer << 'How are you?'
-	            body text
-	        }		
+    void testStreamCharBufferForGrails12() {
+        if(grails.util.GrailsUtil.grailsVersion.startsWith("1.2")) {
+            processDsl {
+                to "fred@g2one.com"
+                subject "Hello Fred"
+    
+                def text = getClass().classLoader.loadClass("org.codehaus.groovy.grails.web.util.StreamCharBuffer").newInstance()
+                text.writer << 'How are you?'
+                body text
+            }       
 
-	        def msg = testBuilder.createMessage().mimeMessage
-	        assertEquals 1, to(msg).size()
-	        assertEquals "fred@g2one.com", to(msg)[0].toString()
-	        assertEquals "Hello Fred", msg.subject
-	        assertEquals "How are you?", msg.content
-	        
-		}
-	}
+            def msg = testBuilder.createMessage().mimeMessage
+            assertEquals 1, to(msg).size()
+            assertEquals "fred@g2one.com", to(msg)[0].toString()
+            assertEquals "Hello Fred", msg.subject
+            assertEquals "How are you?", msg.content
+            
+        }
+    }
     /**
      * Tests the basic elements of the mail DSL.
      */

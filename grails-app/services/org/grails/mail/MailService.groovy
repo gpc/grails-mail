@@ -53,12 +53,11 @@ class MailService {
 
     protected sendMail(message) {
         if(message) {
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
             if(message instanceof MimeMailMessage) {
                 MimeMailMessage msg = message
                 if(mailSender instanceof JavaMailSender) {
                     MimeMessage mimeMsg = msg.getMimeMessage()
-                    if (!config.grails.mail.disabled) {
+                    if (!disabled) {
                         if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
                         mailSender.send(mimeMsg)
                     }
@@ -71,7 +70,7 @@ class MailService {
                 }
             }
             else {
-                if (!config.grails.mail.disabled) {
+                if (!disabled) {
                     if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
                     mailSender?.send(message)
                     if (log.traceEnabled) log.trace("Sent mail re: [${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}")
@@ -80,5 +79,21 @@ class MailService {
                     log.warn("Sending emails disabled by configuration option")
             }
         }
+    }
+    
+    def getMailConfig() {
+        org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.mail
+    }
+    
+    boolean isDisabled() {
+        mailConfig.disabled
+    }
+    
+    String getDefaultFrom() {
+        mailConfig.default.from ?: null
+    }
+    
+    String getOverrideAddress() {
+        mailConfig.overrideAddress ?: null
     }
 }

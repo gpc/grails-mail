@@ -17,7 +17,6 @@ package org.grails.mail
 
 import grails.util.GrailsWebUtil
 import javax.servlet.http.HttpServletRequest
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.commons.GrailsResourceUtils
 import org.codehaus.groovy.grails.plugins.PluginManagerHolder
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
@@ -64,9 +63,9 @@ class MailMessageBuilder {
             else {
                 message = new SimpleMailMessage()
             }
-            message.from = ConfigurationHolder.config.grails.mail.default.from
-            if (ConfigurationHolder.config.grails.mail.overrideAddress)
-                message.from = ConfigurationHolder.config.grails.mail.overrideAddress
+            message.from = mailService.defaultFrom
+            if (mailService.overrideAddress)
+                message.from = mailService.overrideAddress
         }
         return message
     }
@@ -80,8 +79,8 @@ class MailMessageBuilder {
 
     void to(recip) {
         if(recip) {
-            if (ConfigurationHolder.config.grails.mail.overrideAddress)
-                recip = ConfigurationHolder.config.grails.mail.overrideAddress
+            if (mailService.overrideAddress)
+                recip = mailService.overrideAddress
             getMessage().setTo([recip.toString()] as String[])
         }
     }
@@ -103,16 +102,16 @@ class MailMessageBuilder {
 
     void to(Object[] args) {
         if(args) {
-            if (ConfigurationHolder.config.grails.mail.overrideAddress)
-               args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
+            if (mailService.overrideAddress)
+               args = args.collect { mailService.overrideAddress }.toArray()
 
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
     void to(List args) {
         if(args) {
-            if (ConfigurationHolder.config.grails.mail.overrideAddress)
-               args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }   
+            if (mailService.overrideAddress)
+               args = args.collect { mailService.overrideAddress }   
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
@@ -155,38 +154,38 @@ class MailMessageBuilder {
         }
     }
     void bcc(bcc) {
-        if (ConfigurationHolder.config.grails.mail.overrideAddress)
-            bcc = ConfigurationHolder.config.grails.mail.overrideAddress
+        if (mailService.overrideAddress)
+            bcc = mailService.overrideAddress
     
         getMessage().setBcc([bcc?.toString()] as String[])
     }
     void bcc(Object[] args) {
-        if (ConfigurationHolder.config.grails.mail.overrideAddress)
-           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
+        if (mailService.overrideAddress)
+           args = args.collect { mailService.overrideAddress }.toArray()
     
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
     void bcc(List args) {
-        if (ConfigurationHolder.config.grails.mail.overrideAddress)
-           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+        if (mailService.overrideAddress)
+           args = args.collect { mailService.overrideAddress }
     
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
     void cc(cc) {
-        if (ConfigurationHolder.config.grails.mail.overrideAddress)
-            cc = ConfigurationHolder.config.grails.mail.overrideAddress
+        if (mailService.overrideAddress)
+            cc = mailService.overrideAddress
     
         getMessage().setCc([cc?.toString()] as String[])
     }
     void cc(Object[] args) {
-        if (ConfigurationHolder.config.grails.mail.overrideAddress)
-           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
+        if (mailService.overrideAddress)
+           args = args.collect { mailService.overrideAddress }.toArray()
     
         getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
     void cc(List args) {
-        if (ConfigurationHolder.config.grails.mail.overrideAddress)
-           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+        if (mailService.overrideAddress)
+           args = args.collect { mailService.overrideAddress }
     
         getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
