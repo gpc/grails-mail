@@ -20,12 +20,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 import grails.plugin.mail.*
 
 class MailGrailsPlugin {
-
-    def observe = ['controllers','services']
     def version = "1.0-SNAPSHOT"
+    def grailsVersion = "1.3 > *"
+
     def author = "Grails Plugin Collective"
     def authorEmail = "grails.plugin.collective@gmail.com"
-    def grailsVersion = "1.0 > *"
     def title = "Provides Mail support to a running Grails application"
     def description = '''\
 This plug-in provides a MailService class as well as configuring the necessary beans within
@@ -43,10 +42,10 @@ sendMail {
 }
 
 '''
+    def documentation = "http://plugin.grails.org/mail"
 
-    // URL to the plugin's documentation
-    def documentation = "http://grails.org/Mail+Plugin"
-
+    def observe = ['controllers','services']
+        
     def doWithSpring = {
         def config = application.config.grails.mail
 
