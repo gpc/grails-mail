@@ -21,9 +21,9 @@ class MailGrailsPlugin {
 
     def observe = ['controllers','services']
     def version = "1.0-SNAPSHOT"
-    def author = "Graeme Rocher"
+    def author = "Grails Plugin Collective"
+    def authorEmail = "grails.plugin.collective@gmail.com"
     def grailsVersion = "1.0 > *"
-    def authorEmail = "graeme.rocher@springsource.com"
     def title = "Provides Mail support to a running Grails application"
     def description = '''\
 This plug-in provides a MailService class as well as configuring the necessary beans within
