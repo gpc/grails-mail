@@ -150,7 +150,7 @@ class MailMessageBuilder {
     void body(Map params) {
         if (params.view) {
             if (mailMessageContentRenderer == null) {
-                throw new IllegalStateException("mail message builder was constructed without a message content render so cannot render views")
+                throw new GrailsMailException("mail message builder was constructed without a message content render so cannot render views")
             }
             
             // Here need to render it first, establish content type of virtual response / contentType model param
@@ -195,7 +195,7 @@ class MailMessageBuilder {
 
     void attachResource(String fileName, String contentType, Resource res) {
         if (!mimeCapable) {
-            throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
+            throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
         
         assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
