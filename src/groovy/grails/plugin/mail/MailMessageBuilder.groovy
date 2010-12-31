@@ -171,6 +171,8 @@ class MailMessageBuilder {
     void html(text) {
         if (mimeCapable) {
             getMessage().getMimeMessageHelper().setText(text?.toString(), true)
+        } else {
+            throw new GrailsMailException("mail sender is not mime capable, try configuring a JavaMailSender")
         }
     }
     
