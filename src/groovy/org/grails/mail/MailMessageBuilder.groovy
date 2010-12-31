@@ -86,33 +86,33 @@ class MailMessageBuilder {
         }
     }
 
-	void attachBytes(String fileName, String contentType, byte[] bytes) {
+    void attachBytes(String fileName, String contentType, byte[] bytes) {
         attachResource(fileName, contentType, new ByteArrayResource(bytes))
-	}
+    }
 
-	void attachResource(String fileName, String contentType, Resource res) {
-		def msg = getMessage()
-		if(msg instanceof MimeMailMessage) {
+    void attachResource(String fileName, String contentType, Resource res) {
+        def msg = getMessage()
+        if(msg instanceof MimeMailMessage) {
             assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
             msg.mimeMessageHelper.addAttachment(fileName, res, contentType)
-		}
-		else {
-			throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
-		}
-	}
+        }
+        else {
+            throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
+        }
+    }
 
     void to(Object[] args) {
         if(args) {
-			if (ConfigurationHolder.config.grails.mail.overrideAddress)
-			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
+            if (ConfigurationHolder.config.grails.mail.overrideAddress)
+               args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
 
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
     void to(List args) {
         if(args) {
-			if (ConfigurationHolder.config.grails.mail.overrideAddress)
-			   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }	
+            if (ConfigurationHolder.config.grails.mail.overrideAddress)
+               args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }   
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
@@ -155,39 +155,39 @@ class MailMessageBuilder {
         }
     }
     void bcc(bcc) {
-	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
+        if (ConfigurationHolder.config.grails.mail.overrideAddress)
             bcc = ConfigurationHolder.config.grails.mail.overrideAddress
     
         getMessage().setBcc([bcc?.toString()] as String[])
     }
     void bcc(Object[] args) {
-		if (ConfigurationHolder.config.grails.mail.overrideAddress)
-		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
-	
+        if (ConfigurationHolder.config.grails.mail.overrideAddress)
+           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
+    
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
     void bcc(List args) {
-		if (ConfigurationHolder.config.grails.mail.overrideAddress)
-		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
-	
+        if (ConfigurationHolder.config.grails.mail.overrideAddress)
+           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+    
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
     void cc(cc) {
-	    if (ConfigurationHolder.config.grails.mail.overrideAddress)
+        if (ConfigurationHolder.config.grails.mail.overrideAddress)
             cc = ConfigurationHolder.config.grails.mail.overrideAddress
-	
+    
         getMessage().setCc([cc?.toString()] as String[])
     }
     void cc(Object[] args) {
-		if (ConfigurationHolder.config.grails.mail.overrideAddress)
-		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
-	
+        if (ConfigurationHolder.config.grails.mail.overrideAddress)
+           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }.toArray()
+    
         getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
     void cc(List args) {
-		if (ConfigurationHolder.config.grails.mail.overrideAddress)
-		   args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
-	
+        if (ConfigurationHolder.config.grails.mail.overrideAddress)
+           args = args.collect { ConfigurationHolder.config.grails.mail.overrideAddress }
+    
         getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
 
@@ -213,23 +213,23 @@ class MailMessageBuilder {
     }
 
 
-	protected renderMailView(templateName, model, pluginName = null) {
+    protected renderMailView(templateName, model, pluginName = null) {
         if(!mailService.groovyPagesTemplateEngine) throw new IllegalStateException("Property [groovyPagesTemplateEngine] must be set!")
         assert templateName
 
         def engine = mailService.groovyPagesTemplateEngine
         def requestAttributes = RequestContextHolder.getRequestAttributes()
-		boolean unbindRequest = false
+        boolean unbindRequest = false
 
-		// outside of an executing request, establish a mock version
-		if(!requestAttributes) {
-			def servletContext  = ServletContextHolder.getServletContext()
-			def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-			requestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
-			unbindRequest = true
-		}
-		def servletContext = requestAttributes.request.servletContext
-		def request = requestAttributes.request
+        // outside of an executing request, establish a mock version
+        if(!requestAttributes) {
+            def servletContext  = ServletContextHolder.getServletContext()
+            def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
+            requestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
+            unbindRequest = true
+        }
+        def servletContext = requestAttributes.request.servletContext
+        def request = requestAttributes.request
         if (locale) {
             request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE,new FixedLocaleResolver(defaultLocale:locale))
         }
@@ -277,36 +277,36 @@ class MailMessageBuilder {
             if(model instanceof Map) {
                 t.make( model ).writeTo(out)
             }
-    		else {
-    			t.make().writeTo(out)
-    		}
-	    }
-	    finally {
-	        requestAttributes.setOut(originalOut)
-			if(unbindRequest) {
-				RequestContextHolder.setRequestAttributes(null)
-			}
-	    }
+            else {
+                t.make().writeTo(out)
+            }
+        }
+        finally {
+            requestAttributes.setOut(originalOut)
+            if(unbindRequest) {
+                RequestContextHolder.setRequestAttributes(null)
+            }
+        }
 
-	    if (HTML_CONTENTTYPES.contains(t.metaInfo.contentType)) {
-	        html(out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
+        if (HTML_CONTENTTYPES.contains(t.metaInfo.contentType)) {
+            html(out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
         } else {
             text(out)
         }
     }
 
-	protected String getMailViewUri(String viewName, HttpServletRequest request) {
+    protected String getMailViewUri(String viewName, HttpServletRequest request) {
 
         def buf = new StringBuilder(PATH_TO_MAILVIEWS)
-		
+        
         if(viewName.startsWith("/")) {
            def tmp = viewName[1..-1]
            if(tmp.indexOf('/') > -1) {
-			   def i = tmp.lastIndexOf('/')
-        	   buf << "/${tmp[0..i]}/${tmp[(i+1)..-1]}"
+               def i = tmp.lastIndexOf('/')
+               buf << "/${tmp[0..i]}/${tmp[(i+1)..-1]}"
            }
            else {
-        	   buf << "/${viewName[1..-1]}"
+               buf << "/${viewName[1..-1]}"
            }
         }
         else {
@@ -317,5 +317,5 @@ class MailMessageBuilder {
 
         }
         return buf.append(".gsp").toString()
-	}
+    }
 }
