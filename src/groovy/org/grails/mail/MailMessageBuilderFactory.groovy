@@ -15,6 +15,8 @@
  */
 package org.grails.mail
 
+import org.springframework.mail.javamail.JavaMailSender
+
 /**
  * Responsible for creating builder instances, which have dependencies and
  * are not threadsafe.
@@ -28,4 +30,7 @@ class MailMessageBuilderFactory {
         new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
     }
     
+    boolean isMimeCapable() {
+        mailSender instanceof JavaMailSender
+    }
 }

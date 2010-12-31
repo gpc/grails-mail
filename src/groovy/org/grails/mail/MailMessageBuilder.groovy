@@ -23,6 +23,8 @@ import org.springframework.core.io.*
 
 import org.apache.commons.logging.LogFactory
 
+import javax.mail.Message
+
 /**
  * Provides a DSL style interface to mail message sending/generation.
  * 
@@ -31,6 +33,8 @@ import org.apache.commons.logging.LogFactory
  */
 class MailMessageBuilder {
 
+    private log = LogFactory.getLog(MailMessageBuilder)
+    
     final MailSender mailSender
     final MailMessageContentRenderer mailMessageContentRenderer
     
@@ -65,10 +69,35 @@ class MailMessageBuilder {
         message
     }
 
-    MailMessage createMessage() { 
-        getMessage() 
+    MailMessage sendMessage() {
+        def message = getMessage()
+        message.sentDate = new Date()
+        
+        if (log.traceEnabled) {
+            log.trace("Sending mail ${getDescription(message)}} ...")
+        }
+        
+        mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+        
+        if (log.traceEnabled) {
+            log.trace("Sent mail ${getDescription(message)}} ...")
+        }
+        
+        message
     }
 
+    protected getDescription(SimpleMailMessage message) {
+        "[${message.subject}] from [${message.from}] to ${message.to}"
+    }
+    
+    protected getDescription(Message message) {
+        "[${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}"
+    }
+    
+    protected getDescription(MimeMailMessage message) {
+        getDescription(message.mimeMessage)
+    }
+    
     void multipart(boolean multipart) {
         this.multipart = multipart
     }

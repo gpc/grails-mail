@@ -55,7 +55,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
                 body text
             }       
 
-            def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
+            def msg = testJavaMailSenderBuilder.message.mimeMessage
             assertEquals 1, to(msg).size()
             assertEquals "fred@g2one.com", to(msg)[0].toString()
             assertEquals "Hello Fred", msg.subject
@@ -73,7 +73,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'How are you?'
         }
 
-        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.message.mimeMessage
         assertEquals 1, to(msg).size()
         assertEquals "fred@g2one.com", to(msg)[0].toString()
         assertEquals "Hello Fred", msg.subject
@@ -94,7 +94,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'this is some text'
         }
 
-        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.message.mimeMessage
         assertEquals([ "fred@g2one.com", "ginger@g2one.com", "grace@hollywood.com" ], to(msg))
         assertEquals([ "marge@g2one.com", "ed@g2one.com" ], cc(msg))
         assertEquals([ "joe@g2one.com" ], bcc(msg))
@@ -117,7 +117,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'How are you?'
         }
 
-        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.message.mimeMessage
         assertEquals "user@grails.codehaus.org", msg.getHeader("X-Mailing-List", ", ")
         assertEquals "dilbert@somewhere.org", msg.getHeader("Sender", ", ")
         assertEquals([ "fred@g2one.com" ], to(msg))
@@ -149,7 +149,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'How are you?'
             attachBytes "dummy.bin", "application/binary", "abcdef".bytes
         }
-        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.message.mimeMessage
         assertTrue msg.content instanceof MimeMultipart
         assertEquals 2, msg.content.count
 

@@ -34,48 +34,15 @@ class MailService {
     def mailMessageBuilderFactory
     
     MailMessage sendMail(Closure callable) {
-        def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
-        callable.delegate = messageBuilder
-        callable.resolveStrategy = Closure.DELEGATE_FIRST
-        callable.call()
+        if (isDisabled()) {
+            log.warn("Sending emails disabled by configuration option")
+        } else {
+            def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
+            callable.delegate = messageBuilder
+            callable.resolveStrategy = Closure.DELEGATE_FIRST
+            callable.call()
 
-        def message = messageBuilder.createMessage()
-        initMessage(message)
-        sendMail message
-        return message
-    }
-
-    protected initMessage(message) {
-        message.sentDate = new Date()
-    }
-
-    protected sendMail(message) {
-        if(message) {
-            if(message instanceof MimeMailMessage) {
-                MimeMailMessage msg = message
-                if(mailMessageBuilderFactory.mailSender instanceof JavaMailSender) {
-                    MimeMessage mimeMsg = msg.getMimeMessage()
-                    if (!disabled) {
-                        if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
-                        mailMessageBuilderFactory.mailSender.send(mimeMsg)
-                    }
-                    else
-                        log.warn("Sending emails disabled by configuration option")
-                    if (log.traceEnabled) log.trace("Sent mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()}")        
-                }
-                else {
-                    throw new GrailsMailException("MimeMessages require an instance of 'org.springframework.mail.javamail.JavaMailSender' to be configured!")
-                }
-            }
-            else {
-                if (!disabled) {
-                    if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
-                    mailMessageBuilderFactory.mailSender?.send(message)
-                    if (log.traceEnabled) log.trace("Sent mail re: [${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}")
-                }
-                else
-                    log.warn("Sending emails disabled by configuration option")
-            }
+            messageBuilder.sendMessage()
         }
     }
     
