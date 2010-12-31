@@ -1,0 +1,1 @@
+grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
