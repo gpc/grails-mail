@@ -16,6 +16,8 @@
 
 package grails.plugin.mail
 
+import org.springframework.mail.MailMessage
+
 /**
  * Provides the entry point to the mail sending API.
  */
