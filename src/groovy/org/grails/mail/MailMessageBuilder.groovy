@@ -44,7 +44,7 @@ class MailMessageBuilder {
     static PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
     static HTML_CONTENTTYPES = ['text/html', 'text/xhtml']
 
-    private log = LogFactory.getLog(MailMessageBuilder.class);
+    private log = LogFactory.getLog(MailMessageBuilder)
     
     MailSender mailSender
     MailService mailService
