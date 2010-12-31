@@ -60,6 +60,7 @@ environments {
 
 // Mail configuration
 grails.mail.port = 3025
+grails.mail.default.from = "me@me.com"
 
 
 // log4j configuration
