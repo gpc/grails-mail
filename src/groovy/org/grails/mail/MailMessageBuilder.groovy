@@ -46,35 +46,35 @@ class MailMessageBuilder {
         this.mailSender = mailSender
         this.mailMessageContentRenderer = mailMessageContentRenderer
         
-        this.defaultFrom = config.default.from ?: null
         this.overrideAddress = config.overrideAddress ?: null
+        this.defaultFrom = overrideAddress ?: (config.default.from ?: null)
     }
 
     private MailMessage getMessage() {
-        if(!message) {
+        if (!message) {
             if (mimeCapable) {
                 def helper = new MimeMessageHelper(mailSender.createMimeMessage(), multipart)
                 message = new MimeMailMessage(helper)
-            }
-            else {
+            } else {
                 message = new SimpleMailMessage()
             }
+            
             message.from = defaultFrom
-            if (overrideAddress)
-                message.from = overrideAddress
         }
-        return message
+        
+        message
     }
 
-    MailMessage createMessage() { getMessage() }
-
+    MailMessage createMessage() { 
+        getMessage() 
+    }
 
     void multipart(boolean multipart) {
         this.multipart = multipart
     }
 
     void to(recip) {
-        if(recip) {
+        if (recip) {
             if (overrideAddress)
                 recip = overrideAddress
             getMessage().setTo([recip.toString()] as String[])
@@ -95,26 +95,31 @@ class MailMessageBuilder {
     }
 
     void to(Object[] args) {
-        if(args) {
+        if (args) {
             if (overrideAddress)
-               args = args.collect { overrideAddress }.toArray()
+                args = args.collect { overrideAddress }.toArray()
 
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
+    
     void to(List args) {
-        if(args) {
-            if (overrideAddress)
-               args = args.collect { overrideAddress }   
+        if (args) {
+            if (overrideAddress) 
+               args = args.collect { overrideAddress }
+               
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
+    
     void title(title) {
         subject(title)
     }
+    
     void subject(title) {
         getMessage().subject = title?.toString()
     }
+    
     void headers(Map hdrs) {
         // The message must be of type MimeMailMessage to add headers.
         if (!mimeCapable) {
@@ -127,9 +132,11 @@ class MailMessageBuilder {
             msg.setHeader(name.toString(), value?.toString())
         }
     }
+    
     void body(body) {
         text(body)
     }
+    
     void body(Map params) {
         if (params.view) {
             if (mailMessageContentRenderer == null) {
@@ -150,41 +157,48 @@ class MailMessageBuilder {
     void text(body) {
         getMessage().text = body?.toString()
     }
+    
     void html(text) {
         if (mimeCapable) {
             getMessage().getMimeMessageHelper().setText(text?.toString(), true)
         }
     }
+    
     void bcc(bcc) {
         if (overrideAddress)
             bcc = overrideAddress
     
         getMessage().setBcc([bcc?.toString()] as String[])
     }
+    
     void bcc(Object[] args) {
         if (overrideAddress)
            args = args.collect { overrideAddress }.toArray()
     
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
+    
     void bcc(List args) {
         if (overrideAddress)
            args = args.collect { overrideAddress }
     
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
+    
     void cc(cc) {
         if (overrideAddress)
             cc = overrideAddress
     
         getMessage().setCc([cc?.toString()] as String[])
     }
+    
     void cc(Object[] args) {
         if (overrideAddress)
            args = args.collect { overrideAddress }.toArray()
     
         getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
+    
     void cc(List args) {
         if (overrideAddress)
            args = args.collect { overrideAddress }
@@ -195,9 +209,11 @@ class MailMessageBuilder {
     void replyTo(replyTo) {
         getMessage().replyTo = replyTo?.toString()
     }
+    
     void from(from) {
         getMessage().from = from?.toString()
     }
+    
     void locale(String localeStr) {
         def split=localeStr.split('_')
         String language=split[0]
