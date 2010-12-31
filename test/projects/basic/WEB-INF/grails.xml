@@ -1,8 +1,8 @@
 <grails>
   <resources>
     <resource>com.piragua.greenmail.GreenmailController</resource>
-    <resource>org.grails.mail.MailService</resource>
-    <resource>org.grails.mail.PlainTextMailTagLib</resource>
+    <resource>grails.plugin.mail.MailService</resource>
+    <resource>grails.plugin.mail.PlainTextMailTagLib</resource>
     <resource>BootStrap</resource>
     <resource>BuildConfig</resource>
     <resource>Config</resource>

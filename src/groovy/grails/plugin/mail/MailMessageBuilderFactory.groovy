@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.grails.mail
+package grails.plugin.mail
+
+import org.springframework.mail.javamail.JavaMailSender
 
 /**
- * @author Graeme Rocher
- * @since 1.0
- * 
- * Created: May 13, 2008
+ * Responsible for creating builder instances, which have dependencies and
+ * are not threadsafe.
  */
-class GrailsMailException extends RuntimeException{
+class MailMessageBuilderFactory {
 
-    public GrailsMailException(String s) {
-        super(s);
+    def mailSender
+    def mailMessageContentRenderer
+
+    MailMessageBuilder createBuilder(ConfigObject config) {
+        new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
     }
-
-    public GrailsMailException(String s, Throwable throwable) {
-        super(s, throwable);    
+    
+    boolean isMimeCapable() {
+        mailSender instanceof JavaMailSender
     }
-
-
 }

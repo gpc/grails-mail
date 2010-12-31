@@ -17,7 +17,7 @@
 import org.springframework.jndi.JndiObjectFactoryBean
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
-import org.grails.mail.*
+import grails.plugin.mail.*
 
 class MailGrailsPlugin {
 

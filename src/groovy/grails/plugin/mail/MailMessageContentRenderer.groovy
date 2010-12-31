@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.grails.mail
+package grails.plugin.mail
 
 import grails.util.GrailsWebUtil
 

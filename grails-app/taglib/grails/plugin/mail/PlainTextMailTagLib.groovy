@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 the original author or authors.
+ * Copyright 2004-2005 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.grails.mail
-
-/**
- * Represents the result of rendering a message content view.
- */
-class MailMessageContentRender {
+ 
+package grails.plugin.mail
+ 
+class PlainTextMailTagLib {
+    static namespace = "text"
     
-    private static HTML_CONTENT_TYPES = ['text/html', 'text/xhtml']
-    
-    final Writer out
-    final String contentType
-    
-    MailMessageContentRender(Writer out, String contentType) {
-        this.out = out
-        this.contentType = contentType
-    }
-    
-    boolean isHtml() {
-        contentType in HTML_CONTENT_TYPES
+    def newLine = {
+        out << '\n'
     }
 }
