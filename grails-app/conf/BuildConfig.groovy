@@ -12,7 +12,7 @@ grails.project.dependency.resolution = {
     }
     plugins {
         test (":greenmail:1.2.2") {
-            exported = false
+            export = false
         }
     }
 }
