@@ -15,21 +15,10 @@
  */
 package grails.plugin.mail
 
-/**
- * @author Graeme Rocher
- * @since 1.0
- * 
- * Created: May 13, 2008
- */
-class GrailsMailException extends RuntimeException{
+class GrailsMailException extends RuntimeException {
 
-    public GrailsMailException(String s) {
-        super(s);
+    GrailsMailException(String s, Throwable t = null) {
+        super(s, t)
     }
-
-    public GrailsMailException(String s, Throwable throwable) {
-        super(s, throwable);    
-    }
-
 
 }
