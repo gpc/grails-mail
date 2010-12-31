@@ -96,7 +96,7 @@ sendMail {
         }
 
         //adding sendMail to all services, besides the mailService of the plugin
-        application.serviceClasses.each{ serviceClass ->
+        application.serviceClasses.each { serviceClass ->
             if (serviceClass.metaClass?.theClass?.name != applicationContext.mailService?.metaClass?.theClass?.name){
                 serviceClass.metaClass.sendMail = { Closure callable ->
                     applicationContext.mailService?.sendMail(callable)
