@@ -16,33 +16,48 @@
 
 package org.grails.mail
 
+import javax.mail.Message
 import javax.mail.internet.MimeMessage
+
+import org.springframework.mail.javamail.MimeMailMessage
+import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.MailSender
-import org.springframework.mail.MailMessage
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMailMessage
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
-import org.springframework.web.context.support.WebApplicationContextUtils
-import org.springframework.web.context.request.RequestContextHolder
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes
-import javax.mail.Message
+
 import org.springframework.core.io.FileSystemResource
 
+import com.icegreen.greenmail.util.ServerSetupTest
 
 class MailServiceTests extends GroovyTestCase {
 
     static transactional = false
-
-    MailSender mailSender
-
+    
+    def mimeCapableMailService
+    def nonMimeCapableMailService
+    
+    def mailMessageContentRenderer // autowired
+    
+    void setUp() {
+        def mimeMailSender = new JavaMailSenderImpl(host: "localhost", port: ServerSetupTest.SMTP.port)
+        def mimeMessageBuilderFactor = new MailMessageBuilderFactory(
+            mailSender: mimeMailSender, 
+            mailMessageContentRenderer: mailMessageContentRenderer
+        )
+        mimeCapableMailService = new MailService(mailMessageBuilderFactory: mimeMessageBuilderFactor)
+                
+        def simpleMailSender = new MailSender() {
+            void send(SimpleMailMessage simpleMessage) {}
+            void send(SimpleMailMessage[] simpleMessages) {}
+        }
+        def simpleMessageBuilderFactory = new MailMessageBuilderFactory(
+            mailSender: simpleMailSender, 
+            mailMessageContentRenderer: mailMessageContentRenderer
+        )
+        nonMimeCapableMailService = new MailService(mailMessageBuilderFactory: simpleMessageBuilderFactory)
+    }
 
     void testSendSimpleMessage() {
-        def mailService = new MailService()
-
-
-        def message = mailService.sendMail {
+        def message = nonMimeCapableMailService.sendMail {
             to "fred@g2one.com"
             title "Hello John"
             body 'this is some text'
@@ -56,16 +71,11 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendToMultipleRecipients() {
-        def mailService = new MailService()
-
-        def message = mailService.sendMail {
+        def message = nonMimeCapableMailService.sendMail {
             to "fred@g2one.com", "ginger@g2one.com"
             title "Hello John"
             body 'this is some text'
         }
-
-
-
 
         assertEquals "Hello John", message.getSubject()
         assertEquals 'this is some text', message.getText()
@@ -74,9 +84,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendToMultipleRecipientsUsingList() {
-        def mailService = new MailService()
-
-        def message = mailService.sendMail {
+        def message = nonMimeCapableMailService.sendMail {
             to(["fred@g2one.com", "ginger@g2one.com"])
             title "Hello John"
             body 'this is some text'
@@ -86,9 +94,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendToMultipleCCRecipientsUsingList() {
-        def mailService = new MailService()
-
-        def message = mailService.sendMail {
+        def message = nonMimeCapableMailService.sendMail {
             to 'joe@g2one.com'
             cc(["fred@g2one.com", "ginger@g2one.com"])
             title "Hello John"
@@ -99,9 +105,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendToMultipleBCCRecipientsUsingList() {
-        def mailService = new MailService()
-
-        def message = mailService.sendMail {
+        def message = nonMimeCapableMailService.sendMail {
             to("joe@g2one.com")
             bcc(["fred@g2one.com", "ginger@g2one.com"])
             title "Hello John"
@@ -112,9 +116,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendToMultipleRecipientsAndCC() {
-        def mailService = new MailService()
-
-        def message = mailService.sendMail {
+        def message = nonMimeCapableMailService.sendMail {
             to "fred@g2one.com", "ginger@g2one.com"
             from "john@g2one.com"
             cc "marge@g2one.com", "ed@g2one.com"
@@ -122,8 +124,6 @@ class MailServiceTests extends GroovyTestCase {
             title "Hello John"
             body 'this is some text'
         }
-
-
 
         assertEquals "Hello John", message.getSubject()
         assertEquals 'this is some text', message.getText()
@@ -134,19 +134,10 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals 2, message.cc.size()
         assertEquals "marge@g2one.com", message.cc[0]
         assertEquals "ed@g2one.com", message.cc[1]
-
     }
 
     void testSendHtmlMail() {
-        def mailService = new MailService()
-
-        // stub send method
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        mailService.mailSender = mailSender
-
-        MimeMailMessage message = mailService.sendMail {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
             html '<b>Hello</b> World'
@@ -159,20 +150,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendMailView() {
-        def mailService = new MailService()
-
-        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
-        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-
-        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
-
-        // stub send method
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        mailService.mailSender = mailSender
-
-        MimeMailMessage message = mailService.sendMail {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
             body(view: '/_testemails/test', model: [msg: 'hello'])
@@ -184,20 +162,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendMailViewHTML() {
-        def mailService = new MailService()
-
-        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
-        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-
-        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
-
-        // stub send method
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        mailService.mailSender = mailSender
-
-        MimeMailMessage message = mailService.sendMail {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
             body(view: '/_testemails/testhtml', model: [msg: 'hello'])
@@ -210,20 +175,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendMailViewWithTags() {
-        def mailService = new MailService()
-
-        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
-        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-
-        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
-
-        // stub send method
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        mailService.mailSender = mailSender
-
-        MimeMailMessage message = mailService.sendMail {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
             body(view: '/_testemails/tagtest', model: [condition: true])
@@ -232,7 +184,7 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertEquals 'Condition is true', message.getMimeMessage().getContent().trim()
 
-        message = mailService.sendMail {
+        message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
             body(view: '/_testemails/tagtest', model: [condition: false])
@@ -244,20 +196,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendMailViewNoModel() {
-        def mailService = new MailService()
-
-        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
-        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-
-        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
-
-        // stub send method
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        mailService.mailSender = mailSender
-
-        MimeMailMessage message = mailService.sendMail {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             subject "Hello John"
             body(view: '/_testemails/test')
@@ -273,13 +212,7 @@ class MailServiceTests extends GroovyTestCase {
      * specified headers to the underlying MIME message.
      */
     void testSendMailWithHeaders() {
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        def mailService = new MailService()
-        mailService.mailSender = mailSender
-
-        def message = mailService.sendMail {
+        def message = mimeCapableMailService.sendMail {
             headers "X-Mailing-List": "user@grails.codehaus.org",
                 "Sender": "dilbert@somewhere.org"
             to "fred@g2one.com"
@@ -300,13 +233,8 @@ class MailServiceTests extends GroovyTestCase {
      * specify custom headers with just a plain MailSender.
      */
     void testSendMailWithHeadersAndBasicMailSender() {
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        def mailService = new MailService()
-
         shouldFail(GrailsMailException) {
-            mailService.sendMail {
+            nonMimeCapableMailService.sendMail {
                 headers "Content-Type": "text/plain;charset=UTF-8",
                     "Sender": "dilbert@somewhere.org"
                 to "fred@g2one.com"
@@ -317,18 +245,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendmailWithTranslations() {
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-
-        def mailService = new MailService()
-        mailService.mailSender = mailSender
-        def ctx = RequestContextHolder.currentRequestAttributes().servletContext
-        def applicationContext = ctx[GrailsApplicationAttributes.APPLICATION_CONTEXT]
-        mailService.groovyPagesTemplateEngine = applicationContext.getBean(GroovyPagesTemplateEngine.BEAN_ID)
-
-
-
-        def message = mailService.sendMail {
+        def message = mimeCapableMailService.sendMail {
             from 'neur0maner@gmail.com'
             to "neur0maner@gmail.com"
             locale 'en_US'
@@ -340,7 +257,7 @@ class MailServiceTests extends GroovyTestCase {
         def html = slurper.parseText(msg.content)
         assertEquals 'Translate this: Luis', html.body.toString()
 
-        message = mailService.sendMail {
+        message = mimeCapableMailService.sendMail {
             from 'neur0maner@gmail.com'
             to "neur0maner@gmail.com"
             locale Locale.FRENCH
@@ -354,12 +271,7 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendmailWithByteArrayAttachment() {
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-        def mailService = new MailService()
-        mailService.mailSender = mailSender
-
-        def message = mailService.sendMail {
+        def message = mimeCapableMailService.sendMail {
             multipart true
 
             to "fred@g2one.com", "ginger@g2one.com"
@@ -378,14 +290,9 @@ class MailServiceTests extends GroovyTestCase {
     }
 
     void testSendmailWithByteArrayAndResourceAttachments() {
-        MailSender.metaClass.send = { SimpleMailMessage smm -> }
-        JavaMailSender.metaClass.send = { MimeMessage mm -> }
-        def mailService = new MailService()
-        mailService.mailSender = mailSender
-
         def tmpFile
         try {                
-            def message = mailService.sendMail {
+            def message = mimeCapableMailService.sendMail {
                 multipart true
 
                 tmpFile = File.createTempFile('testSendmailWithAttachments',null)

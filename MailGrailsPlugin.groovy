@@ -17,6 +17,8 @@
 import org.springframework.jndi.JndiObjectFactoryBean
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
+import org.grails.mail.*
+
 class MailGrailsPlugin {
 
     def observe = ['controllers','services']
@@ -69,6 +71,14 @@ sendMail {
                 protocol = config.protocol
             if (config.props instanceof Map && config.props)
                 javaMailProperties = config.props
+        }
+        
+        mailMessageBuilderFactory(MailMessageBuilderFactory) {
+            it.autowire = true
+        }
+        
+        mailMessageContentRenderer(MailMessageContentRenderer) {
+            it.autowire = true
         }
     }
    

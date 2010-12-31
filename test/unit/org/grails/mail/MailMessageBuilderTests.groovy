@@ -27,26 +27,21 @@ import javax.mail.internet.MimeMultipart
  * Test case for {@link MailMessageBuilder}.
  */
 class MailMessageBuilderTests extends GroovyTestCase {
-    def mockService
-    def mockSender
-    def testBuilder
+
+    def testJavaMailSenderBuilder
+    def testBasicMailSenderBuilder
 
     void setUp() {
-        super.setUp()
-
-        ConfigurationHolder.config = new ConfigObject()
-        mockService = [:] as MailService
-        mockSender = [
+        def config = new ConfigObject()
+        config.default.from = "test@grailsplugin.com"
+        
+        def mockJavaMailSender = [
                 createMimeMessage: {-> return new MimeMessage(Session.getInstance(new Properties())) }
         ] as JavaMailSender
-        testBuilder = new MailMessageBuilder(mockService, mockSender)
+        testJavaMailSenderBuilder = new MailMessageBuilder(mockJavaMailSender, config)
         
-        ConfigurationHolder.config.grails.mail.default.from = "test@grailsplugin.com"
-    }
-
-    void tearDown() {
-        ConfigurationHolder.config = null
-        super.tearDown()
+        def mockBasicMailSender = [:] as MailSender
+        testBasicMailSenderBuilder = new MailMessageBuilder(mockBasicMailSender, config)
     }
 
     void testStreamCharBufferForGrails12() {
@@ -60,7 +55,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
                 body text
             }       
 
-            def msg = testBuilder.createMessage().mimeMessage
+            def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
             assertEquals 1, to(msg).size()
             assertEquals "fred@g2one.com", to(msg)[0].toString()
             assertEquals "Hello Fred", msg.subject
@@ -78,7 +73,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'How are you?'
         }
 
-        def msg = testBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
         assertEquals 1, to(msg).size()
         assertEquals "fred@g2one.com", to(msg)[0].toString()
         assertEquals "Hello Fred", msg.subject
@@ -99,7 +94,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'this is some text'
         }
 
-        def msg = testBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
         assertEquals([ "fred@g2one.com", "ginger@g2one.com", "grace@hollywood.com" ], to(msg))
         assertEquals([ "marge@g2one.com", "ed@g2one.com" ], cc(msg))
         assertEquals([ "joe@g2one.com" ], bcc(msg))
@@ -122,7 +117,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'How are you?'
         }
 
-        def msg = testBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
         assertEquals "user@grails.codehaus.org", msg.getHeader("X-Mailing-List", ", ")
         assertEquals "dilbert@somewhere.org", msg.getHeader("Sender", ", ")
         assertEquals([ "fred@g2one.com" ], to(msg))
@@ -135,11 +130,8 @@ class MailMessageBuilderTests extends GroovyTestCase {
      * specify custom headers with just a plain MailSender.
      */
     void testHeadersWithBasicMailSender() {
-        mockSender = [:] as MailSender
-        testBuilder = new MailMessageBuilder(mockService, mockSender)
-
         shouldFail(GrailsMailException) {
-            processDsl {
+            processDsl(testBasicMailSenderBuilder) {
                 headers "Content-Type": "text/plain;charset=UTF-8",
                         "Sender": "dilbert@somewhere.org"
                 to "fred@g2one.com"
@@ -157,7 +149,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             body 'How are you?'
             attachBytes "dummy.bin", "application/binary", "abcdef".bytes
         }
-        def msg = testBuilder.createMessage().mimeMessage
+        def msg = testJavaMailSenderBuilder.createMessage().mimeMessage
         assertTrue msg.content instanceof MimeMultipart
         assertEquals 2, msg.content.count
 
@@ -179,7 +171,12 @@ class MailMessageBuilderTests extends GroovyTestCase {
     }
 
     private processDsl(Closure c) {
-        c.delegate = this.testBuilder
+        processDsl(testJavaMailSenderBuilder, c)
+    }
+
+    private processDsl(MailMessageBuilder builder, Closure c) {
+        c.delegate = builder
         c.call()
     }
+    
 }

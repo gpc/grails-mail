@@ -40,20 +40,13 @@ class MailMessageContentRenderer {
 
     static PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
     
-    
     private log = LogFactory.getLog(MailMessageContentRenderer)
     
-    def mailService
-    
-    MailMessageContentRenderer(mailService) {
-        this.mailService = mailService
-    }
-    
+    def groovyPagesTemplateEngine
+        
     MailMessageContentRender render(Writer out, templateName, model, locale, pluginName = null) {
-        if(!mailService.groovyPagesTemplateEngine) throw new IllegalStateException("Property [groovyPagesTemplateEngine] must be set!")
         assert templateName
 
-        def engine = mailService.groovyPagesTemplateEngine
         def requestAttributes = RequestContextHolder.getRequestAttributes()
         boolean unbindRequest = false
 
@@ -74,7 +67,7 @@ class MailMessageContentRenderer {
         // See if the application has the view for it
         def uri = getMailViewUri(templateName, request)
 
-        def r = engine.getResourceForUri(uri)
+        def r = groovyPagesTemplateEngine.getResourceForUri(uri)
         // Try plugin view if not found in application
         if (!r || !r.exists()) {
             if (log.debugEnabled) {
@@ -90,7 +83,7 @@ class MailMessageContentRenderer {
 
                 if (pathToView != null) {
                     uri = GrailsResourceUtils.WEB_INF +pathToView +templateName+".gsp";
-                    r = engine.getResourceForUri(uri)
+                    r = groovyPagesTemplateEngine.getResourceForUri(uri)
                 } else {
                     if (log.errorEnabled) {
                         log.error "Could not locate email view ${templateName} in plugin [$pluginName]"
@@ -104,7 +97,7 @@ class MailMessageContentRenderer {
                 throw new IllegalArgumentException("Could not locate mail body ${templateName}. Is it in a plugin? If so you must pass the plugin name in the [plugin] variable")
             }
         }
-        def t = engine.createTemplate( r )
+        def t = groovyPagesTemplateEngine.createTemplate( r )
 
         def originalOut = requestAttributes.getOut()
         requestAttributes.setOut(out)

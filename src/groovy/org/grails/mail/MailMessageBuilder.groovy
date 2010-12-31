@@ -24,22 +24,30 @@ import org.springframework.core.io.*
 import org.apache.commons.logging.LogFactory
 
 /**
- * The builder that implements the mail DSL.
+ * Provides a DSL style interface to mail message sending/generation.
+ * 
+ * If the builder is constructed without a MailMessageContentRenderer, it is incapable
+ * of rendering GSP views into message content.
  */
 class MailMessageBuilder {
 
+    final MailSender mailSender
+    final MailMessageContentRenderer mailMessageContentRenderer
+    
+    final String defaultFrom
+    final String overrideAddress
+    
     private MailMessage message
     private Locale locale
-
-    private log = LogFactory.getLog(MailMessageBuilder)
     
-    MailSender mailSender
-    MailService mailService
     boolean multipart = false // by default, we're sending non-multipart emails
 
-    MailMessageBuilder(MailService svc, MailSender mailSender) {
+    MailMessageBuilder(MailSender mailSender, ConfigObject config, MailMessageContentRenderer mailMessageContentRenderer = null) {
         this.mailSender = mailSender
-        this.mailService = svc
+        this.mailMessageContentRenderer = mailMessageContentRenderer
+        
+        this.defaultFrom = config.default.from ?: null
+        this.overrideAddress = config.overrideAddress ?: null
     }
 
     private MailMessage getMessage() {
@@ -51,9 +59,9 @@ class MailMessageBuilder {
             else {
                 message = new SimpleMailMessage()
             }
-            message.from = mailService.defaultFrom
-            if (mailService.overrideAddress)
-                message.from = mailService.overrideAddress
+            message.from = defaultFrom
+            if (overrideAddress)
+                message.from = overrideAddress
         }
         return message
     }
@@ -67,8 +75,8 @@ class MailMessageBuilder {
 
     void to(recip) {
         if(recip) {
-            if (mailService.overrideAddress)
-                recip = mailService.overrideAddress
+            if (overrideAddress)
+                recip = overrideAddress
             getMessage().setTo([recip.toString()] as String[])
         }
     }
@@ -90,16 +98,16 @@ class MailMessageBuilder {
 
     void to(Object[] args) {
         if(args) {
-            if (mailService.overrideAddress)
-               args = args.collect { mailService.overrideAddress }.toArray()
+            if (overrideAddress)
+               args = args.collect { overrideAddress }.toArray()
 
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
     void to(List args) {
         if(args) {
-            if (mailService.overrideAddress)
-               args = args.collect { mailService.overrideAddress }   
+            if (overrideAddress)
+               args = args.collect { overrideAddress }   
             getMessage().setTo((args.collect { it?.toString() }) as String[])
         }
     }
@@ -127,8 +135,12 @@ class MailMessageBuilder {
     }
     void body(Map params) {
         if (params.view) {
+            if (mailMessageContentRenderer == null) {
+                throw new IllegalStateException("mail message builder was constructed without a message content render so cannot render views")
+            }
+            
             // Here need to render it first, establish content type of virtual response / contentType model param
-            def render = createContentRenderer().render(new StringWriter(), params.view, params.model, locale, params.plugin)
+            def render = mailMessageContentRenderer.render(new StringWriter(), params.view, params.model, locale, params.plugin)
             
             if (render.html) {
                 html(render.out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
@@ -136,10 +148,6 @@ class MailMessageBuilder {
                 text(render.out.toString())
             }
         } 
-    }
-    
-    protected createContentRenderer() {
-        new MailMessageContentRenderer(mailService)
     }
     
     void text(body) {
@@ -153,38 +161,38 @@ class MailMessageBuilder {
         }
     }
     void bcc(bcc) {
-        if (mailService.overrideAddress)
-            bcc = mailService.overrideAddress
+        if (overrideAddress)
+            bcc = overrideAddress
     
         getMessage().setBcc([bcc?.toString()] as String[])
     }
     void bcc(Object[] args) {
-        if (mailService.overrideAddress)
-           args = args.collect { mailService.overrideAddress }.toArray()
+        if (overrideAddress)
+           args = args.collect { overrideAddress }.toArray()
     
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
     void bcc(List args) {
-        if (mailService.overrideAddress)
-           args = args.collect { mailService.overrideAddress }
+        if (overrideAddress)
+           args = args.collect { overrideAddress }
     
         getMessage().setBcc((args.collect { it?.toString() }) as String[])
     }
     void cc(cc) {
-        if (mailService.overrideAddress)
-            cc = mailService.overrideAddress
+        if (overrideAddress)
+            cc = overrideAddress
     
         getMessage().setCc([cc?.toString()] as String[])
     }
     void cc(Object[] args) {
-        if (mailService.overrideAddress)
-           args = args.collect { mailService.overrideAddress }.toArray()
+        if (overrideAddress)
+           args = args.collect { overrideAddress }.toArray()
     
         getMessage().setCc((args.collect { it?.toString() }) as String[])
     }
     void cc(List args) {
-        if (mailService.overrideAddress)
-           args = args.collect { mailService.overrideAddress }
+        if (overrideAddress)
+           args = args.collect { overrideAddress }
     
         getMessage().setCc((args.collect { it?.toString() }) as String[])
     }

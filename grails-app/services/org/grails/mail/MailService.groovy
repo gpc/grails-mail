@@ -30,13 +30,11 @@ import org.springframework.mail.javamail.MimeMailMessage
 class MailService {
 
     static transactional = false
-
-    def groovyPagesTemplateEngine
     
-    MailSender mailSender
+    def mailMessageBuilderFactory
     
     MailMessage sendMail(Closure callable) {
-        def messageBuilder = new MailMessageBuilder(this, mailSender)
+        def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
         callable.delegate = messageBuilder
         callable.resolveStrategy = Closure.DELEGATE_FIRST
         callable.call()
@@ -55,11 +53,11 @@ class MailService {
         if(message) {
             if(message instanceof MimeMailMessage) {
                 MimeMailMessage msg = message
-                if(mailSender instanceof JavaMailSender) {
+                if(mailMessageBuilderFactory.mailSender instanceof JavaMailSender) {
                     MimeMessage mimeMsg = msg.getMimeMessage()
                     if (!disabled) {
                         if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
-                        mailSender.send(mimeMsg)
+                        mailMessageBuilderFactory.mailSender.send(mimeMsg)
                     }
                     else
                         log.warn("Sending emails disabled by configuration option")
@@ -72,7 +70,7 @@ class MailService {
             else {
                 if (!disabled) {
                     if (log.traceEnabled) log.trace("Sending mail re: [${mimeMsg.subject}] from [${mimeMsg.from}] to ${mimeMsg.getRecipients(Message.RecipientType.TO)*.toString()} ...")        
-                    mailSender?.send(message)
+                    mailMessageBuilderFactory.mailSender?.send(message)
                     if (log.traceEnabled) log.trace("Sent mail re: [${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}")
                 }
                 else
@@ -89,11 +87,4 @@ class MailService {
         mailConfig.disabled
     }
     
-    String getDefaultFrom() {
-        mailConfig.default.from ?: null
-    }
-    
-    String getOverrideAddress() {
-        mailConfig.overrideAddress ?: null
-    }
 }
