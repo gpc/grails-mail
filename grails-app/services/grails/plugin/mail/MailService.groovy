@@ -16,16 +16,8 @@
 
 package grails.plugin.mail
 
-import javax.mail.Message
-import javax.mail.internet.MimeMessage
-import org.springframework.mail.MailMessage
-import org.springframework.mail.MailSender
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMailMessage
-
 /**
- *
- * @author Graeme Rocher
+ * Provides the entry point to the mail sending API.
  */
 class MailService {
 
