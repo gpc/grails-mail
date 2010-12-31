@@ -57,17 +57,17 @@ sendMail {
         mailSender(JavaMailSenderImpl) {
             host = config.host ?: "localhost"
             defaultEncoding = config.encoding ?: "utf-8"
-            if(config.jndiName)
+            if (config.jndiName)
                 session = ref('mailSession')
-            if(config.port)
+            if (config.port)
                 port = config.port
-            if(config.username)
+            if (config.username)
                 username = config.username
-            if(config.password)
+            if (config.password)
                 password = config.password
-            if(config.protocol)
+            if (config.protocol)
                 protocol = config.protocol
-            if(config.props instanceof Map && config.props)
+            if (config.props instanceof Map && config.props)
                 javaMailProperties = config.props
         }
     }
@@ -76,13 +76,13 @@ sendMail {
         configureSendMail(application, applicationContext)
     }
 
-    def onChange = {event ->
+    def onChange = { event ->
         configureSendMail(event.application, event.ctx)
     }
 
     def configureSendMail(application, applicationContext) {
         //adding sendMail to controllers
-        application.controllerClasses*.metaClass*.sendMail = {Closure callable ->
+        application.controllerClasses*.metaClass*.sendMail = { Closure callable ->
             applicationContext.mailService?.sendMail(callable)
         }
 
