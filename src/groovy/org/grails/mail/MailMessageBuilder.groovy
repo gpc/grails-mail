@@ -52,7 +52,7 @@ class MailMessageBuilder {
 
     private MailMessage getMessage() {
         if(!message) {
-            if(mailSender instanceof JavaMailSender) {
+            if (mimeCapable) {
                 def helper = new MimeMessageHelper(mailSender.createMimeMessage(), multipart)
                 message = new MimeMailMessage(helper)
             }
@@ -86,14 +86,12 @@ class MailMessageBuilder {
     }
 
     void attachResource(String fileName, String contentType, Resource res) {
-        def msg = getMessage()
-        if(msg instanceof MimeMailMessage) {
-            assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
-            msg.mimeMessageHelper.addAttachment(fileName, res, contentType)
-        }
-        else {
+        if (!mimeCapable) {
             throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
+        
+        assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
+        getMessage().mimeMessageHelper.addAttachment(fileName, res, contentType)
     }
 
     void to(Object[] args) {
@@ -118,13 +116,12 @@ class MailMessageBuilder {
         getMessage().subject = title?.toString()
     }
     void headers(Map hdrs) {
-        def msg = getMessage()
-
         // The message must be of type MimeMailMessage to add headers.
-        if (!(msg instanceof MimeMailMessage)) {
+        if (!mimeCapable) {
             throw new GrailsMailException("You must use a JavaMailSender to customise the headers.")
         }
 
+        def msg = getMessage()
         msg = msg.mimeMessageHelper.mimeMessage
         hdrs.each { name, value ->
             msg.setHeader(name.toString(), value?.toString())
@@ -154,10 +151,8 @@ class MailMessageBuilder {
         getMessage().text = body?.toString()
     }
     void html(text) {
-        def msg = getMessage()
-        if(msg instanceof MimeMailMessage) {
-            MimeMailMessage mm = msg
-            mm.getMimeMessageHelper().setText(text?.toString(), true)
+        if (mimeCapable) {
+            getMessage().getMimeMessageHelper().setText(text?.toString(), true)
         }
     }
     void bcc(bcc) {
@@ -217,5 +212,8 @@ class MailMessageBuilder {
     void locale(Locale locale) {
         this.locale=locale
     }
-    
+
+    boolean isMimeCapable() {
+        mailSender instanceof JavaMailSender
+    }
 }
