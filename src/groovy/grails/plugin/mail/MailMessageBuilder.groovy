@@ -85,68 +85,9 @@ class MailMessageBuilder {
         
         message
     }
-
-    protected getDescription(SimpleMailMessage message) {
-        "[${message.subject}] from [${message.from}] to ${message.to}"
-    }
-    
-    protected getDescription(Message message) {
-        "[${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}"
-    }
-    
-    protected getDescription(MimeMailMessage message) {
-        getDescription(message.mimeMessage)
-    }
     
     void multipart(boolean multipart) {
         this.multipart = multipart
-    }
-
-    void to(recip) {
-        if (recip) {
-            if (overrideAddress)
-                recip = overrideAddress
-            getMessage().setTo([recip.toString()] as String[])
-        }
-    }
-
-    void attachBytes(String fileName, String contentType, byte[] bytes) {
-        attachResource(fileName, contentType, new ByteArrayResource(bytes))
-    }
-
-    void attachResource(String fileName, String contentType, Resource res) {
-        if (!mimeCapable) {
-            throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
-        }
-        
-        assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
-        getMessage().mimeMessageHelper.addAttachment(fileName, res, contentType)
-    }
-
-    void to(Object[] args) {
-        if (args) {
-            if (overrideAddress)
-                args = args.collect { overrideAddress }.toArray()
-
-            getMessage().setTo((args.collect { it?.toString() }) as String[])
-        }
-    }
-    
-    void to(List args) {
-        if (args) {
-            if (overrideAddress) 
-               args = args.collect { overrideAddress }
-               
-            getMessage().setTo((args.collect { it?.toString() }) as String[])
-        }
-    }
-    
-    void title(title) {
-        subject(title)
-    }
-    
-    void subject(title) {
-        getMessage().subject = title?.toString()
     }
     
     void headers(Map hdrs) {
@@ -162,6 +103,46 @@ class MailMessageBuilder {
         }
     }
     
+    void to(Object[] args) {
+        getMessage().setTo(toDestinationAddresses(args))
+    }
+    
+    void to(List args) {
+        to(*args)
+    }
+    
+    void bcc(Object[] args) {
+        getMessage().setBcc(toDestinationAddresses(args))
+    }
+    
+    void bcc(List args) {
+        bcc(*args)
+    }
+        
+    void cc(Object[] args) {
+        getMessage().setCc(toDestinationAddresses(args))
+    }
+    
+    void cc(List args) {
+        cc(*args)
+    }
+
+    void replyTo(replyTo) {
+        getMessage().replyTo = replyTo?.toString()
+    }
+    
+    void from(from) {
+        getMessage().from = from?.toString()
+    }
+    
+    void title(title) {
+        subject(title)
+    }
+    
+    void subject(title) {
+        getMessage().subject = title?.toString()
+    }
+        
     void body(body) {
         text(body)
     }
@@ -193,56 +174,6 @@ class MailMessageBuilder {
         }
     }
     
-    void bcc(bcc) {
-        if (overrideAddress)
-            bcc = overrideAddress
-    
-        getMessage().setBcc([bcc?.toString()] as String[])
-    }
-    
-    void bcc(Object[] args) {
-        if (overrideAddress)
-           args = args.collect { overrideAddress }.toArray()
-    
-        getMessage().setBcc((args.collect { it?.toString() }) as String[])
-    }
-    
-    void bcc(List args) {
-        if (overrideAddress)
-           args = args.collect { overrideAddress }
-    
-        getMessage().setBcc((args.collect { it?.toString() }) as String[])
-    }
-    
-    void cc(cc) {
-        if (overrideAddress)
-            cc = overrideAddress
-    
-        getMessage().setCc([cc?.toString()] as String[])
-    }
-    
-    void cc(Object[] args) {
-        if (overrideAddress)
-           args = args.collect { overrideAddress }.toArray()
-    
-        getMessage().setCc((args.collect { it?.toString() }) as String[])
-    }
-    
-    void cc(List args) {
-        if (overrideAddress)
-           args = args.collect { overrideAddress }
-    
-        getMessage().setCc((args.collect { it?.toString() }) as String[])
-    }
-
-    void replyTo(replyTo) {
-        getMessage().replyTo = replyTo?.toString()
-    }
-    
-    void from(from) {
-        getMessage().from = from?.toString()
-    }
-    
     void locale(String localeStr) {
         def split = localeStr.split('_')
         String language = split[0]
@@ -258,7 +189,41 @@ class MailMessageBuilder {
         this.locale = locale
     }
 
+    void attachBytes(String fileName, String contentType, byte[] bytes) {
+        attachResource(fileName, contentType, new ByteArrayResource(bytes))
+    }
+
+    void attachResource(String fileName, String contentType, Resource res) {
+        if (!mimeCapable) {
+            throw new IllegalStateException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
+        }
+        
+        assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
+        getMessage().mimeMessageHelper.addAttachment(fileName, res, contentType)
+    }
+    
     boolean isMimeCapable() {
         mailSender instanceof JavaMailSender
     }
+    
+    protected String[] toDestinationAddresses(addresses) {
+        if (overrideAddress) {
+            addresses = addresses.collect { overrideAddress }
+        }
+    
+        addresses.collect { it?.toString() } as String[]
+    }
+    
+    protected getDescription(SimpleMailMessage message) {
+        "[${message.subject}] from [${message.from}] to ${message.to}"
+    }
+    
+    protected getDescription(Message message) {
+        "[${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}"
+    }
+    
+    protected getDescription(MimeMailMessage message) {
+        getDescription(message.mimeMessage)
+    }
+    
 }
