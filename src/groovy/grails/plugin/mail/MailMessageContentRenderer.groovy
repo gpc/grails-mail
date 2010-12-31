@@ -18,16 +18,13 @@ package grails.plugin.mail
 
 import grails.util.GrailsWebUtil
 
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
-import org.codehaus.groovy.grails.web.servlet.DefaultGrailsApplicationAttributes
 import org.codehaus.groovy.grails.plugins.PluginManagerHolder
-import org.codehaus.groovy.grails.commons.GrailsResourceUtils
-import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
 
 import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.web.context.support.WebApplicationContextUtils
 import org.springframework.web.servlet.DispatcherServlet
 import org.springframework.web.servlet.i18n.FixedLocaleResolver
+
+import org.springframework.context.ApplicationContext
 
 import org.apache.commons.logging.LogFactory
 
@@ -44,46 +41,19 @@ class MailMessageContentRenderer {
     
     def groovyPagesTemplateEngine
     def groovyPagesUriService
+    def grailsApplication
         
     MailMessageContentRender render(Writer out, templateName, model, locale, pluginName = null) {
-        def requestAttributes = RequestContextHolder.getRequestAttributes()
-        def controllerName = null
-        boolean unbindRequest = false
-        
-        if (requestAttributes) {
-            controllerName = requestAttributes.controllerName
-        } else {
-            // outside of an executing request, establish a mock version
-            def servletContext = ServletContextHolder.getServletContext()
-            def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-            requestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
-            unbindRequest = true
-        }
-        
-        def request = requestAttributes.request
-        
-        if (locale) {
-            request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: locale))
-        }
-
-        def template = createTemplate(templateName, controllerName, pluginName)
-        def originalOut = requestAttributes.getOut()
-        requestAttributes.setOut(out)
-        
-        try {
+        RenderEnvironment.with(grailsApplication.mainContext, out, locale) { env ->
+            def template = createTemplate(templateName, env.controllerName, pluginName)
             if (model instanceof Map) {
                 template.make(model).writeTo(out)
             } else {
                 template.make().writeTo(out)
             }
-        } finally {
-            requestAttributes.setOut(originalOut)
-            if (unbindRequest) {
-                RequestContextHolder.setRequestAttributes(null)
-            }
+            
+            new MailMessageContentRender(out, template.metaInfo.contentType)
         }
-
-        new MailMessageContentRender(out, template.metaInfo.contentType)
     }
 
     protected createTemplate(String templateName, String controllerName, String pluginName) {
@@ -124,6 +94,58 @@ class MailMessageContentRenderer {
         }
         
         contextPath
+    }
+    
+    static private class RenderEnvironment {
+        final Writer out
+        final Locale locale
+        final ApplicationContext applicationContext
+        
+        private requestAttributes
+        private isMock = false
+        private originalOut = null
+        
+        RenderEnvironment(ApplicationContext applicationContext, Writer out, Locale locale = null) {
+            this.out = out
+            this.locale = locale
+        }
+        
+        private init() {
+            requestAttributes = RequestContextHolder.getRequestAttributes()
+            
+            if (!requestAttributes) {
+                requestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
+                isMock = true
+            }
+            
+            if (locale) {
+                requestAttributes.request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: locale))
+            }
+            
+            originalOut = requestAttributes.getOut()
+            requestAttributes.setOut(out)
+        }
+        
+        private close() {
+            requestAttributes.setOut(originalOut)
+            if (isMock) {
+                RequestContextHolder.setRequestAttributes(null)
+            }
+        }
+        
+        static with(ApplicationContext applicationContext, Writer out, Locale locale, Closure block) {
+            def env = new RenderEnvironment(applicationContext, out, locale)
+            env.init()
+            try {
+                block(env)
+            } finally {
+                env.close()
+            }
+        }
+        
+        String getControllerName() {
+            isMock ? null : requestAttributes.controllerName
+        }
     }
     
 }
