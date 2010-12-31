@@ -215,18 +215,18 @@ class MailMessageBuilder {
     }
     
     void locale(String localeStr) {
-        def split=localeStr.split('_')
-        String language=split[0]
-        if (split.length>1) {
-            String country=split[1]
-            locale=new Locale(language,country)
+        def split = localeStr.split('_')
+        String language = split[0]
+        if (split.length > 1) {
+            String country = split[1]
+            locale = new Locale(language,country)
         } else {
-            locale=new Locale(language)
+            locale = new Locale(language)
         }
     }
 
     void locale(Locale locale) {
-        this.locale=locale
+        this.locale = locale
     }
 
     boolean isMimeCapable() {
