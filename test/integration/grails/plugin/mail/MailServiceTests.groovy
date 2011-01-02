@@ -303,8 +303,8 @@ class MailServiceTests extends GroovyTestCase {
                 cc "marge@g2one.com", "ed@g2one.com"
                 bcc "joe@g2one.com"
                 title "Hello John"
-                attachBytes 'fileName', 'text/plain', 'Dear John'.getBytes("US-ASCII")
-                attachResource 'fileName2', 'application/octet-stream', new FileSystemResource(tmpFile)
+                attach 'fileName', 'text/plain', 'Dear John'.getBytes("US-ASCII")
+                attach 'fileName2', 'application/octet-stream', new FileSystemResource(tmpFile)
                 html 'this is some text'
             }
 

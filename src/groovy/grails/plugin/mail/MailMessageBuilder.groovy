@@ -184,11 +184,18 @@ class MailMessageBuilder {
         this.locale = locale
     }
 
+    /**
+     * @deprecated use attach(String, String, byte[])
+     */
     void attachBytes(String fileName, String contentType, byte[] bytes) {
-        attachResource(fileName, contentType, new ByteArrayResource(bytes))
+        attach(fileName, contentType, bytes)
     }
 
-    void attachResource(String fileName, String contentType, Resource res) {
+    void attach(String fileName, String contentType, byte[] bytes) {
+        attach(fileName, contentType, new ByteArrayResource(bytes))
+    }
+    
+    void attach(String fileName, String contentType, Resource res) {
         if (!mimeCapable) {
             throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
