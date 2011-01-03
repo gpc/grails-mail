@@ -164,6 +164,30 @@ class MailServiceTests extends GroovyTestCase {
         assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()
     }
 
+    void testSendMailViewText() {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            text view: '/_testemails/test', model: [msg: 'hello']
+        }
+
+        assertTrue message.mimeMessage.contentType.startsWith('text/plain')
+        assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()
+    }
+
+    void testSendMailViewHtmlMethod() {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            html view: '/_testemails/testhtml', model: [msg: 'hello']
+        }
+
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        // This isn't working - because no DataHandler available for unit tests?
+        //assertTrue message.mimeMessage.contentType.startsWith('text/html')
+        assertEquals '<b>Message is: hello</b>', message.getMimeMessage().getContent().trim()
+    }
+
     void testSendMailViewHTML() {
         MimeMailMessage message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"

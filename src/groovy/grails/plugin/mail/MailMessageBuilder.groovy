@@ -185,8 +185,16 @@ class MailMessageBuilder {
         mailMessageContentRenderer.render(new StringWriter(), params.view, params.model, locale, params.plugin)
     }
     
+    void text(Map params) {
+        text(doRender(params).out.toString())
+    }
+    
     void text(CharSequence text) {
         textContent = text.toString()
+    }
+
+    void html(Map params) {
+        html(doRender(params).out.toString())
     }
     
     void html(CharSequence text) {
