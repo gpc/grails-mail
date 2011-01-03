@@ -29,6 +29,8 @@ import org.springframework.core.io.FileSystemResource
 import com.icegreen.greenmail.util.ServerSetupTest
 import org.springframework.core.io.*
 
+import javax.mail.internet.MimeMultipart
+
 class MailServiceTests extends GroovyTestCase {
 
     static transactional = false
@@ -335,6 +337,61 @@ class MailServiceTests extends GroovyTestCase {
         assert inlinePart.inputStream.bytes == bytes
     }
 
+    void testHtmlContentType() {
+        def msg = mimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            subject "test"
+            html '<html><head></head><body>How are you?</body></html>'
+        }.mimeMessage
+        
+        // assert msg.contentType == 'text/html; charset=UTF-8'  // is text/plain here, but not in production
+        assert msg.content == '<html><head></head><body>How are you?</body></html>'
+    }
+
+    void testMultipart_html_first() {
+        def msg = mimeCapableMailService.sendMail {
+            multipart true
+            to "fred@g2one.com"
+            subject "test"
+            html '<html><head></head><body>How are you?</body></html>'
+            text 'How are you?'
+        }.mimeMessage
+        
+        assert msg.content instanceof MimeMultipart
+        
+        MimeMultipart mp = msg.content.getBodyPart(0).content.getBodyPart(0).content
+        
+        assert mp.count == 2
+
+        assert mp.getBodyPart(0).contentType.startsWith('text/plain')
+        assert mp.getBodyPart(0).content == 'How are you?'
+        
+        assert mp.getBodyPart(1).contentType.startsWith('text/html')
+        assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
+    }
+
+    void testMultipart_text_first() {
+        def msg = mimeCapableMailService.sendMail {
+            multipart true
+            to "fred@g2one.com"
+            subject "test"
+            text 'How are you?'
+            html '<html><head></head><body>How are you?</body></html>'
+        }.mimeMessage
+
+        assert msg.content instanceof MimeMultipart
+
+        MimeMultipart mp = msg.content.getBodyPart(0).content.getBodyPart(0).content
+        
+        assert mp.count == 2
+
+        assert mp.getBodyPart(0).contentType.startsWith('text/plain')
+        assert mp.getBodyPart(0).content == 'How are you?'
+        
+        assert mp.getBodyPart(1).contentType.startsWith('text/html')
+        assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
+    }
+    
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()
     }

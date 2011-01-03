@@ -173,7 +173,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
         assertEquals "abcdef", attachment.content.text
         assertEquals "dummy.bin", attachment.fileName
     }
-
+    
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()
     }
@@ -193,6 +193,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
     private processDsl(MailMessageBuilder builder, Closure c) {
         c.delegate = builder
         c.call()
+        builder.finishMessage()
     }
     
 }

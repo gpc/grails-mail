@@ -45,7 +45,18 @@ class MailMessageBuilder {
     private MailMessage message
     private Locale locale
     
+    private String textContent = null
+    private String htmlContent = null
+    
     boolean multipart = false // by default, we're sending non-multipart emails
+    
+    private List<Inline> inlines = []
+    
+    static private class Inline {
+        String id
+        String contentType
+        Resource resource
+    }
 
     MailMessageBuilder(MailSender mailSender, ConfigObject config, MailMessageContentRenderer mailMessageContentRenderer = null) {
         this.mailSender = mailSender
@@ -76,8 +87,7 @@ class MailMessageBuilder {
     }
 
     MailMessage sendMessage() {
-        def message = getMessage()
-        message.sentDate = new Date()
+        def message = finishMessage()
         
         if (log.traceEnabled) {
             log.trace("Sending mail ${getDescription(message)}} ...")
@@ -154,29 +164,34 @@ class MailMessageBuilder {
     }
     
     void body(Map params) {
-        if (params.view) {
-            if (mailMessageContentRenderer == null) {
-                throw new GrailsMailException("mail message builder was constructed without a message content render so cannot render views")
-            }
-            
-            // Here need to render it first, establish content type of virtual response / contentType model param
-            def render = mailMessageContentRenderer.render(new StringWriter(), params.view, params.model, locale, params.plugin)
-            
-            if (render.html) {
-                html(render.out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
-            } else {
-                text(render.out.toString())
-            }
-        } 
+        def render = doRender(params)
+    
+        if (render.html) {
+            html(render.out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
+        } else {
+            text(render.out.toString())
+        }
     }
     
-    void text(body) {
-        getMessage().text = body?.toString()
+    protected MailMessageContentRender doRender(Map params) {
+        if (mailMessageContentRenderer == null) {
+            throw new GrailsMailException("mail message builder was constructed without a message content render so cannot render views")
+        }
+        
+        if (!params.view) {
+            throw new GrailsMailException("no view specified")
+        }
+        
+        mailMessageContentRenderer.render(new StringWriter(), params.view, params.model, locale, params.plugin)
     }
     
-    void html(text) {
+    void text(CharSequence text) {
+        textContent = text.toString()
+    }
+    
+    void html(CharSequence text) {
         if (mimeCapable) {
-            getMessage().getMimeMessageHelper().setText(text?.toString(), true)
+            htmlContent = text.toString()
         } else {
             throw new GrailsMailException("mail sender is not mime capable, try configuring a JavaMailSender")
         }
@@ -210,7 +225,7 @@ class MailMessageBuilder {
     }
     
     void inline(String contentId, String contentType, Resource resource) {
-        doAdd(contentId, contentType, resource, false)
+        inlines << new Inline(id: contentId, contentType: contentType, resource: resource)
     }
     
     protected doAdd(String id, String contentType, Resource resource, boolean isAttachment) {
@@ -250,6 +265,37 @@ class MailMessageBuilder {
     
     protected getDescription(MimeMailMessage message) {
         getDescription(message.mimeMessage)
+    }
+    
+    MailMessage finishMessage() {
+        def message = getMessage()
+
+        if (htmlContent) {
+            def helper = message.getMimeMessageHelper()
+            if (textContent) {
+                helper.setText(textContent, htmlContent)
+            } else {
+                helper.setText(htmlContent, false)
+            }
+        } else {
+            if (!textContent) {
+                throw new GrailsMailException("message has no content, use text(), html() or body() methods to set content")
+            }
+            
+            message.text = textContent
+        }
+        
+        inlines.each {
+            doAdd(it.id, it.contentType, it.resource, false)
+        }
+        
+        message.sentDate = new Date()
+        
+        if (mimeCapable) {
+            message.mimeMessage.saveChanges()
+        }
+        
+        message
     }
     
 }
