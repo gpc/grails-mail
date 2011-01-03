@@ -56,7 +56,7 @@ class MailMessageBuilder {
     static private class Inline {
         String id
         String contentType
-        Resource resource
+        def toAdd
     }
 
     MailMessageBuilder(MailSender mailSender, ConfigObject config, MailMessageContentRenderer mailMessageContentRenderer = null) {
@@ -229,19 +229,19 @@ class MailMessageBuilder {
         attach(fileName, contentType, new ByteArrayResource(bytes))
     }
     
-    void attach(String fileName, String contentType, Resource resource) {
-        doAdd(fileName, contentType, resource, true)
+    void attach(String fileName, String contentType, InputStreamSource source) {
+        doAdd(fileName, contentType, source, true)
     }
     
     void inline(String contentId, String contentType, byte[] bytes) {
         inline(contentId, contentType, new ByteArrayResource(bytes))
     }
     
-    void inline(String contentId, String contentType, Resource resource) {
-        inlines << new Inline(id: contentId, contentType: contentType, resource: resource)
+    void inline(String contentId, String contentType, InputStreamSource source) {
+        inlines << new Inline(id: contentId, contentType: contentType, toAdd: source)
     }
     
-    protected doAdd(String id, String contentType, Resource resource, boolean isAttachment) {
+    protected doAdd(String id, String contentType, toAdd, boolean isAttachment) {
         if (!mimeCapable) {
             throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
@@ -250,9 +250,9 @@ class MailMessageBuilder {
 
         def helper = getMessage().mimeMessageHelper
         if (isAttachment) {
-            helper.addAttachment(MimeUtility.encodeWord(id), resource, contentType)
+            helper.addAttachment(MimeUtility.encodeWord(id), toAdd, contentType)
         } else {
-            helper.addInline(MimeUtility.encodeWord(id), resource, contentType)
+            helper.addInline(MimeUtility.encodeWord(id), toAdd, contentType)
         }
     }
     
@@ -299,7 +299,7 @@ class MailMessageBuilder {
         }
         
         inlines.each {
-            doAdd(it.id, it.contentType, it.resource, false)
+            doAdd(it.id, it.contentType, it.toAdd, false)
         }
         
         message.sentDate = new Date()
