@@ -44,6 +44,7 @@ class MailMessageBuilder {
     final String overrideAddress
     
     private MailMessage message
+    private MimeMessageHelper helper
     private Locale locale
     
     private String textContent = null
@@ -71,7 +72,7 @@ class MailMessageBuilder {
     private MailMessage getMessage() {
         if (!message) {
             if (mimeCapable) {
-                def helper = new MimeMessageHelper(mailSender.createMimeMessage(), multipart)
+                helper = new MimeMessageHelper(mailSender.createMimeMessage(), multipart)
                 message = new MimeMailMessage(helper)
             } else {
                 message = new SimpleMailMessage()
@@ -228,6 +229,26 @@ class MailMessageBuilder {
     void attach(String fileName, String contentType, byte[] bytes) {
         attach(fileName, contentType, new ByteArrayResource(bytes))
     }
+
+    void attach(File file) {
+        attach(file.name, file)
+    }
+    
+    void attach(String fileName, File file) {
+        if (!mimeCapable) {
+            throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
+        }
+        
+        attach(fileName, helper.fileTypeMap.getContentType(file), file)
+    }
+    
+    void attach(String fileName, String contentType, File file) {
+        if (!file.exists()) {
+            throw new FileNotFoundException("cannot use $file as an attachment as it does not exist")
+        }
+        
+        attach(fileName, contentType, new FileSystemResource(file))
+    }
     
     void attach(String fileName, String contentType, InputStreamSource source) {
         doAdd(fileName, contentType, source, true)
@@ -235,6 +256,26 @@ class MailMessageBuilder {
     
     void inline(String contentId, String contentType, byte[] bytes) {
         inline(contentId, contentType, new ByteArrayResource(bytes))
+    }
+
+    void inline(File file) {
+        inline(file.name, file)
+    }
+    
+    void inline(String fileName, File file) {
+        if (!mimeCapable) {
+            throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
+        }
+        
+        inline(fileName, helper.fileTypeMap.getContentType(file), file)
+    }
+
+    void inline(String contentId, String contentType, File file) {
+        if (!file.exists()) {
+            throw new FileNotFoundException("cannot use $file as an attachment as it does not exist")
+        }
+        
+        inline(contentId, contentType, new FileSystemResource(file))
     }
     
     void inline(String contentId, String contentType, InputStreamSource source) {
@@ -248,7 +289,6 @@ class MailMessageBuilder {
         
         assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
 
-        def helper = getMessage().mimeMessageHelper
         if (isAttachment) {
             helper.addAttachment(MimeUtility.encodeWord(id), toAdd, contentType)
         } else {
@@ -284,7 +324,6 @@ class MailMessageBuilder {
         def message = getMessage()
 
         if (htmlContent) {
-            def helper = message.getMimeMessageHelper()
             if (textContent) {
                 helper.setText(textContent, htmlContent)
             } else {
@@ -305,7 +344,7 @@ class MailMessageBuilder {
         message.sentDate = new Date()
         
         if (mimeCapable) {
-            message.mimeMessage.saveChanges()
+/*            message.mimeMessage.saveChanges()*/
         }
         
         message

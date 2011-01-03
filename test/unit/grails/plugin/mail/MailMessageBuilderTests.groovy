@@ -201,7 +201,73 @@ class MailMessageBuilderTests extends GroovyTestCase {
         assertEquals "abcdef", attachment.content.text
         assertEquals "dummy.bin", attachment.fileName
     }
-   
+
+    void testAttachmentUsingAttachFileNoFilenameOverride() {
+        //create temp file to attach
+        def tempFile = File.createTempFile("grailsMailUnitTest",".txt")
+        tempFile << 'abcdef'
+        
+        try {
+            processDsl {
+                multipart true
+                to "fred@g2one.com"
+                subject "Hello Fred"
+                body 'How are you?'
+                attach tempFile
+            }
+            def msg = testJavaMailSenderBuilder.message.mimeMessage
+            assertTrue msg.content instanceof MimeMultipart
+            assertEquals 2, msg.content.count
+
+            def attachment = msg.content.getBodyPart(1)
+            assertEquals 'abcdef', attachment.content
+            assertEquals tempFile.name, attachment.fileName
+            assertEquals 'text/plain', attachment.contentType
+        }
+        finally {
+            tempFile.delete()
+        }
+    }
+
+    void testAttachmentUsingAttachFileWithFilenameOverride() {
+        //create temp file to attach
+        def tempFile = File.createTempFile("grailsMailUnitTest",".txt")
+        tempFile << 'abcdef'
+        
+        try {
+            processDsl {
+                multipart true
+                to "fred@g2one.com"
+                subject "Hello Fred"
+                body 'How are you?'
+                attach 'alternativeName.txt', tempFile
+            }
+            def msg = testJavaMailSenderBuilder.message.mimeMessage
+            assertTrue msg.content instanceof MimeMultipart
+            assertEquals 2, msg.content.count
+
+            def attachment = msg.content.getBodyPart(1)
+            assertEquals 'abcdef', attachment.content
+            assertEquals 'alternativeName.txt', attachment.fileName
+            assertEquals 'text/plain', attachment.contentType
+        }
+        finally {
+            tempFile.delete()
+        }
+    }
+    
+    void testAttachFileWithNonExistentFile() {
+        def ex = shouldFail(FileNotFoundException) {
+            processDsl {
+                multipart true
+                to "fred@g2one.com"
+                subject "Hello Fred"
+                body 'How are you?'
+                attach new File("I don't exist.zip")
+            }
+        }
+    }
+    
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()
     }
