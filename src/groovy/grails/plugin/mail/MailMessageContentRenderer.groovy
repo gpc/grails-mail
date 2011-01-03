@@ -29,8 +29,6 @@ import org.springframework.context.ApplicationContext
 
 import org.apache.commons.logging.LogFactory
 
-import javax.servlet.http.HttpServletRequest
-
 /**
  * Responsible for rendering a GSP into the content of a mail message.
  */
