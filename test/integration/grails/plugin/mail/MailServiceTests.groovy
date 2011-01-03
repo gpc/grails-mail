@@ -30,6 +30,8 @@ import org.springframework.core.io.*
 
 import javax.mail.internet.MimeMultipart
 
+import org.springframework.web.context.request.RequestContextHolder
+
 class MailServiceTests extends GroovyTestCase {
 
     static transactional = false
@@ -437,7 +439,23 @@ class MailServiceTests extends GroovyTestCase {
         assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
     }
     
-    
+    // http://jira.codehaus.org/browse/GRAILSPLUGINS-2232
+    void testContentTypeDoesNotGetChanged() {
+        def originalContentType = RequestContextHolder.currentRequestAttributes().currentResponse.contentType
+
+        MimeMailMessage message = mimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body(view: '/_testemails/test', model: [msg: 'hello'])
+        }
+        
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertTrue message.mimeMessage.contentType.startsWith('text/plain')
+        assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()
+        
+        assertEquals originalContentType, RequestContextHolder.currentRequestAttributes().currentResponse.contentType
+    }
+         
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()
     }

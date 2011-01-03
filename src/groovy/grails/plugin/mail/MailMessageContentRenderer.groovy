@@ -19,6 +19,7 @@ package grails.plugin.mail
 import grails.util.GrailsWebUtil
 
 import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import org.codehaus.groovy.grails.web.servlet.WrappedResponseHolder
 
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.DispatcherServlet
@@ -101,36 +102,37 @@ class MailMessageContentRenderer {
         final Locale locale
         final ApplicationContext applicationContext
         
-        private requestAttributes
+        private originalRequestAttributes = null
+        private renderRequestAttributes
+        
         private isMock = false
         private originalOut = null
         
         RenderEnvironment(ApplicationContext applicationContext, Writer out, Locale locale = null) {
             this.out = out
             this.locale = locale
+            this.applicationContext = applicationContext
         }
         
         private init() {
-            requestAttributes = RequestContextHolder.getRequestAttributes()
+            originalRequestAttributes = RequestContextHolder.getRequestAttributes()
+            renderRequestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
             
-            if (!requestAttributes) {
-                requestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
-                isMock = true
+            if (originalRequestAttributes) {
+                renderRequestAttributes.controllerName = originalRequestAttributes.controllerName
             }
             
             if (locale) {
-                requestAttributes.request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: locale))
+                renderRequestAttributes.request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: locale))
             }
             
-            originalOut = requestAttributes.getOut()
-            requestAttributes.setOut(out)
+            renderRequestAttributes.setOut(out)
+            WrappedResponseHolder.wrappedResponse = renderRequestAttributes.currentResponse
         }
         
         private close() {
-            requestAttributes.setOut(originalOut)
-            if (isMock) {
-                RequestContextHolder.setRequestAttributes(null)
-            }
+            RequestContextHolder.setRequestAttributes(originalRequestAttributes) // null ok
+            WrappedResponseHolder.wrappedResponse = originalRequestAttributes?.currentResponse
         }
         
         static with(ApplicationContext applicationContext, Writer out, Locale locale, Closure block) {
@@ -144,7 +146,7 @@ class MailMessageContentRenderer {
         }
         
         String getControllerName() {
-            isMock ? null : requestAttributes.controllerName
+            renderRequestAttributes.controllerName
         }
     }
     
