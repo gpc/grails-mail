@@ -19,8 +19,7 @@ package grails.plugin.mail
 import javax.mail.Message
 import javax.mail.internet.MimeMessage
 
-import org.springframework.mail.javamail.MimeMailMessage
-import org.springframework.mail.javamail.JavaMailSenderImpl
+import org.springframework.mail.javamail.*
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.MailSender
 
@@ -415,6 +414,29 @@ class MailServiceTests extends GroovyTestCase {
         assert mp.getBodyPart(1).contentType.startsWith('text/html')
         assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
     }
+
+    void testMultipartMode() {
+        def msg = mimeCapableMailService.sendMail {
+            multipart MimeMessageHelper.MULTIPART_MODE_RELATED
+            to "fred@g2one.com"
+            subject "test"
+            text 'How are you?'
+            html '<html><head></head><body>How are you?</body></html>'
+        }.mimeMessage
+
+        assert msg.content instanceof MimeMultipart
+
+        MimeMultipart mp = msg.content.getBodyPart(0).content
+        
+        assert mp.count == 2
+
+        assert mp.getBodyPart(0).contentType.startsWith('text/plain')
+        assert mp.getBodyPart(0).content == 'How are you?'
+        
+        assert mp.getBodyPart(1).contentType.startsWith('text/html')
+        assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
+    }
+    
     
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()

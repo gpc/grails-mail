@@ -48,7 +48,7 @@ class MailMessageBuilder {
     private String textContent = null
     private String htmlContent = null
     
-    boolean multipart = false // by default, we're sending non-multipart emails
+    private multipart = false // by default, we're sending non-multipart emails
     
     private List<Inline> inlines = []
     
@@ -104,6 +104,10 @@ class MailMessageBuilder {
     
     void multipart(boolean multipart) {
         this.multipart = multipart
+    }
+    
+    void multipart(int multipartMode) {
+        this.multipart = multipartMode
     }
     
     void headers(Map hdrs) {
