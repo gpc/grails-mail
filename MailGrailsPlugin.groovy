@@ -45,42 +45,16 @@ sendMail {
     def documentation = "http://plugin.grails.org/mail"
 
     def observe = ['controllers','services']
-        
+    
+    def mailConfigHash = null
+    def mailConfig = null
+    def createdSession = false
+    
     def doWithSpring = {
-        def config = application.config.grails.mail
-
-        if (config.jndiName && !springConfig.containsBean("mailSession")) {
-            mailSession(JndiObjectFactoryBean) {
-                jndiName = config.jndiName
-            }
-        }
- 
-        mailSender(JavaMailSenderImpl) {
-            if (config.host) {
-                host = config.host
-            } else if (!config.jndiName) {
-                host = "localhost"
-            }
-            
-            if (config.encoding) {
-                defaultEncoding = config.encoding
-            } else if (!config.jndiName) {
-                defaultEncoding = "utf-8"
-            }
-
-            if (config.jndiName)
-                session = ref('mailSession')
-            if (config.port)
-                port = config.port
-            if (config.username)
-                username = config.username
-            if (config.password)
-                password = config.password
-            if (config.protocol)
-                protocol = config.protocol
-            if (config.props instanceof Map && config.props)
-                javaMailProperties = config.props
-        }
+        mailConfig = application.config.grails.mail
+        mailConfigHash = mailConfig.hashCode()
+        
+        configureMailSender(delegate, mailConfig)
         
         mailMessageBuilderFactory(MailMessageBuilderFactory) {
             it.autowire = true
@@ -98,7 +72,71 @@ sendMail {
     def onChange = { event ->
         configureSendMail(event.application, event.ctx)
     }
+    
+    def onConfigChange = { event ->
+        def newMailConfig = event.source.grails.mail
+        def newMailConfigHash = newMailConfig.hashCode()
+        
+        if (newMailConfigHash != mailConfigHash) {
+            if (createdSession) {
+                event.ctx.removeBeanDefinition("mailSession")
+            }
 
+            event.ctx.removeBeanDefinition("mailSender")
+            
+            mailConfig = newMailConfig
+            mailConfigHash = newMailConfigHash
+            
+            def newBeans = beans {
+                configureMailSender(delegate, mailConfig)
+            }
+            
+            newBeans.beanDefinitions.each { name, definition ->
+                event.ctx.registerBeanDefinition(name, definition)
+            }
+        }
+    }
+    
+    def configureMailSender(builder, config) {
+        builder.with {
+            if (config.jndiName && !springConfig.containsBean("mailSession")) {
+                mailSession(JndiObjectFactoryBean) {
+                    jndiName = config.jndiName
+                }
+                createdSession = true
+            } else {
+                createdSession = false
+            }
+            
+            mailSender(JavaMailSenderImpl) {
+                if (config.host) {
+                    host = config.host
+                } else if (!config.jndiName) {
+                    host = "localhost"
+                }
+
+                if (config.encoding) {
+                    defaultEncoding = config.encoding
+                } else if (!config.jndiName) {
+                    defaultEncoding = "utf-8"
+                }
+
+                if (config.jndiName)
+                    session = ref('mailSession')
+                if (config.port)
+                    port = config.port
+                if (config.username)
+                    username = config.username
+                if (config.password)
+                    password = config.password
+                if (config.protocol)
+                    protocol = config.protocol
+                if (config.props instanceof Map && config.props)
+                    javaMailProperties = config.props
+            }
+        }
+    }
+    
     def configureSendMail(application, applicationContext) {
         //adding sendMail to controllers
         application.controllerClasses*.metaClass*.sendMail = { Closure callable ->
