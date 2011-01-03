@@ -39,6 +39,7 @@ class MailMessageBuilder {
     final MailMessageContentRenderer mailMessageContentRenderer
     
     final String defaultFrom
+    final String defaultTo
     final String overrideAddress
     
     private MailMessage message
@@ -52,6 +53,7 @@ class MailMessageBuilder {
         
         this.overrideAddress = config.overrideAddress ?: null
         this.defaultFrom = overrideAddress ?: (config.default.from ?: null)
+        this.defaultTo = overrideAddress ?: (config.default.to ?: null)
     }
 
     private MailMessage getMessage() {
@@ -64,6 +66,10 @@ class MailMessageBuilder {
             }
             
             message.from = defaultFrom
+
+            if (defaultTo) {
+                message.setTo(defaultTo)
+            }
         }
         
         message

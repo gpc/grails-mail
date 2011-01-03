@@ -31,9 +31,13 @@ class MailMessageBuilderTests extends GroovyTestCase {
     def testJavaMailSenderBuilder
     def testBasicMailSenderBuilder
 
+    def defaultFrom = "from@grailsplugin.com"
+    def defaultTo = "to@grailsplugin.com"
+    
     void setUp() {
         def config = new ConfigObject()
-        config.default.from = "test@grailsplugin.com"
+        config.default.from = defaultFrom
+        config.default.to = defaultTo
         
         def mockJavaMailSender = [
                 createMimeMessage: {-> return new MimeMessage(Session.getInstance(new Properties())) }
@@ -141,6 +145,18 @@ class MailMessageBuilderTests extends GroovyTestCase {
         }
     }
 
+    void testDefaultToAndFrom() {
+        processDsl {
+            subject "Hello Fred"
+            body 'How are you?'
+        }
+
+        def msg = testJavaMailSenderBuilder.message.mimeMessage
+        assertEquals defaultTo, to(msg)[0].toString()
+        assertEquals defaultFrom, msg.from[0].toString()
+        
+    }
+    
     void testAttachment() {
         processDsl {
             multipart true
