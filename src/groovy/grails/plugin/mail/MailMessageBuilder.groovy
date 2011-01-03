@@ -195,13 +195,31 @@ class MailMessageBuilder {
         attach(fileName, contentType, new ByteArrayResource(bytes))
     }
     
-    void attach(String fileName, String contentType, Resource res) {
+    void attach(String fileName, String contentType, Resource resource) {
+        doAdd(fileName, contentType, resource, true)
+    }
+    
+    void inline(String contentId, String contentType, byte[] bytes) {
+        inline(contentId, contentType, new ByteArrayResource(bytes))
+    }
+    
+    void inline(String contentId, String contentType, Resource resource) {
+        doAdd(contentId, contentType, resource, false)
+    }
+    
+    protected doAdd(String id, String contentType, Resource resource, boolean isAttachment) {
         if (!mimeCapable) {
             throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
         
         assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
-        getMessage().mimeMessageHelper.addAttachment(fileName, res, contentType)
+
+        def helper = getMessage().mimeMessageHelper
+        if (isAttachment) {
+            helper.addAttachment(id, resource, contentType)
+        } else {
+            helper.addInline(id, resource, contentType)
+        }
     }
     
     boolean isMimeCapable() {

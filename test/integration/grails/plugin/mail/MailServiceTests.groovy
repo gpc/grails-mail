@@ -27,6 +27,7 @@ import org.springframework.mail.MailSender
 import org.springframework.core.io.FileSystemResource
 
 import com.icegreen.greenmail.util.ServerSetupTest
+import org.springframework.core.io.*
 
 class MailServiceTests extends GroovyTestCase {
 
@@ -316,6 +317,22 @@ class MailServiceTests extends GroovyTestCase {
         finally {
             tmpFile?.delete()
         }
+    }
+
+    void testInlineAttachment() {
+        def bytes = getClass().getResource("grailslogo.png").bytes
+        
+        def message = mimeCapableMailService.sendMail {
+            multipart true
+            to "fred@g2one.com", "ginger@g2one.com"
+            from "john@g2one.com"
+            title "Hello John"
+            text 'this is some text <img src="cid:abc123" />'
+            inline 'abc123', 'image/png', bytes
+        }
+        
+        def inlinePart = message.mimeMessage.content.getBodyPart(0).content.getBodyPart("<abc123>")
+        assert inlinePart.inputStream.bytes == bytes
     }
 
     private List to(MimeMessage msg) {
