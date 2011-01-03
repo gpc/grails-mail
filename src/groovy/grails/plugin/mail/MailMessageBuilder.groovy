@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory
 import javax.mail.Message
 import javax.mail.internet.MimeUtility
 
+import org.springframework.util.Assert
+
 /**
  * Provides a DSL style interface to mail message sending/generation.
  * 
@@ -113,6 +115,8 @@ class MailMessageBuilder {
     }
     
     void headers(Map hdrs) {
+        Assert.notNull(hdrs, "headers cannot be null")
+         
         // The message must be of type MimeMailMessage to add headers.
         if (!mimeCapable) {
             throw new GrailsMailException("You must use a JavaMailSender to customise the headers.")
@@ -126,50 +130,74 @@ class MailMessageBuilder {
     }
     
     void to(Object[] args) {
+        Assert.notNull(args, "to cannot be null")
+        
         getMessage().setTo(toDestinationAddresses(args))
     }
     
     void to(List args) {
+        Assert.notNull(args, "to cannot be null")
+        
         to(*args)
     }
     
     void bcc(Object[] args) {
+        Assert.notNull(args, "bcc cannot be null")
+        
         getMessage().setBcc(toDestinationAddresses(args))
     }
     
     void bcc(List args) {
+        Assert.notNull(args, "bcc cannot be null")
+        
         bcc(*args)
     }
         
     void cc(Object[] args) {
+        Assert.notNull(args, "cc cannot be null")
+        
         getMessage().setCc(toDestinationAddresses(args))
     }
     
     void cc(List args) {
+        Assert.notNull(args, "cc cannot be null")
+        
         cc(*args)
     }
 
     void replyTo(replyTo) {
+        Assert.notNull(replyTo, "replyTo cannot be null")
+        
         getMessage().replyTo = replyTo?.toString()
     }
     
     void from(from) {
+        Assert.notNull(from, "from cannot be null")
+        
         getMessage().from = from?.toString()
     }
     
     void title(title) {
+        Assert.notNull(title, "title cannot be null")
+        
         subject(title)
     }
     
     void subject(title) {
+        Assert.notNull(title, "subject cannot be null")
+        
         getMessage().subject = title?.toString()
     }
         
-    void body(body) {
+    void body(CharSequence body) {
+        Assert.notNull(body, "body cannot be null")
+        
         text(body)
     }
     
     void body(Map params) {
+        Assert.notNull(params, "body cannot be null")
+        
         def render = doRender(params)
     
         if (render.html) {
@@ -192,18 +220,26 @@ class MailMessageBuilder {
     }
     
     void text(Map params) {
+        Assert.notNull(params, "text cannot be null")
+        
         text(doRender(params).out.toString())
     }
     
     void text(CharSequence text) {
+        Assert.notNull(text, "text cannot be null")
+        
         textContent = text.toString()
     }
 
     void html(Map params) {
+        Assert.notNull(params, "html cannot be null")
+        
         html(doRender(params).out.toString())
     }
     
     void html(CharSequence text) {
+        Assert.notNull(text, "html cannot be null")
+        
         if (mimeCapable) {
             htmlContent = text.toString()
         } else {
@@ -212,10 +248,14 @@ class MailMessageBuilder {
     }
     
     void locale(String localeStr) {
+        Assert.notNull(localeStr, "locale cannot be null")
+        
         locale(new Locale(*localeStr.split('_', 3)))
     }
 
     void locale(Locale locale) {
+        Assert.notNull(locale, "locale cannot be null")
+        
         this.locale = locale
     }
 
