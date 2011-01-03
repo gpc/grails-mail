@@ -22,6 +22,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSender
 import javax.mail.internet.MimeMultipart
+import javax.mail.internet.MimeUtility
 
 /**
  * Test case for {@link MailMessageBuilder}.
@@ -164,14 +165,18 @@ class MailMessageBuilderTests extends GroovyTestCase {
             subject "Hello Fred"
             body 'How are you?'
             attachBytes "dummy.bin", "application/binary", "abcdef".bytes
+            attachBytes "äöü.bin", "application/binary", "abcdef".bytes
         }
         def msg = testJavaMailSenderBuilder.message.mimeMessage
         assertTrue msg.content instanceof MimeMultipart
-        assertEquals 2, msg.content.count
+        assertEquals 3, msg.content.count
 
         def attachment = msg.content.getBodyPart(1)
         assertEquals "abcdef", attachment.content.text
         assertEquals "dummy.bin", attachment.fileName
+        
+        attachment = msg.content.getBodyPart(2)
+        assertEquals MimeUtility.encodeWord("äöü.bin"), attachment.fileName
     }
     
     private List to(MimeMessage msg) {

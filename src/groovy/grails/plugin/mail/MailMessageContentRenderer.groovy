@@ -29,6 +29,8 @@ import org.springframework.context.ApplicationContext
 
 import org.apache.commons.logging.LogFactory
 
+import javax.mail.internet.MimeUtility
+
 /**
  * Responsible for rendering a GSP into the content of a mail message.
  */

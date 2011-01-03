@@ -24,6 +24,7 @@ import org.springframework.core.io.*
 import org.apache.commons.logging.LogFactory
 
 import javax.mail.Message
+import javax.mail.internet.MimeUtility
 
 /**
  * Provides a DSL style interface to mail message sending/generation.
@@ -249,9 +250,9 @@ class MailMessageBuilder {
 
         def helper = getMessage().mimeMessageHelper
         if (isAttachment) {
-            helper.addAttachment(id, resource, contentType)
+            helper.addAttachment(MimeUtility.encodeWord(id), resource, contentType)
         } else {
-            helper.addInline(id, resource, contentType)
+            helper.addInline(MimeUtility.encodeWord(id), resource, contentType)
         }
     }
     
