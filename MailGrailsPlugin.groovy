@@ -56,8 +56,18 @@ sendMail {
         }
  
         mailSender(JavaMailSenderImpl) {
-            host = config.host ?: "localhost"
-            defaultEncoding = config.encoding ?: "utf-8"
+            if (config.host) {
+                host = config.host
+            } else if (!config.jndiName) {
+                host = "localhost"
+            }
+            
+            if (config.encoding) {
+                defaultEncoding = config.encoding
+            } else if (!config.jndiName) {
+                defaultEncoding = "utf-8"
+            }
+
             if (config.jndiName)
                 session = ref('mailSession')
             if (config.port)
