@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>1. Introduction</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    The Grails mail plugin provides a convenient DSL for <em class="italic">sending</em> email. It supports plain text, html, attachments, inline resources and i18n among other features.<p class="paragraph"/>Mail can be sent using the <code>mailService</code> via the <code>sendMail</code> method. Here is an example…<p class="paragraph"/><div class="code"><pre>mailService.sendMail &#123;
+   to <span class="java&#45;quote">"fred<code>gmail.com"</span>,<span class="java&#45;quote">"ginger</code>gmail.com"</span>
+   from <span class="java&#45;quote">"john@gmail.com"</span>
+   cc <span class="java&#45;quote">"marge<code>gmail.com"</span>, <span class="java&#45;quote">"ed</code>gmail.com"</span>
+   bcc <span class="java&#45;quote">"joe@gmail.com"</span>
+   subject <span class="java&#45;quote">"Hello John"</span>
+   text '<span class="java&#45;keyword">this</span> is some text'
+&#125;</pre></div><p class="paragraph"/>Here we are sending a plain text email with no attachments to the given addresses.
+    </body>
+</html>

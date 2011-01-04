@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>2. SMTP Server Configuration</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    By default the plugin assumes an unsecured mail server configured at localhost on port 25. However you can change this via the grails-app/Config.groovy file. For example here is how you would configure the default sender to send with a Gmail account:<p class="paragraph"/><div class="code"><pre>grails &#123;
+   mail &#123;
+     host = <span class="java&#45;quote">"smtp.gmail.com"</span>
+     port = 465
+     username = <span class="java&#45;quote">"youracount@gmail.com"</span>
+     password = <span class="java&#45;quote">"yourpassword"</span>
+     props = &#91;<span class="java&#45;quote">"mail.smtp.auth"</span>:<span class="java&#45;quote">"<span class="java&#45;keyword">true</span>"</span>,
+              <span class="java&#45;quote">"mail.smtp.socketFactory.port"</span>:<span class="java&#45;quote">"465"</span>,
+              <span class="java&#45;quote">"mail.smtp.socketFactory.class"</span>:<span class="java&#45;quote">"javax.net.ssl.SSLSocketFactory"</span>,
+              <span class="java&#45;quote">"mail.smtp.socketFactory.fallback"</span>:<span class="java&#45;quote">"<span class="java&#45;keyword">false</span>"</span>&#93;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>And the configuration for sending via a Hotmail/Live account:<p class="paragraph"/><div class="code"><pre>grails &#123;
+   mail &#123;
+     host = <span class="java&#45;quote">"smtp.live.com"</span>
+     port = 587
+     username = <span class="java&#45;quote">"youracount@live.com"</span>
+     password = <span class="java&#45;quote">"yourpassword"</span>
+     props = &#91;<span class="java&#45;quote">"mail.smtp.starttls.enable"</span>:<span class="java&#45;quote">"<span class="java&#45;keyword">true</span>"</span>, 
+                  <span class="java&#45;quote">"mail.smtp.port"</span>:<span class="java&#45;quote">"587"</span>&#93;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>If your mail session is provided via JNDI you can use the jndiName setting:<p class="paragraph"/><div class="code"><pre>grails.mail.jndiName = <span class="java&#45;quote">"myMailSession"</span></pre></div>
+    </body>
+</html>
