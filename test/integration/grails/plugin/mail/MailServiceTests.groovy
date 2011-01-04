@@ -455,7 +455,19 @@ class MailServiceTests extends GroovyTestCase {
         
         assertEquals originalContentType, RequestContextHolder.currentRequestAttributes().currentResponse.contentType
     }
-         
+     
+    void testViewResolutionFromPlugin() {
+        MimeMailMessage message = mimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body view: '/email/email', plugin: 'for-plugin-view-resolution'
+        }
+
+        assertEquals "Hello John", message.getMimeMessage().getSubject()
+        assertTrue message.mimeMessage.contentType.startsWith('text/plain')
+        assertEquals 'This is from a plugin!!!', message.getMimeMessage().getContent().trim()
+    }
+    
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()
     }

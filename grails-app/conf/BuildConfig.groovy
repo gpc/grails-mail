@@ -16,3 +16,8 @@ grails.project.dependency.resolution = {
         }
     }
 }
+
+if (appName == "grails-mail") {
+    // use for testing view resolution from plugins
+    grails.plugin.location.'for-plugin-view-resolution' = 'plugins/for-plugin-view-resolution'
+}

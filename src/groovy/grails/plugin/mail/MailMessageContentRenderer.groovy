@@ -69,9 +69,15 @@ class MailMessageContentRenderer {
         }
         
         def contextPath = getContextPath(pluginName)
-        def templateUri = groovyPagesUriService.getDeployedViewURI(controllerName, templateName)
-        def uris = ["$contextPath$templateUri", "$contextPath/grails-app/views$templateUri"] as String[]
-        def template = groovyPagesTemplateEngine.createTemplateForUri(uris)
+        
+        def templateUri
+        if (contextPath) {
+            templateUri = contextPath + groovyPagesUriService.getViewURI(controllerName, templateName)
+        } else {
+            templateUri = groovyPagesUriService.getDeployedViewURI(controllerName, templateName)
+        }
+
+        def template = groovyPagesTemplateEngine.createTemplateForUri(templateUri)
         
         if (!template) {
             if (pluginName) {
@@ -90,7 +96,7 @@ class MailMessageContentRenderer {
         if (pluginName) {
             def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
             if (plugin && !plugin.isBasePlugin()) {
-                contextPath = plugin.pluginPath
+                contextPath = plugin.pluginPath + "/grails-app/views"
             }
         }
         
