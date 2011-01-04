@@ -115,7 +115,7 @@ class MailMessageBuilder {
     }
     
     void headers(Map hdrs) {
-        Assert.notNull(hdrs, "headers cannot be null")
+        Assert.notEmpty(hdrs, "headers cannot be null")
          
         // The message must be of type MimeMailMessage to add headers.
         if (!mimeCapable) {
@@ -125,65 +125,77 @@ class MailMessageBuilder {
         def msg = getMessage()
         msg = msg.mimeMessageHelper.mimeMessage
         hdrs.each { name, value ->
-            msg.setHeader(name.toString(), value?.toString())
+            def nameString = name?.toString()
+            def valueString = value?.toString()
+            
+            Assert.hasText(nameString, "header names cannot be null or empty")
+            Assert.hasText(valueString, "header value for '$nameString' cannot be null")
+
+            msg.setHeader(nameString, valueString)
         }
     }
     
     void to(Object[] args) {
-        Assert.notNull(args, "to cannot be null")
+        Assert.notEmpty(args, "to cannot be null or empty")
+        Assert.noNullElements(args, "to cannot contain null elements") 
         
         getMessage().setTo(toDestinationAddresses(args))
     }
     
     void to(List args) {
-        Assert.notNull(args, "to cannot be null")
+        Assert.notEmpty(args, "to cannot be null or empty")
+        Assert.noNullElements(args.toArray(), "to cannot contain null elements")
         
         to(*args)
     }
     
     void bcc(Object[] args) {
-        Assert.notNull(args, "bcc cannot be null")
+        Assert.notEmpty(args, "bcc cannot be null or empty")
+        Assert.noNullElements(args, "bcc cannot contain null elements") 
         
         getMessage().setBcc(toDestinationAddresses(args))
     }
     
     void bcc(List args) {
-        Assert.notNull(args, "bcc cannot be null")
+        Assert.notEmpty(args, "bcc cannot be null or empty")
+        Assert.noNullElements(args.toArray(), "bcc cannot contain null elements") 
         
         bcc(*args)
     }
         
     void cc(Object[] args) {
-        Assert.notNull(args, "cc cannot be null")
+        Assert.notEmpty(args, "cc cannot be null or empty")
+        Assert.noNullElements(args, "cc cannot contain null elements") 
         
         getMessage().setCc(toDestinationAddresses(args))
     }
     
     void cc(List args) {
-        Assert.notNull(args, "cc cannot be null")
+        Assert.notEmpty(args, "cc cannot be null or empty")
+        Assert.noNullElements(args.toArray(), "cc cannot contain null elements") 
         
         cc(*args)
     }
 
-    void replyTo(replyTo) {
-        Assert.notNull(replyTo, "replyTo cannot be null")
+    void replyTo(CharSequence replyTo) {
+        Assert.hasText(replyTo, "replyTo cannot be null or 0 length")
         
         getMessage().replyTo = replyTo.toString()
     }
     
-    void from(from) {
-        Assert.notNull(from, "from cannot be null")
+    void from(CharSequence from) {
+        Assert.hasText(from, "from cannot be null or 0 length")
         
         getMessage().from = from.toString()
     }
     
-    void title(title) {
+    void title(CharSequence title) {
         Assert.notNull(title, "title cannot be null")
         
         subject(title)
     }
     
-    void subject(title) {
+    void subject(CharSequence title) {
         Assert.notNull(title, "subject cannot be null")
         
         getMessage().subject = title.toString()
@@ -196,7 +208,7 @@ class MailMessageBuilder {
     }
     
     void body(Map params) {
-        Assert.notNull(params, "body cannot be null")
+        Assert.notEmpty(params, "body cannot be null or empty")
         
         def render = doRender(params)
     
@@ -220,7 +232,7 @@ class MailMessageBuilder {
     }
     
     void text(Map params) {
-        Assert.notNull(params, "text cannot be null")
+        Assert.notEmpty(params, "text cannot be null or empty")
         
         text(doRender(params).out.toString())
     }
@@ -232,7 +244,7 @@ class MailMessageBuilder {
     }
 
     void html(Map params) {
-        Assert.notNull(params, "html cannot be null")
+        Assert.notEmpty(params, "html cannot be null or empty")
         
         html(doRender(params).out.toString())
     }
@@ -248,7 +260,7 @@ class MailMessageBuilder {
     }
     
     void locale(String localeStr) {
-        Assert.notNull(localeStr, "locale cannot be null")
+        Assert.hasText(localeStr, "locale cannot be null or empty")
         
         locale(new Locale(*localeStr.split('_', 3)))
     }
