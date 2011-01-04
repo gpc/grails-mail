@@ -1,0 +1,21 @@
+
+h1. sendMail
+
+h2. Purpose
+
+
+
+h2. Examples
+
+{code:java}
+foo.sendMail(closure)
+{code}
+
+h2. Description
+
+
+
+Arguments:
+
+[* @closure@
+]
