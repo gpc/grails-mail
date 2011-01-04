@@ -1,3 +1,5 @@
 stacktrace.log
 test/reports
 target/
+plugin.xml
+*.zip
