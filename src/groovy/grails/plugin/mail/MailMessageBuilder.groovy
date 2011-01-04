@@ -168,13 +168,13 @@ class MailMessageBuilder {
     void replyTo(replyTo) {
         Assert.notNull(replyTo, "replyTo cannot be null")
         
-        getMessage().replyTo = replyTo?.toString()
+        getMessage().replyTo = replyTo.toString()
     }
     
     void from(from) {
         Assert.notNull(from, "from cannot be null")
         
-        getMessage().from = from?.toString()
+        getMessage().from = from.toString()
     }
     
     void title(title) {
@@ -186,7 +186,7 @@ class MailMessageBuilder {
     void subject(title) {
         Assert.notNull(title, "subject cannot be null")
         
-        getMessage().subject = title?.toString()
+        getMessage().subject = title.toString()
     }
         
     void body(CharSequence body) {
