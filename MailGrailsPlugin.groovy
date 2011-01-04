@@ -139,15 +139,19 @@ sendMail {
     
     def configureSendMail(application, applicationContext) {
         //adding sendMail to controllers
-        application.controllerClasses*.metaClass*.sendMail = { Closure callable ->
-            applicationContext.mailService?.sendMail(callable)
+        for (controllerClass in application.controllerClasses) {
+            controllerClass.metaClass.sendMail = { Closure dsl ->
+                applicationContext.mailService.sendMail(dsl)
+            }
         }
 
+        def mailServiceClassName = applicationContext.mailService.class.name
+        
         //adding sendMail to all services, besides the mailService of the plugin
-        application.serviceClasses.each { serviceClass ->
-            if (serviceClass.metaClass?.theClass?.name != applicationContext.mailService?.metaClass?.theClass?.name){
-                serviceClass.metaClass.sendMail = { Closure callable ->
-                    applicationContext.mailService?.sendMail(callable)
+        for (serviceClass in application.serviceClasses) {
+            if (serviceClass.clazz.name != mailServiceClassName) {
+                serviceClass.metaClass.sendMail = { Closure dsl ->
+                    applicationContext.mailService.sendMail(dsl)
                 }
             }
         }
