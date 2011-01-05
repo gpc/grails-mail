@@ -379,7 +379,7 @@ class MailMessageBuilder {
             if (textContent) {
                 helper.setText(textContent, htmlContent)
             } else {
-                helper.setText(htmlContent, false)
+                helper.setText(htmlContent, true)
             }
         } else {
             if (!textContent) {

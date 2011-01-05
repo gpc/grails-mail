@@ -148,8 +148,7 @@ class MailServiceTests extends GroovyTestCase {
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
-        // This isn't working - because no DataHandler available for unit tests?
-        //assertTrue message.mimeMessage.contentType.startsWith('text/html')
+        assertTrue message.mimeMessage.contentType.startsWith('text/html')
         assertEquals '<b>Hello</b> World', message.getMimeMessage().getContent()
     }
 
@@ -184,8 +183,7 @@ class MailServiceTests extends GroovyTestCase {
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
-        // This isn't working - because no DataHandler available for unit tests?
-        //assertTrue message.mimeMessage.contentType.startsWith('text/html')
+        assertTrue message.mimeMessage.contentType.startsWith('text/html')
         assertEquals '<b>Message is: hello</b>', message.getMimeMessage().getContent().trim()
     }
 
@@ -197,8 +195,7 @@ class MailServiceTests extends GroovyTestCase {
         }
 
         assertEquals "Hello John", message.getMimeMessage().getSubject()
-        // This isn't working - because no DataHandler available for unit tests?
-        //assertTrue message.mimeMessage.contentType.startsWith('text/html')
+        assertTrue message.mimeMessage.contentType.startsWith('text/html')
         assertEquals '<b>Message is: hello</b>', message.getMimeMessage().getContent().trim()
     }
 
@@ -369,7 +366,7 @@ class MailServiceTests extends GroovyTestCase {
             html '<html><head></head><body>How are you?</body></html>'
         }.mimeMessage
         
-        // assert msg.contentType == 'text/html; charset=UTF-8'  // is text/plain here, but not in production
+        assert msg.contentType.startsWith("text/html")
         assert msg.content == '<html><head></head><body>How are you?</body></html>'
     }
 
