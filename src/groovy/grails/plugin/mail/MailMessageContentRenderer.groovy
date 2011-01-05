@@ -22,6 +22,7 @@ import org.codehaus.groovy.grails.plugins.PluginManagerHolder
 import org.codehaus.groovy.grails.web.servlet.WrappedResponseHolder
 
 import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.servlet.support.RequestContextUtils
 import org.springframework.web.servlet.DispatcherServlet
 import org.springframework.web.servlet.i18n.FixedLocaleResolver
 
@@ -127,9 +128,14 @@ class MailMessageContentRenderer {
                 renderRequestAttributes.controllerName = originalRequestAttributes.controllerName
             }
             
+            def renderLocale
             if (locale) {
-                renderRequestAttributes.request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: locale))
+                renderLocale = locale
+            } else if (originalRequestAttributes) {
+                renderLocale = RequestContextUtils.getLocale(originalRequestAttributes.request)
             }
+            
+            renderRequestAttributes.request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: renderLocale))
             
             renderRequestAttributes.setOut(out)
             WrappedResponseHolder.wrappedResponse = renderRequestAttributes.currentResponse
