@@ -111,7 +111,6 @@ class MailMessageContentRenderer {
         private originalRequestAttributes = null
         private renderRequestAttributes
         
-        private isMock = false
         private originalOut = null
         
         RenderEnvironment(ApplicationContext applicationContext, Writer out, Locale locale = null) {
