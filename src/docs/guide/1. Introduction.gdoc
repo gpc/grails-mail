@@ -14,3 +14,13 @@ mailService.sendMail {
 {code}
 
 Here we are sending a plain text email with no attachments to the given addresses.
+
+The @sendMail@ method is injected into all controllers to simplify access:
+
+{code}
+sendMail {
+   to "fred@g2one.com"
+   subject "Hello Fred"
+   text 'How are you?'
+}
+{code}
