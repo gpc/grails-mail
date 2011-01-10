@@ -54,18 +54,6 @@ sendMail {
 }
 {code}
 
-There is a pitfall when using a List for storing the recipients. You'll have to invoke toArray when providing it to the builder, like this:
-
-{code}
-sendMail {
-    to issue.watchers.email.toArray()
-    subject "The issue you watch has been updated"
-    body "Hello Watcher!"
-}
-{code}
-
-If you forget the call to @toArray@, Groovy will convert the list (even a list with a single entry) to a @String@ (the same way it does on the interactive console). The result will be something that is not a valid email address and you'll face @javax.mail.internet.AddressException@.
-
 h3. Attachments
 
 Since version 0.9 attachment support has been improved. It is possible to have both, email body and multiple attachments. In order to activate multipart support, the 'multipart true' must be the first element in the closure passed to the sendMail method, e.g.:
