@@ -67,8 +67,3 @@ sendMail {
 {code}
 
 See also [GRAILSPLUGINS-1175|http://jira.codehaus.org/browse/GRAILSPLUGINS-1175].
-
-h3. Troubleshooting
-
-* If you face @javax.mail.internet.AddressException@ errors referring to "Illegal address in string" or "Missing ']' in string", it could be that you try to send to a @List@ of recipients, which is not supported by the plugin. See 'Multiple recipients' above for information how to deal with that.
-* If you call sendMail in a service class rendering a gsp template, you may realize that the plugin is rendering the template as text/plain instead of html. To solve this issue you have to put in your gsp <%@ page contentType="text/html" %> or <%@ page contentType="text/xhtml" %> without setting the encoding
