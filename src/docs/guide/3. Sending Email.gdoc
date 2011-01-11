@@ -24,7 +24,7 @@ If you wish to render a mail body from a GSP view from anywhere in your applicat
 sendMail {
   to "john@g2one.com"
   subject "Hello John"
-  body( view:"/emailconfirmation/mail/confirmationRequest",
+  html( view:"/emailconfirmation/mail/confirmationRequest",
       plugin:"email-confirmation",
       model:[fromAddress:'bill@microsoft.com'])
 }
@@ -32,13 +32,11 @@ sendMail {
 
 The view is the absolute path (or relative if you have a current controller) to the GSP. The plugin parameter is optional - if you need to render a template that may exist in a plugin installed in your application, you must include the name here. The model parameter is a map representing the model the GSP will see for rendering data.
 
-In this case the content type will be auto-sensed - use the GSP page contentType directive to set the content-type to use in the e-mail. The *default* is text/plain so you must include this at the top of the GSP for a HTML email:
+The content-type is always set to text/html when using the @html@ method. When using the @body@ method, the content-type defaults to text/plain, so you must include the GSP page contentType directive at the top of the GSP for a HTML email:
 
 {code}
 <%@ page contentType="text/html"%>
 {code}
-
-Note however that due to a limitation of the underlying Spring APIs used, XHTML content type text/xhtml will not result in a correct XHTML email.
 
 This plugin also accepts emails in the form "Bill Gates<bill@microsoft.com>". This allows you to specify the sender display name in mail clients.
 
