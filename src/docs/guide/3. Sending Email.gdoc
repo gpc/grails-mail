@@ -1,3 +1,21 @@
+
+h3. Recipients
+
+The DSL provides @to@, @cc@ and @bcc@ methods that allow you to set one or more address values for these recipient types.
+
+{code}
+sendMail {
+    to "someone@org.com"
+    cc "manager@org.com"
+    bcc "employee1\@org.com", "employee2\@org.com"
+    …
+}
+{code}
+
+All methods take one or more string values that are an email address using the syntax of "RFC822":http://www.ietf.org/rfc/rfc822.txt. Typical address syntax is of the form @"user\@host.domain"@ or @"Personal Name <user\@host.domain>"@.
+
+h3. Message Content
+
 To send HTML mail you can use the @html@ method instead of the @body@ method:
 
 {code}
@@ -40,17 +58,6 @@ The content-type is always set to text/html when using the @html@ method. When u
 
 This plugin also accepts emails in the form "Bill Gates<bill@microsoft.com>". This allows you to specify the sender display name in mail clients.
 
-h3. Multiple recipients
-
-You can send mail to multiple recipients (in either of 'to', 'cc' or 'bcc') at once.
-
-{code}
-sendMail {
-    to "fred\@g2one.com", "ginger@g2one.com"
-    subject "Hello to mutliple recipients"
-    body "Hello Fred! Hello Ginger!"
-}
-{code}
 
 h3. Attachments
 
