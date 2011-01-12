@@ -396,11 +396,6 @@ class MailMessageBuilder {
         }
         
         message.sentDate = new Date()
-        
-        if (mimeCapable) {
-/*            message.mimeMessage.saveChanges()*/
-        }
-        
         message
     }
     
