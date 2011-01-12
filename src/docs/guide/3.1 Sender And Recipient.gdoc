@@ -1,0 +1,17 @@
+h3. Recipients
+
+The DSL provides @to@, @cc@ and @bcc@ methods that allow you to set one or more address values for these recipient types.
+
+{code}
+sendMail {
+    to "someone@org.com"
+    cc "manager@org.com"
+    bcc "employee1\@org.com", "employee2\@org.com"
+    …
+}
+{code}
+
+All methods take one or more string values that are an email address using the syntax of "RFC822":http://www.ietf.org/rfc/rfc822.txt. Typical address syntax is of the form @"user\@host.domain"@ or @"Personal Name <user\@host.domain>"@.
+
+h3. Sender
+

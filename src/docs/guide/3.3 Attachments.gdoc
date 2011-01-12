@@ -1,0 +1,13 @@
+Since version 0.9 attachment support has been improved. It is possible to have both, email body and multiple attachments. In order to activate multipart support, the 'multipart true' must be the first element in the closure passed to the sendMail method, e.g.:
+
+{code}
+sendMail {
+    multipart true
+    to issue.watchers.email.toArray()
+    subject "The issue you watch has been updated"
+    body "Hello Watcher!"
+    attachBytes "Some-File-Name.xml", "text/xml", contentOrder.getBytes("UTF-8")
+}
+{code}
+
+See also [GRAILSPLUGINS-1175|http://jira.codehaus.org/browse/GRAILSPLUGINS-1175].
