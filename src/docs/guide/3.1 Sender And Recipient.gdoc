@@ -15,3 +15,15 @@ All methods take one or more string values that are an email address using the s
 
 h3. Sender
 
+The sender address of the email is configured by the @from@ method.
+
+{code}
+sendMail {
+    from "me@org.com"
+    …
+}
+{code}
+
+The @from@ method accepts one string value email address using the syntax of "RFC822":http://www.ietf.org/rfc/rfc822.txt. Typical address syntax is of the form @"user\@host.domain"@ or @"Personal Name <user\@host.domain>"@.
+
+If no value is provided for @from@ when sending an email, the _default from address_ will be used.
