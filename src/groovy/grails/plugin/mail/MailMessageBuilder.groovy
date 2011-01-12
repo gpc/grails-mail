@@ -80,7 +80,9 @@ class MailMessageBuilder {
                 message = new SimpleMailMessage()
             }
             
-            message.from = defaultFrom
+            if (defaultFrom) {
+                message.from = defaultFrom
+            }
 
             if (defaultTo) {
                 message.setTo(defaultTo)
