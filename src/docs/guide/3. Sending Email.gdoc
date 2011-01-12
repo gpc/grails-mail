@@ -55,48 +55,88 @@ All methods take one or more string values that are an email address using the s
 
 h3. Message Content
 
-To send HTML mail you can use the @html@ method instead of the @body@ method:
+Message content is specified by either the @text@ and/or @html@ methods that specify either the plain text or HTML content respectively.
 
-{code}
-sendMail {
-  to "fred@g2one.com"
-  subject "Hello John"
-  html "<b>Hello</b> World"
-}
-{code}
+{note}
+As of version 1.0, the @body@ method that could be used to specify the message content has been deprecated (but is still there). The @body@ method requires the user to specify the content type of the message using a GSP directive such as:
 
-If your HTML is contained within a GSP template you can use the render tag called as a method (available in controllers and tag libraries):
-
-{code}
-sendMail {
-  to "john@g2one.com"
-  subject "Hello John"
-  html g.render(template: "myMailTemplate")
-}
-{code}
-
-If you wish to render a mail body from a GSP view from anywhere in your application, including from services or jobs where there may or may not be a current request, you can pass a view, model, and optional plugin to the @html@ method:
-
-{code}
-sendMail {
-  to "john@g2one.com"
-  subject "Hello John"
-  html(view: "/emailconfirmation/mail/confirmationRequest",
-      plugin: "email-confirmation",
-      model: [fromAddress: "bill@microsoft.com"])
-}
-{code}
-
-The view is the absolute path (or relative if you have a current controller) to the GSP. If you need to render a template that may exist in a plugin installed in your application, you must include the name in the plugin parameter. The model parameter is a map representing the model the GSP will see for rendering data.
-
-The content-type is always set to text/html when using the @html@ method. When using the @body@ method, the content-type defaults to text/plain, so you must include the GSP page contentType directive at the top of the GSP for a HTML email:
-
-{code}
 <%\@ page contentType="text/html" %>
+{note}
+
+h4. HTML Email
+
+To send HTML mail you can use the @html@ method. This will set the content type of the message to @text/html@.
+
+You can either supply a string value…
+
+{code}
+sendMail {
+    to "user@somewhere.org"
+    subject "Hello John"
+    html "<b>Hello</b> World"
+}
 {code}
 
-This plugin also accepts emails in the form "Bill Gates<bill@microsoft.com>". This allows you to specify the sender display name in mail clients.
+Or a view to render to form the content…
 
+{code}
+sendMail {
+    to "user@somewhere.org"
+    subject "Hello John"
+    html view: "/emails/hello", model: [param1: "value1", param2: "value2"]
+}
+{code}
+
+See the section on using views for more details of the parameters to this version of @html@.
+
+h4. Plain Text Email
+
+To send plain text mail you can use the @text@ method. This will set the content type of the message to @text/plain@. 
+
+You can either supply a string value…
+
+{code}
+sendMail {
+    to "user@somewhere.org"
+    subject "Hello John"
+    text "Hello World"
+}
+{code}
+
+Or a view to render to form the content…
+
+{code}
+sendMail {
+    to "user@somewhere.org"
+    subject "Hello John"
+    text view: "/emails/hello", model: [param1: "value1", param2: "value2"]
+}
+{code}
+
+See the section on using views for more details of the parameters to this version of @text@.
+
+h4. Plain Text *and* HTML
+
+It is possible to send a multipart message that contains both plain text and HTML versions of the message. In this situation, the mail reading client is responsible for selecting the variant to display to the user.
+
+To do this, simply use both the @html@ and @text@ methods…
+
+{code}
+sendMail {
+    to "user@somewhere.org"
+    subject "Hello John"
+    text view: "/emails/text-hello", model: [param1: "value1", param2: "value2"]
+    html view: "/emails/html-hello", model: [param1: "value1", param2: "value2"]
+}
+{code}
+
+h4. Using Views
+
+The _view_ is the absolute path (or relative to the current controller if during a request) to the GSP, just like the existing Grails @render@ method.
+
+If the view you wish to render comes from a plugin you must specify the plugin name as the _plugin_ parameter, just like the existing Grails @render@ method.
+
+The _model_ parameter is a map representing the model the GSP will see for rendering data, just like the existing Grails @render@ method.
 
 h3. Attachments
 
