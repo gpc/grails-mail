@@ -7,7 +7,7 @@ grails.project.dependency.resolution = {
         mavenRepo "http://download.java.net/maven/2/"
     }
     dependencies {
-        compile "javax.mail:mail:1.4.1"
+        compile "javax.mail:mail:1.4.3"
         runtime "org.springframework:org.springframework.test:3.0.3.RELEASE"
     }
     plugins {
