@@ -1,4 +1,4 @@
-Mail is sent using the @sendMail()@ method of the @mailService@. This plugin also adds a shortcut @sendMail()@ method to all controllers and services in your application that simply delegates to the @mailService@.
+Mail is sent using the @sendMail()@ method of the @mailService@. This plugin also adds a shortcut @sendMail()@ method to all controllers and services in your application that simply delegates to the @mailService@. There is no difference between the two methods so the choice is stylistic.
 
 {code}
 class PersonController {
@@ -17,8 +17,6 @@ class PersonController {
 {code}
 
 The @sendMail()@ method takes a single @Closure@ argument that uses a DSL to configure the message to be sent. This section describes the aspects of the DSL.
-
-Alternatively, you can use the @sendMail@ method of the @mailService@ directly.
 
 {code}
 class PersonController {
