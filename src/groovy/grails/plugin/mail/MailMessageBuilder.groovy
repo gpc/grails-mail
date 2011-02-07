@@ -52,7 +52,7 @@ class MailMessageBuilder {
     private String textContent = null
     private String htmlContent = null
     
-    private multipart = false // by default, we're sending non-multipart emails
+    private multipart = false
     
     private List<Inline> inlines = []
     
