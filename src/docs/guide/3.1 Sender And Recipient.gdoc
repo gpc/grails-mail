@@ -13,6 +13,17 @@ sendMail {
 
 All methods take one or more string values that are an email address using the syntax of "RFC822":http://www.ietf.org/rfc/rfc822.txt. Typical address syntax is of the form @"user\@host.domain"@ or @"Personal Name <user\@host.domain>"@.
 
+You can supply multiple values for @to@, @cc@ and @bcc@.
+
+{code}
+sendMail {
+    to "someone@org.com", "someone.else@org.com"
+    …
+}
+{code}
+
+If no value is provided for @to@ when sending an email, the _default to address_ will be used.
+
 h3. Sender
 
 The sender address of the email is configured by the @from@ method.
