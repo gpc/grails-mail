@@ -24,6 +24,10 @@ sendMail {
 
 If no value is provided for @to@ when sending an email, the _default to address_ will be used.
 
+{warning}
+If the configuration property @grails.mail.overrideAddress@ is set, each recipient address specified will be substituted with the override address. See the configuration section for more information.
+{warning}
+
 h3. Sender
 
 The sender address of the email is configured by the @from@ method.
