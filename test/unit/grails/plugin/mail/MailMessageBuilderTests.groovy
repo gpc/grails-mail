@@ -162,6 +162,21 @@ class MailMessageBuilderTests extends GroovyTestCase {
         assertEquals defaultFrom, msg.from[0].toString()
     }
 
+    void testEnvelopeFrom() {
+        processDsl {
+            to "fred@g2one.com"
+            from "john@g2one.com"
+            envelopeFrom "peter@g2one.com"
+            subject "Hello Fred"
+            body 'How are you?'
+        }
+
+        def msg = testJavaMailSenderBuilder.message.mimeMessage
+        assertEquals "fred@g2one.com", to(msg)[0].toString()
+        assertEquals "john@g2one.com", msg.from[0].toString()
+        assertEquals "peter@g2one.com", testJavaMailSenderBuilder.envelopeFrom
+    }
+    
     void testAttachment() {
         processDsl {
             multipart true
