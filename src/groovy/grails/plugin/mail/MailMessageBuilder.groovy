@@ -111,6 +111,10 @@ class MailMessageBuilder {
 
         def sendingMsg = message instanceof MimeMailMessage ? message.mimeMessage : message
         if(envelopeFrom) {
+            if(!mimeCapable) {
+                throw new GrailsMailException("You must use a JavaMailSender to set the envelopeFrom.")
+            }
+
             sendingMsg = new SMTPMessage(sendingMsg)
             sendingMsg.envelopeFrom = envelopeFrom
         }
