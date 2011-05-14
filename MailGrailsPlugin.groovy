@@ -12,15 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * File modified by Vithun (original source obtained from github.com/gpc/grails-mail).
  */
 
 import org.springframework.jndi.JndiObjectFactoryBean
 import org.springframework.mail.javamail.JavaMailSenderImpl
+import org.springframework.mail.MailSender
 
 import grails.plugin.mail.*
 
 class MailGrailsPlugin {
-    def version = "1.0-SNAPSHOT"
+    def version = "1.0-SNAPSHOT-fork"
     def grailsVersion = "1.3 > *"
 
     def author = "Grails Plugin Collective"
@@ -33,6 +36,19 @@ the Spring ApplicationContext.
 It also adds a "sendMail" method to all controller classes. A typical example usage is:
 
 sendMail {
+    to "fred@g2one.com","ginger@g2one.com"
+    from "john@g2one.com"
+    cc "marge@g2one.com", "ed@g2one.com"
+    bcc "joe@g2one.com"
+    subject "Hello John"
+    text "this is some text"
+}
+
+In addition to the above, it also adds a "sendMail" method which also takes a custom MailSender as an argument. 
+A typical example usage is:
+
+MailSender mailSender = ... //instantiate and customize MailSender
+sendMail(mailSender) {
     to "fred@g2one.com","ginger@g2one.com"
     from "john@g2one.com"
     cc "marge@g2one.com", "ed@g2one.com"
@@ -143,6 +159,9 @@ sendMail {
             controllerClass.metaClass.sendMail = { Closure dsl ->
                 applicationContext.mailService.sendMail(dsl)
             }
+            controllerClass.metaClass.sendMail = { MailSender mailSender, Closure dsl ->
+                applicationContext.mailService.sendMail(mailSender, dsl)
+            }
         }
 
         def mailServiceClassName = applicationContext.mailService.class.name
@@ -152,6 +171,9 @@ sendMail {
             if (serviceClass.clazz.name != mailServiceClassName) {
                 serviceClass.metaClass.sendMail = { Closure dsl ->
                     applicationContext.mailService.sendMail(dsl)
+                }
+                serviceClass.metaClass.sendMail = { MailSender mailSender, Closure dsl ->
+                    applicationContext.mailService.sendMail(mailSender, dsl)
                 }
             }
         }

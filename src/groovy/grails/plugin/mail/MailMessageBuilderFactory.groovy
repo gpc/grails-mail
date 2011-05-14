@@ -12,9 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * File modified by Vithun (original source obtained from github.com/gpc/grails-mail).
  */
 package grails.plugin.mail
 
+import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSender
 
 /**
@@ -26,8 +29,8 @@ class MailMessageBuilderFactory {
     def mailSender
     def mailMessageContentRenderer
 
-    MailMessageBuilder createBuilder(ConfigObject config) {
-        new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
+    MailMessageBuilder createBuilder(MailSender mailSender, ConfigObject config) {
+        new MailMessageBuilder((mailSender ? mailSender : this.mailSender), config, mailMessageContentRenderer)
     }
     
     boolean isMimeCapable() {
