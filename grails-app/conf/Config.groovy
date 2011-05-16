@@ -13,3 +13,5 @@ grails {
         footer = "Developed by the <a href='http://gpc.github.com'>Grails Plugin Collective</a>"
     }
 }
+grails.views.default.codec="none" // none, html, base64
+grails.views.gsp.encoding="UTF-8"
