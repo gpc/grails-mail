@@ -17,7 +17,7 @@ The plugin is released under the [Apache License 2.0](http://www.apache.org/lice
 
 ## Update
 
-This fork adds an additional method to the original plugin. This method can be used to send a mail with a custom mailSender. See this blog post for more details: (http://code.vith.me/2011/05/multiple-mailsenders-in-grails-mail.html "Multiple 'MailSender's in grails-mail Plugin").
+This fork adds an additional method to the original plugin. This method can be used to send a mail with a custom mailSender. See this blog post for more details: [Multiple 'MailSender's in grails-mail Plugin](http://code.vith.me/2011/05/multiple-mailsenders-in-grails-mail.html "code.vith.me - Multiple 'MailSender's in grails-mail Plugin").
 
 ## Issues
 
