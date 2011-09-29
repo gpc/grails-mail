@@ -15,6 +15,10 @@ Please see the [User Guide](http://gpc.github.com/grails-mail/ "Grails Mail Plug
 
 The plugin is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html "Apache License, Version 2.0 - The Apache Software Foundation") and is produced under the [Grails Plugin Collective](http://gpc.github.com/).
 
+## Update
+
+This fork adds an additional method to the original plugin. This method can be used to send a mail with a custom mailSender. See this blog post for more details: (http://code.vith.me/2011/05/multiple-mailsenders-in-grails-mail.html "Multiple 'MailSender's in grails-mail Plugin").
+
 ## Issues
 
 Issues can be raised via the [Codehaus Jira](http://jira.codehaus.org/browse/GRAILSPLUGINS/component/13340 "Grails Plugins: Grails-Mail - jira.codehaus.org").
