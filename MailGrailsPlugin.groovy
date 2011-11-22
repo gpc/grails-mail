@@ -42,7 +42,7 @@ sendMail {
 }
 
 '''
-    def documentation = "http://plugin.grails.org/mail"
+    def documentation = "http://grails.org/plugin/mail"
 
     def observe = ['controllers','services']
     
