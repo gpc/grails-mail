@@ -1,5 +1,11 @@
 grails.project.work.dir = "target"
 
+def springTestDepsByGrailsVersion = [
+    '1.3.7':':org.springframework.test:3.0.5.RELEASE',
+    '2.0':'org.springframework:spring-test:3.1.0.RELEASE'
+]
+def springTestDep = springTestDepsByGrailsVersion[grailsVersion]
+
 grails.project.dependency.resolution = {
     inherits("global")
     repositories {
@@ -9,12 +15,7 @@ grails.project.dependency.resolution = {
     dependencies {
         compile "javax.mail:mail:1.4.3"
         
-        // Potential problem here in that we may end up with a different version
-        // during war deployment to product, but there is no solution right now.
-        // 
-        // See: http://jira.codehaus.org/browse/GRAILS-7192
-        // See: http://grails.1312388.n4.nabble.com/handling-Spring-dependencies-td3226874.html
-        runtime "org.springframework:spring-test:latest.release"
+        runtime springTestDep
     }
     plugins {
         test (":greenmail:1.2.2") {
