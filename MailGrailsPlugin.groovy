@@ -112,7 +112,12 @@ sendMail {
                 if (config.host) {
                     host = config.host
                 } else if (!config.jndiName) {
-                    host = "localhost"
+                    def envHost = System.getenv()['SMTP_HOST']
+                    if (envHost) {
+                        host = envHost
+                    } else {
+                        host = "localhost"
+                    }
                 }
 
                 if (config.encoding) {
