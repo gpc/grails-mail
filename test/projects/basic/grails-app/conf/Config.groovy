@@ -59,9 +59,10 @@ environments {
 }
 
 // Mail configuration
-grails.mail.port = 3025
+def smtpPort = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
+grails.mail.port = smtpPort
+greenmail.ports.smtp = smtpPort
 grails.mail.default.from = "me@me.com"
-
 
 // log4j configuration
 log4j = {
