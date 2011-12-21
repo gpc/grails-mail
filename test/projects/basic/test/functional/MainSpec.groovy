@@ -1,4 +1,4 @@
-import grails.plugin.geb.GebSpec
+import geb.spock.GebSpec
 import spock.lang.Issue
 
 class MainSpec extends GebSpec {

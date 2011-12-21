@@ -13,18 +13,12 @@ grails.project.dependency.resolution = {
         mavenCentral()
     }
     plugins {
-        test ":geb:0.4", {
-            excludes "geb-grails"
-        }
+        test ":geb:0.6.1"
     }
     dependencies {
-        test "org.codehaus.geb:geb-grails:0.5-SNAPSHOT"
-
-        test "org.seleniumhq.selenium:selenium-htmlunit-driver:latest.integration", {
+        test "org.seleniumhq.selenium:selenium-htmlunit-driver:2.15.0", {
             excludes "xml-apis"
         }
-        test "net.sourceforge.htmlunit:htmlunit:2.8", {
-            excludes "xml-apis", "commons-logging"
-        }
+        test "org.codehaus.geb:geb-spock:0.6.1"
     }
 }
