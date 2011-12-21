@@ -13,7 +13,17 @@ def springTestDepsByGrailsVersion = [
     '2.0':'org.springframework:spring-test:3.1.0.RELEASE'
 ]
 // For Grails version newer than 2.0 we can find this out, so fall back to that
-def springTestDep = springTestDepsByGrailsVersion[grailsVersion] ?: "org.springframework:spring-test:$grailsCoreDependencies.springVersion"
+def springTestDep = springTestDepsByGrailsVersion[grailsVersion]
+
+if (springTestDep == null) {
+    if (grailsSettings.hasProperty("coreDependencies") && grailsSettings.coreDependencies.hasProperty("springVersion")) {
+        // We are on Grails 2.1+
+        springTestDep = "org.springframework:spring-test:$grailsSettings.coreDependencies.springVersion"
+    } else {
+        // we don't know the spring version, guess at it
+        springTestDep = 'org.springframework:spring-test:3.1.0.RELEASE'
+    }
+}
 
 grails.project.dependency.resolution = {
     inherits("global")
@@ -24,11 +34,15 @@ grails.project.dependency.resolution = {
     dependencies {
         compile "javax.mail:mail:1.4.3"
         
-        runtime springTestDep
+        runtime(springTestDep) {
+            transitive = false
+        }
     }
     plugins {
-        test (":greenmail:1.2.2") {
-            export = false
+        if (appName == "grails-mail") {
+            test (":greenmail:1.3.0") {
+                export = false
+            }
         }
     }
 }
