@@ -20,7 +20,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 import grails.plugin.mail.*
 
 class MailGrailsPlugin {
-    def version = "1.0-SNAPSHOT"
+    def version = "1.0"
     def grailsVersion = "1.3 > *"
 
     def author = "Grails Plugin Collective"
@@ -42,7 +42,28 @@ sendMail {
 }
 
 '''
-    def documentation = "http://plugin.grails.org/mail"
+    def documentation = "http://gpc.github.com/grails-mail/"
+
+    // License: one of 'APACHE', 'GPL2', 'GPL3'
+    def license = "APACHE"
+
+    // Details of company behind the plugin (if there is one)
+    def organization = [ name: "Grails Plugin Collective", url: "http://github.com/gpc" ]
+
+    // Any additional developers beyond the author specified above.
+    def developers = [ 
+        [ name: "Luke Daley", email: "ld@ldaley.com" ],
+        [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ],
+        [ name: "Jeff Brown", email: "jbrown@vmware.com" ],
+        [ name: "Graeme Rocher", email: "grocher@vmware.com" ],
+        [ name: "Marc Palmer", email: "marc@grailsrocks.com" ]
+    ]
+
+    // Location of the plugin's issue tracker.
+    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMAIL" ]
+
+    // Online location of the plugin's browseable source code.
+    def scm = [ url: "http://github.com/gpc/grails-mail" ]
 
     def observe = ['controllers','services']
     
