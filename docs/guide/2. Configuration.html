@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>2 Configuration 1.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/1.%20Introduction.html"><strong>1</strong><span>Introduction</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/2.%20Configuration.html"><strong>2</strong><span>Configuration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/3.%20Sending%20Email.html"><strong>3</strong><span>Sending Email</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/4.%20Testing.html"><strong>4</strong><span>Testing</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Send email from Grails applications</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/1.%20Introduction.html">&lt;&lt; <strong>1</strong><span>Introduction</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../guide/3.%20Sending%20Email.html"><strong>3</strong><span>Sending Email</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>2 Configuration - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Grails Plugin Collective</p>
+
+                    <p><strong>Version:</strong> 1.0</p>
+
+                    
+                </div>
+
+                
+                <div id="table-of-content">
+                    <h2>Table of Contents</h2>
+                    
+                    <div class="toc-item" style="margin-left:0px"><a href="#2.1%20SMTP%20Server%20Configuration"><strong>2.1</strong><span>SMTP Server Configuration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0px"><a href="#2.2%20Defaults%20Configuration"><strong>2.2</strong><span>Defaults Configuration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0px"><a href="#2.3%20Other%20Configuration"><strong>2.3</strong><span>Other Configuration</span></a>
+                    </div>
+                    
+                </div>
+                
+
+                
+
+<h1 id="2. Configuration">2 Configuration</h1>
+
+
+
+<h2 id="2.1 SMTP Server Configuration">2.1 SMTP Server Configuration</h2>
+By default the plugin assumes an unsecured mail server configured on port 25, getting the SMTP host name from the environment variable SMTP_HOST. However you can change this via the grails-app/Config.groovy file. For example here is how you would configure the default sender to send with a Gmail account:<p class="paragraph"/><div class="code"><pre>grails &#123;
+   mail &#123;
+     host = <span class="java&#45;quote">"smtp.gmail.com"</span>
+     port = 465
+     username = <span class="java&#45;quote">"youracount@gmail.com"</span>
+     password = <span class="java&#45;quote">"yourpassword"</span>
+     props = &#91;<span class="java&#45;quote">"mail.smtp.auth"</span>:<span class="java&#45;quote">"<span class="java&#45;keyword">true</span>"</span>,
+              <span class="java&#45;quote">"mail.smtp.socketFactory.port"</span>:<span class="java&#45;quote">"465"</span>,
+              <span class="java&#45;quote">"mail.smtp.socketFactory.class"</span>:<span class="java&#45;quote">"javax.net.ssl.SSLSocketFactory"</span>,
+              <span class="java&#45;quote">"mail.smtp.socketFactory.fallback"</span>:<span class="java&#45;quote">"<span class="java&#45;keyword">false</span>"</span>&#93;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>And the configuration for sending via a Hotmail/Live account:<p class="paragraph"/><div class="code"><pre>grails &#123;
+   mail &#123;
+     host = <span class="java&#45;quote">"smtp.live.com"</span>
+     port = 587
+     username = <span class="java&#45;quote">"youracount@live.com"</span>
+     password = <span class="java&#45;quote">"yourpassword"</span>
+     props = &#91;<span class="java&#45;quote">"mail.smtp.starttls.enable"</span>:<span class="java&#45;quote">"<span class="java&#45;keyword">true</span>"</span>, 
+                  <span class="java&#45;quote">"mail.smtp.port"</span>:<span class="java&#45;quote">"587"</span>&#93;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>If your mail session is provided via JNDI you can use the jndiName setting:<p class="paragraph"/><div class="code"><pre>grails.mail.jndiName = <span class="java&#45;quote">"myMailSession"</span></pre></div>
+
+
+<h2 id="2.2 Defaults Configuration">2.2 Defaults Configuration</h2>
+You can set various  <em class="italic">default</em>  settings via the application config that will be used in the absence of explicit values when sending mail.<p class="paragraph"/>You can also set the default "from" address to use for messages in Config using:<p class="paragraph"/><div class="code"><pre>grails.mail.<span class="java&#45;keyword">default</span>.from = <span class="java&#45;quote">"server@yourhost.com"</span></pre></div><p class="paragraph"/>You can also set the default "to" address to use for messages in Config using:<p class="paragraph"/><div class="code"><pre>grails.mail.<span class="java&#45;keyword">default</span>.to = <span class="java&#45;quote">"user@yourhost.com"</span></pre></div>
+
+
+<h2 id="2.3 Other Configuration">2.3 Other Configuration</h2>
+<h3>Disabling Mail Sending</h3><p class="paragraph"/>You can completely disable the sending of mail by setting:<p class="paragraph"/><div class="code"><pre>grails.mail.disabled = <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>You may want to set this value for the development and/or test environments. However, this will treat any call to <code>mailService.sendMail()</code> as a no-op which means that the mail plugin will not attempt to render the email message or assemble any attachments. This can hide issues such as incorrect view names, invalid configuration or non existent during development.<p class="paragraph"/>Consider using the <a href="http://www.grails.org/plugin/greenmail" target="blank">greenmail plugin</a> which allows you to start an in memory test SMTP server for local development. This allows you to test more of your code.<p class="paragraph"/><h3>Overriding Addresses</h3><p class="paragraph"/>An alternative to disabling email or using something like the <a href="http://www.grails.org/plugin/greenmail" target="blank">greenmail plugin</a> is to use the <code>overrideAddress</code> config setting for your development and/or test environment to force all mail to be delivered to a specific address, regardless of what the addresses were at send time:<p class="paragraph"/><div class="code"><pre>grails.mail.overrideAddress = <span class="java&#45;quote">"test@address.com"</span></pre></div>
+
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/1.%20Introduction.html">&lt;&lt; <strong>1</strong><span>Introduction</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../guide/3.%20Sending%20Email.html"><strong>3</strong><span>Sending Email</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.
+    Developed by the <a href='http://gpc.github.com'>Grails Plugin Collective</a>
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
