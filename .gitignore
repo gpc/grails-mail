@@ -1,5 +1,6 @@
-stacktrace.log
+*.log
 test/reports
 target/
 plugin.xml
 *.zip
+web-app
