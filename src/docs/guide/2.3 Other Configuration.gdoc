@@ -6,7 +6,7 @@ You can completely disable the sending of mail by setting:
 grails.mail.disabled = true
 {code}
 
-You may want to set this value for the development and/or test environments. However, this will treat any call to @mailService.sendMail()@ as a no-op which means that the mail plugin will not attempt to render the email message or assemble any attachments. This can hide issues such as incorrect view names, invalid configuration or non existent during development. 
+You may want to set this value for the development and/or test environments. However, this will treat any call to @mailService.sendMail()@ as a no-op which means that the mail plugin will not attempt to render the email message or assemble any attachments. This can hide issues such as incorrect view names, invalid configuration or non existent during development.
 
 Consider using the "greenmail plugin":http://www.grails.org/plugin/greenmail which allows you to start an in memory test SMTP server for local development. This allows you to test more of your code.
 

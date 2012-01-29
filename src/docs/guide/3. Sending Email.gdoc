@@ -2,17 +2,16 @@ Mail is sent using the @sendMail()@ method of the @mailService@. This plugin als
 
 {code}
 class PersonController {
-    
+
     def create = {
         // create user
-        
+
         sendMail {
             from "admin@mysystem.com"
             subject "New user"
             text "A new user has been created"
         }
     }
-    
 }
 {code}
 
@@ -20,18 +19,17 @@ The @sendMail()@ method takes a single @Closure@ argument that uses a DSL to con
 
 {code}
 class PersonController {
-    
+
     def mailService
-    
+
     def create = {
         // create user
-        
+
         mailService.sendMail {
             from "admin@mysystem.com"
             subject "New user"
             text "A new user has been created"
         }
     }
-    
 }
 {code}

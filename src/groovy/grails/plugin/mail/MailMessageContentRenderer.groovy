@@ -30,21 +30,19 @@ import org.springframework.context.ApplicationContext
 
 import org.apache.commons.logging.LogFactory
 
-import javax.mail.internet.MimeUtility
-
 /**
  * Responsible for rendering a GSP into the content of a mail message.
  */
 class MailMessageContentRenderer {
 
-    static PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
-    
+    static String PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
+
     private log = LogFactory.getLog(MailMessageContentRenderer)
-    
+
     def groovyPagesTemplateEngine
     def groovyPagesUriService
     def grailsApplication
-        
+
     MailMessageContentRender render(Writer out, templateName, model, locale, pluginName = null) {
         RenderEnvironment.with(grailsApplication.mainContext, out, locale) { env ->
             def template = createTemplate(templateName, env.controllerName, pluginName)
@@ -53,7 +51,7 @@ class MailMessageContentRenderer {
             } else {
                 template.make().writeTo(out)
             }
-            
+
             new MailMessageContentRender(out, template.metaInfo.contentType)
         }
     }
@@ -68,9 +66,9 @@ class MailMessageContentRenderer {
                 throw new IllegalArgumentException("Mail views cannot be loaded from relative view paths where there is no current HTTP request")
             }
         }
-        
+
         def contextPath = getContextPath(pluginName)
-        
+
         def templateUri
         if (contextPath) {
             templateUri = contextPath + groovyPagesUriService.getViewURI(controllerName, templateName)
@@ -79,7 +77,7 @@ class MailMessageContentRenderer {
         }
 
         def template = groovyPagesTemplateEngine.createTemplateForUri(templateUri)
-        
+
         if (!template) {
             if (pluginName) {
                 throw new IllegalArgumentException("Could not locate email view ${templateName} in plugin [$pluginName]")
@@ -87,65 +85,64 @@ class MailMessageContentRenderer {
                 throw new IllegalArgumentException("Could not locate mail body ${templateName}. Is it in a plugin? If so you must pass the plugin name in the [plugin] variable")
             }
         }
-        
+
         template
     }
-    
+
     protected getContextPath(pluginName) {
         def contextPath = ""
-        
+
         if (pluginName) {
             def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
             if (plugin && !plugin.isBasePlugin()) {
                 contextPath = plugin.pluginPath + "/grails-app/views"
             }
         }
-        
+
         contextPath
     }
-    
-    static private class RenderEnvironment {
+
+    private static class RenderEnvironment {
         final Writer out
         final Locale locale
         final ApplicationContext applicationContext
-        
-        private originalRequestAttributes = null
+
+        private originalRequestAttributes
         private renderRequestAttributes
-        
-        private originalOut = null
-        
+        private originalOut
+
         RenderEnvironment(ApplicationContext applicationContext, Writer out, Locale locale = null) {
             this.out = out
             this.locale = locale
             this.applicationContext = applicationContext
         }
-        
+
         private init() {
             originalRequestAttributes = RequestContextHolder.getRequestAttributes()
             renderRequestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
-            
+
             if (originalRequestAttributes) {
                 renderRequestAttributes.controllerName = originalRequestAttributes.controllerName
             }
-            
+
             def renderLocale
             if (locale) {
                 renderLocale = locale
             } else if (originalRequestAttributes) {
                 renderLocale = RequestContextUtils.getLocale(originalRequestAttributes.request)
             }
-            
+
             renderRequestAttributes.request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: renderLocale))
-            
+
             renderRequestAttributes.setOut(out)
             WrappedResponseHolder.wrappedResponse = renderRequestAttributes.currentResponse
         }
-        
+
         private close() {
             RequestContextHolder.setRequestAttributes(originalRequestAttributes) // null ok
             WrappedResponseHolder.wrappedResponse = originalRequestAttributes?.currentResponse
         }
-        
+
         /**
          * Establish an environment inheriting the locale of the current request if there is one
          */
@@ -165,10 +162,9 @@ class MailMessageContentRenderer {
                 env.close()
             }
         }
-        
+
         String getControllerName() {
             renderRequestAttributes.controllerName
         }
     }
-    
 }

@@ -20,5 +20,4 @@ class GrailsMailException extends RuntimeException {
     GrailsMailException(String s, Throwable t = null) {
         super(s, t)
     }
-
 }

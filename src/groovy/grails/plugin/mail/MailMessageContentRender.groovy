@@ -20,17 +20,17 @@ package grails.plugin.mail
  * Represents the result of rendering a message content view.
  */
 class MailMessageContentRender {
-    
+
     private static HTML_CONTENT_TYPES = ['text/html', 'text/xhtml']
-    
+
     final Writer out
     final String contentType
-    
+
     MailMessageContentRender(Writer out, String contentType) {
         this.out = out
         this.contentType = contentType
     }
-    
+
     boolean isHtml() {
         contentType in HTML_CONTENT_TYPES
     }

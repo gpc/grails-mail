@@ -18,43 +18,42 @@ package grails.plugin.mail
 
 import javax.mail.Message
 import javax.mail.internet.MimeMessage
-
-import org.springframework.mail.javamail.*
-import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.MailSender
-
-import org.springframework.core.io.FileSystemResource
-
-import com.icegreen.greenmail.util.ServerSetupTest
-import org.springframework.core.io.*
-
 import javax.mail.internet.MimeMultipart
 
+import org.springframework.core.io.FileSystemResource
+import org.springframework.mail.MailSender
+import org.springframework.mail.SimpleMailMessage
+import org.springframework.mail.javamail.JavaMailSenderImpl
+import org.springframework.mail.javamail.MimeMailMessage
+import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.web.context.request.RequestContextHolder
+
+import com.icegreen.greenmail.util.ServerSetupTest
 
 class MailServiceTests extends GroovyTestCase {
 
     static transactional = false
-    
+
     def mimeCapableMailService
     def nonMimeCapableMailService
-    
+
     def mailMessageContentRenderer // autowired
-    
-    void setUp() {
+
+    protected void setUp() {
+
         def mimeMailSender = new JavaMailSenderImpl(host: "localhost", port: ServerSetupTest.SMTP.port)
         def mimeMessageBuilderFactor = new MailMessageBuilderFactory(
-            mailSender: mimeMailSender, 
+            mailSender: mimeMailSender,
             mailMessageContentRenderer: mailMessageContentRenderer
         )
         mimeCapableMailService = new MailService(mailMessageBuilderFactory: mimeMessageBuilderFactor)
-                
+
         def simpleMailSender = new MailSender() {
             void send(SimpleMailMessage simpleMessage) {}
             void send(SimpleMailMessage[] simpleMessages) {}
         }
         def simpleMessageBuilderFactory = new MailMessageBuilderFactory(
-            mailSender: simpleMailSender, 
+            mailSender: simpleMailSender,
             mailMessageContentRenderer: mailMessageContentRenderer
         )
         nonMimeCapableMailService = new MailService(mailMessageBuilderFactory: simpleMessageBuilderFactory)
@@ -316,7 +315,7 @@ class MailServiceTests extends GroovyTestCase {
 
     void testSendmailWithByteArrayAndResourceAttachments() {
         def tmpFile
-        try {                
+        try {
             def message = mimeCapableMailService.sendMail {
                 multipart true
 
@@ -345,7 +344,7 @@ class MailServiceTests extends GroovyTestCase {
 
     void testInlineAttachment() {
         def bytes = getClass().getResource("grailslogo.png").bytes
-        
+
         def message = mimeCapableMailService.sendMail {
             multipart true
             to "fred@g2one.com", "ginger@g2one.com"
@@ -354,7 +353,7 @@ class MailServiceTests extends GroovyTestCase {
             text 'this is some text <img src="cid:abc123" />'
             inline 'abc123', 'image/png', bytes
         }
-        
+
         def inlinePart = message.mimeMessage.content.getBodyPart(0).content.getBodyPart("<abc123>")
         assert inlinePart.inputStream.bytes == bytes
     }
@@ -365,7 +364,7 @@ class MailServiceTests extends GroovyTestCase {
             subject "test"
             html '<html><head></head><body>How are you?</body></html>'
         }.mimeMessage
-        
+
         assert msg.contentType.startsWith("text/html")
         assert msg.content == '<html><head></head><body>How are you?</body></html>'
     }
@@ -378,16 +377,16 @@ class MailServiceTests extends GroovyTestCase {
             html '<html><head></head><body>How are you?</body></html>'
             text 'How are you?'
         }.mimeMessage
-        
+
         assert msg.content instanceof MimeMultipart
-        
+
         MimeMultipart mp = msg.content.getBodyPart(0).content.getBodyPart(0).content
-        
+
         assert mp.count == 2
 
         assert mp.getBodyPart(0).contentType.startsWith('text/plain')
         assert mp.getBodyPart(0).content == 'How are you?'
-        
+
         assert mp.getBodyPart(1).contentType.startsWith('text/html')
         assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
     }
@@ -404,12 +403,12 @@ class MailServiceTests extends GroovyTestCase {
         assert msg.content instanceof MimeMultipart
 
         MimeMultipart mp = msg.content.getBodyPart(0).content.getBodyPart(0).content
-        
+
         assert mp.count == 2
 
         assert mp.getBodyPart(0).contentType.startsWith('text/plain')
         assert mp.getBodyPart(0).content == 'How are you?'
-        
+
         assert mp.getBodyPart(1).contentType.startsWith('text/html')
         assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
     }
@@ -426,16 +425,16 @@ class MailServiceTests extends GroovyTestCase {
         assert msg.content instanceof MimeMultipart
 
         MimeMultipart mp = msg.content.getBodyPart(0).content
-        
+
         assert mp.count == 2
 
         assert mp.getBodyPart(0).contentType.startsWith('text/plain')
         assert mp.getBodyPart(0).content == 'How are you?'
-        
+
         assert mp.getBodyPart(1).contentType.startsWith('text/html')
         assert mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
     }
-    
+
     // http://jira.codehaus.org/browse/GRAILSPLUGINS-2232
     void testContentTypeDoesNotGetChanged() {
         def originalContentType = RequestContextHolder.currentRequestAttributes().currentResponse.contentType
@@ -445,14 +444,14 @@ class MailServiceTests extends GroovyTestCase {
             subject "Hello John"
             body(view: '/_testemails/test', model: [msg: 'hello'])
         }
-        
+
         assertEquals "Hello John", message.getMimeMessage().getSubject()
         assertTrue message.mimeMessage.contentType.startsWith('text/plain')
         assertEquals 'Message is: hello', message.getMimeMessage().getContent().trim()
-        
+
         assertEquals originalContentType, RequestContextHolder.currentRequestAttributes().currentResponse.contentType
     }
-     
+
     void testViewResolutionFromPlugin() {
         MimeMailMessage message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
@@ -464,7 +463,7 @@ class MailServiceTests extends GroovyTestCase {
         assertTrue message.mimeMessage.contentType.startsWith('text/plain')
         assertEquals 'This is from a plugin!!!', message.getMimeMessage().getContent().trim()
     }
-    
+
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()
     }
@@ -477,4 +476,3 @@ class MailServiceTests extends GroovyTestCase {
         msg.getRecipients(Message.RecipientType.BCC)*.toString()
     }
 }
-

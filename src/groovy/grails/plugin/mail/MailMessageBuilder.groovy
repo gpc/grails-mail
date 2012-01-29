@@ -15,48 +15,50 @@
  */
 package grails.plugin.mail
 
-import org.springframework.mail.MailMessage
-import org.springframework.mail.MailSender
-import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.javamail.*
-import org.springframework.core.io.*
-
-import org.apache.commons.logging.LogFactory
-
 import javax.mail.Message
 import javax.mail.internet.MimeUtility
 
+import org.apache.commons.logging.LogFactory
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.InputStreamSource
+import org.springframework.mail.MailMessage
+import org.springframework.mail.MailSender
+import org.springframework.mail.SimpleMailMessage
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.MimeMailMessage
+import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.util.Assert
 
 /**
  * Provides a DSL style interface to mail message sending/generation.
- * 
+ *
  * If the builder is constructed without a MailMessageContentRenderer, it is incapable
  * of rendering GSP views into message content.
  */
 class MailMessageBuilder {
 
     private log = LogFactory.getLog(MailMessageBuilder)
-    
+
     final MailSender mailSender
     final MailMessageContentRenderer mailMessageContentRenderer
-    
+
     final String defaultFrom
     final String defaultTo
     final String overrideAddress
-    
+
     private MailMessage message
     private MimeMessageHelper helper
     private Locale locale
-    
-    private String textContent = null
-    private String htmlContent = null
-    
+
+    private String textContent
+    private String htmlContent
+
     private multipart = false
-    
+
     private List<Inline> inlines = []
-    
-    static private class Inline {
+
+    private static class Inline {
         String id
         String contentType
         def toAdd
@@ -65,7 +67,7 @@ class MailMessageBuilder {
     MailMessageBuilder(MailSender mailSender, ConfigObject config, MailMessageContentRenderer mailMessageContentRenderer = null) {
         this.mailSender = mailSender
         this.mailMessageContentRenderer = mailMessageContentRenderer
-        
+
         this.overrideAddress = config.overrideAddress ?: null
         this.defaultFrom = overrideAddress ?: (config.default.from ?: null)
         this.defaultTo = overrideAddress ?: (config.default.to ?: null)
@@ -79,7 +81,7 @@ class MailMessageBuilder {
             } else {
                 message = new SimpleMailMessage()
             }
-            
+
             if (defaultFrom) {
                 message.from = defaultFrom
             }
@@ -88,37 +90,37 @@ class MailMessageBuilder {
                 message.setTo(defaultTo)
             }
         }
-        
+
         message
     }
 
     MailMessage sendMessage() {
         def message = finishMessage()
-        
+
         if (log.traceEnabled) {
             log.trace("Sending mail ${getDescription(message)}} ...")
         }
-        
+
         mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
-        
+
         if (log.traceEnabled) {
             log.trace("Sent mail ${getDescription(message)}} ...")
         }
-        
+
         message
     }
-    
+
     void multipart(boolean multipart) {
         this.multipart = multipart
     }
-    
+
     void multipart(int multipartMode) {
         this.multipart = multipartMode
     }
-    
+
     void headers(Map hdrs) {
         Assert.notEmpty(hdrs, "headers cannot be null")
-         
+
         // The message must be of type MimeMailMessage to add headers.
         if (!mimeCapable) {
             throw new GrailsMailException("You must use a JavaMailSender to customise the headers.")
@@ -129,147 +131,147 @@ class MailMessageBuilder {
         hdrs.each { name, value ->
             def nameString = name?.toString()
             def valueString = value?.toString()
-            
+
             Assert.hasText(nameString, "header names cannot be null or empty")
             Assert.hasText(valueString, "header value for '$nameString' cannot be null")
 
             msg.setHeader(nameString, valueString)
         }
     }
-    
+
     void to(Object[] args) {
         Assert.notEmpty(args, "to cannot be null or empty")
-        Assert.noNullElements(args, "to cannot contain null elements") 
-        
+        Assert.noNullElements(args, "to cannot contain null elements")
+
         getMessage().setTo(toDestinationAddresses(args))
     }
-    
+
     void to(List args) {
         Assert.notEmpty(args, "to cannot be null or empty")
         Assert.noNullElements(args.toArray(), "to cannot contain null elements")
-        
+
         to(*args)
     }
-    
+
     void bcc(Object[] args) {
         Assert.notEmpty(args, "bcc cannot be null or empty")
-        Assert.noNullElements(args, "bcc cannot contain null elements") 
-        
+        Assert.noNullElements(args, "bcc cannot contain null elements")
+
         getMessage().setBcc(toDestinationAddresses(args))
     }
-    
+
     void bcc(List args) {
         Assert.notEmpty(args, "bcc cannot be null or empty")
-        Assert.noNullElements(args.toArray(), "bcc cannot contain null elements") 
-        
+        Assert.noNullElements(args.toArray(), "bcc cannot contain null elements")
+
         bcc(*args)
     }
-        
+
     void cc(Object[] args) {
         Assert.notEmpty(args, "cc cannot be null or empty")
-        Assert.noNullElements(args, "cc cannot contain null elements") 
-        
+        Assert.noNullElements(args, "cc cannot contain null elements")
+
         getMessage().setCc(toDestinationAddresses(args))
     }
-    
+
     void cc(List args) {
         Assert.notEmpty(args, "cc cannot be null or empty")
-        Assert.noNullElements(args.toArray(), "cc cannot contain null elements") 
-        
+        Assert.noNullElements(args.toArray(), "cc cannot contain null elements")
+
         cc(*args)
     }
 
     void replyTo(CharSequence replyTo) {
         Assert.hasText(replyTo, "replyTo cannot be null or 0 length")
-        
+
         getMessage().replyTo = replyTo.toString()
     }
-    
+
     void from(CharSequence from) {
         Assert.hasText(from, "from cannot be null or 0 length")
-        
+
         getMessage().from = from.toString()
     }
-    
+
     void title(CharSequence title) {
         Assert.notNull(title, "title cannot be null")
-        
+
         subject(title)
     }
-    
+
     void subject(CharSequence title) {
         Assert.notNull(title, "subject cannot be null")
-        
+
         getMessage().subject = title.toString()
     }
-        
+
     void body(CharSequence body) {
         Assert.notNull(body, "body cannot be null")
-        
+
         text(body)
     }
-    
+
     void body(Map params) {
         Assert.notEmpty(params, "body cannot be null or empty")
-        
+
         def render = doRender(params)
-    
+
         if (render.html) {
             html(render.out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
         } else {
             text(render.out.toString())
         }
     }
-    
+
     protected MailMessageContentRender doRender(Map params) {
         if (mailMessageContentRenderer == null) {
             throw new GrailsMailException("mail message builder was constructed without a message content render so cannot render views")
         }
-        
+
         if (!params.view) {
             throw new GrailsMailException("no view specified")
         }
-        
+
         mailMessageContentRenderer.render(new StringWriter(), params.view, params.model, locale, params.plugin)
     }
-    
+
     void text(Map params) {
         Assert.notEmpty(params, "text cannot be null or empty")
-        
+
         text(doRender(params).out.toString())
     }
-    
+
     void text(CharSequence text) {
         Assert.notNull(text, "text cannot be null")
-        
+
         textContent = text.toString()
     }
 
     void html(Map params) {
         Assert.notEmpty(params, "html cannot be null or empty")
-        
+
         html(doRender(params).out.toString())
     }
-    
+
     void html(CharSequence text) {
         Assert.notNull(text, "html cannot be null")
-        
+
         if (mimeCapable) {
             htmlContent = text.toString()
         } else {
             throw new GrailsMailException("mail sender is not mime capable, try configuring a JavaMailSender")
         }
     }
-    
+
     void locale(String localeStr) {
         Assert.hasText(localeStr, "locale cannot be null or empty")
-        
+
         locale(new Locale(*localeStr.split('_', 3)))
     }
 
     void locale(Locale locale) {
         Assert.notNull(locale, "locale cannot be null")
-        
+
         this.locale = locale
     }
 
@@ -287,27 +289,27 @@ class MailMessageBuilder {
     void attach(File file) {
         attach(file.name, file)
     }
-    
+
     void attach(String fileName, File file) {
         if (!mimeCapable) {
             throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
-        
+
         attach(fileName, helper.fileTypeMap.getContentType(file), file)
     }
-    
+
     void attach(String fileName, String contentType, File file) {
         if (!file.exists()) {
             throw new FileNotFoundException("cannot use $file as an attachment as it does not exist")
         }
-        
+
         attach(fileName, contentType, new FileSystemResource(file))
     }
-    
+
     void attach(String fileName, String contentType, InputStreamSource source) {
         doAdd(fileName, contentType, source, true)
     }
-    
+
     void inline(String contentId, String contentType, byte[] bytes) {
         inline(contentId, contentType, new ByteArrayResource(bytes))
     }
@@ -315,12 +317,12 @@ class MailMessageBuilder {
     void inline(File file) {
         inline(file.name, file)
     }
-    
+
     void inline(String fileName, File file) {
         if (!mimeCapable) {
             throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
-        
+
         inline(fileName, helper.fileTypeMap.getContentType(file), file)
     }
 
@@ -328,19 +330,19 @@ class MailMessageBuilder {
         if (!file.exists()) {
             throw new FileNotFoundException("cannot use $file as an attachment as it does not exist")
         }
-        
+
         inline(contentId, contentType, new FileSystemResource(file))
     }
-    
+
     void inline(String contentId, String contentType, InputStreamSource source) {
         inlines << new Inline(id: contentId, contentType: contentType, toAdd: source)
     }
-    
+
     protected doAdd(String id, String contentType, toAdd, boolean isAttachment) {
         if (!mimeCapable) {
             throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
-        
+
         assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
 
         if (isAttachment) {
@@ -349,31 +351,31 @@ class MailMessageBuilder {
             helper.addInline(MimeUtility.encodeWord(id), toAdd, contentType)
         }
     }
-    
+
     boolean isMimeCapable() {
         mailSender instanceof JavaMailSender
     }
-    
+
     protected String[] toDestinationAddresses(addresses) {
         if (overrideAddress) {
             addresses = addresses.collect { overrideAddress }
         }
-    
+
         addresses.collect { it?.toString() } as String[]
     }
-    
+
     protected getDescription(SimpleMailMessage message) {
         "[${message.subject}] from [${message.from}] to ${message.to}"
     }
-    
+
     protected getDescription(Message message) {
         "[${message.subject}] from [${message.from}] to ${message.getRecipients(Message.RecipientType.TO)*.toString()}"
     }
-    
+
     protected getDescription(MimeMailMessage message) {
         getDescription(message.mimeMessage)
     }
-    
+
     MailMessage finishMessage() {
         def message = getMessage()
 
@@ -387,16 +389,15 @@ class MailMessageBuilder {
             if (!textContent) {
                 throw new GrailsMailException("message has no content, use text(), html() or body() methods to set content")
             }
-            
+
             message.text = textContent
         }
-        
+
         inlines.each {
             doAdd(it.id, it.contentType, it.toAdd, false)
         }
-        
+
         message.sentDate = new Date()
         message
     }
-    
 }

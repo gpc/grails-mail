@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package grails.plugin.mail
 
 import org.springframework.mail.MailMessage
@@ -24,28 +23,28 @@ import org.springframework.mail.MailMessage
 class MailService {
 
     static transactional = false
-    
+
     def mailMessageBuilderFactory
-    
+
     MailMessage sendMail(Closure callable) {
         if (isDisabled()) {
             log.warn("Sending emails disabled by configuration option")
-        } else {
-            def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
-            callable.delegate = messageBuilder
-            callable.resolveStrategy = Closure.DELEGATE_FIRST
-            callable.call()
-
-            messageBuilder.sendMessage()
+            return
         }
+
+        def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
+        callable.delegate = messageBuilder
+        callable.resolveStrategy = Closure.DELEGATE_FIRST
+        callable.call()
+
+        messageBuilder.sendMessage()
     }
-    
+
     def getMailConfig() {
         org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.mail
     }
-    
+
     boolean isDisabled() {
         mailConfig.disabled
     }
-    
 }

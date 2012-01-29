@@ -34,7 +34,7 @@ See the section on using views for more details of the parameters to this versio
 
 h3. Plain Text Email
 
-To send plain text mail you can use the @text@ method. This will set the content type of the message to @text/plain@. 
+To send plain text mail you can use the @text@ method. This will set the content type of the message to @text/plain@.
 
 You can either supply a string value…
 

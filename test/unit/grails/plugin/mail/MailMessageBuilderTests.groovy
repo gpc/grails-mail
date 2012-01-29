@@ -15,17 +15,17 @@
  */
 package grails.plugin.mail
 
+import grails.util.GrailsUtil
+
 import javax.mail.Message
 import javax.mail.Session
 import javax.mail.internet.MimeMessage
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.springframework.mail.MailSender
-import org.springframework.mail.javamail.JavaMailSender
 import javax.mail.internet.MimeMultipart
 import javax.mail.internet.MimeUtility
-
-import org.springframework.web.context.support.ServletContextResource
 import javax.servlet.ServletContext
+import org.springframework.mail.MailSender
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.web.context.support.ServletContextResource
 
 /**
  * Test case for {@link MailMessageBuilder}.
@@ -35,42 +35,44 @@ class MailMessageBuilderTests extends GroovyTestCase {
     def testJavaMailSenderBuilder
     def testBasicMailSenderBuilder
 
-    def defaultFrom = "from@grailsplugin.com"
-    def defaultTo = "to@grailsplugin.com"
-    
-    void setUp() {
+    private String defaultFrom = "from@grailsplugin.com"
+    private String defaultTo = "to@grailsplugin.com"
+
+    protected void setUp() {
         def config = new ConfigObject()
         config.default.from = defaultFrom
         config.default.to = defaultTo
-        
+
         def mockJavaMailSender = [
-                createMimeMessage: {-> return new MimeMessage(Session.getInstance(new Properties())) }
+            createMimeMessage: {-> new MimeMessage(Session.getInstance(new Properties())) }
         ] as JavaMailSender
         testJavaMailSenderBuilder = new MailMessageBuilder(mockJavaMailSender, config)
-        
+
         def mockBasicMailSender = [:] as MailSender
         testBasicMailSenderBuilder = new MailMessageBuilder(mockBasicMailSender, config)
     }
 
     void testStreamCharBufferForGrails12() {
-        if(grails.util.GrailsUtil.grailsVersion.startsWith("1.2")) {
-            processDsl {
-                to "fred@g2one.com"
-                subject "Hello Fred"
-    
-                def text = getClass().classLoader.loadClass("org.codehaus.groovy.grails.web.util.StreamCharBuffer").newInstance()
-                text.writer << 'How are you?'
-                body text
-            }       
-
-            def msg = testJavaMailSenderBuilder.message.mimeMessage
-            assertEquals 1, to(msg).size()
-            assertEquals "fred@g2one.com", to(msg)[0].toString()
-            assertEquals "Hello Fred", msg.subject
-            assertEquals "How are you?", msg.content
-            
+        if (!GrailsUtil.grailsVersion.startsWith("1.2")) {
+            return
         }
+
+        processDsl {
+            to "fred@g2one.com"
+            subject "Hello Fred"
+
+            def text = getClass().classLoader.loadClass("org.codehaus.groovy.grails.web.util.StreamCharBuffer").newInstance()
+            text.writer << 'How are you?'
+            body text
+        }
+
+        def msg = testJavaMailSenderBuilder.message.mimeMessage
+        assertEquals 1, to(msg).size()
+        assertEquals "fred@g2one.com", to(msg)[0].toString()
+        assertEquals "Hello Fred", msg.subject
+        assertEquals "How are you?", msg.content
     }
+
     /**
      * Tests the basic elements of the mail DSL.
      */
@@ -158,9 +160,8 @@ class MailMessageBuilderTests extends GroovyTestCase {
         def msg = testJavaMailSenderBuilder.message.mimeMessage
         assertEquals defaultTo, to(msg)[0].toString()
         assertEquals defaultFrom, msg.from[0].toString()
-        
     }
-    
+
     void testAttachment() {
         processDsl {
             multipart true
@@ -177,12 +178,11 @@ class MailMessageBuilderTests extends GroovyTestCase {
         def attachment = msg.content.getBodyPart(1)
         assertEquals "abcdef", attachment.content.text
         assertEquals "dummy.bin", attachment.fileName
-        
+
         attachment = msg.content.getBodyPart(2)
         assertEquals MimeUtility.encodeWord("äöü.bin"), attachment.fileName
     }
-    
-   
+
     void testStream() {
         def servletContext = [getResourceAsStream: { new ByteArrayInputStream("abcdef".bytes) }] as ServletContext
         processDsl {
@@ -192,7 +192,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
            body 'How are you?'
            attach "dummy.bin", "application/binary", new ServletContextResource(servletContext, "path/to/file")
         }
-        
+
         def msg = testJavaMailSenderBuilder.message.mimeMessage
         assertTrue msg.content instanceof MimeMultipart
         assertEquals 2, msg.content.count
@@ -206,7 +206,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
         //create temp file to attach
         def tempFile = File.createTempFile("grailsMailUnitTest",".txt")
         tempFile << 'abcdef'
-        
+
         try {
             processDsl {
                 multipart true
@@ -233,7 +233,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
         //create temp file to attach
         def tempFile = File.createTempFile("grailsMailUnitTest",".txt")
         tempFile << 'abcdef'
-        
+
         try {
             processDsl {
                 multipart true
@@ -255,7 +255,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             tempFile.delete()
         }
     }
-    
+
     void testAttachFileWithNonExistentFile() {
         def ex = shouldFail(FileNotFoundException) {
             processDsl {
@@ -267,7 +267,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
             }
         }
     }
-    
+
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()
     }
@@ -289,5 +289,4 @@ class MailMessageBuilderTests extends GroovyTestCase {
         c.call()
         builder.finishMessage()
     }
-    
 }

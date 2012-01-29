@@ -29,7 +29,7 @@ class MailMessageBuilderFactory {
     MailMessageBuilder createBuilder(ConfigObject config) {
         new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
     }
-    
+
     boolean isMimeCapable() {
         mailSender instanceof JavaMailSender
     }

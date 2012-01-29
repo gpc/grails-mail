@@ -24,8 +24,8 @@ grails {
      port = 587
      username = "youracount@live.com"
      password = "yourpassword"
-     props = ["mail.smtp.starttls.enable":"true", 
-                  "mail.smtp.port":"587"]
+     props = ["mail.smtp.starttls.enable":"true",
+              "mail.smtp.port":"587"]
    }
 }
 {code}
