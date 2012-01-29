@@ -24,6 +24,7 @@ class MailService {
 
     static transactional = false
 
+    def grailsApplication
     def mailMessageBuilderFactory
 
     MailMessage sendMail(Closure callable) {
@@ -41,7 +42,7 @@ class MailService {
     }
 
     def getMailConfig() {
-        org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.mail
+        grailsApplication.config.grails.mail
     }
 
     boolean isDisabled() {

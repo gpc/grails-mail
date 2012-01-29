@@ -41,12 +41,16 @@ class MailServiceTests extends GroovyTestCase {
 
     protected void setUp() {
 
+        def grailsApplication = [config: new ConfigObject()]
+
         def mimeMailSender = new JavaMailSenderImpl(host: "localhost", port: ServerSetupTest.SMTP.port)
         def mimeMessageBuilderFactor = new MailMessageBuilderFactory(
             mailSender: mimeMailSender,
             mailMessageContentRenderer: mailMessageContentRenderer
         )
-        mimeCapableMailService = new MailService(mailMessageBuilderFactory: mimeMessageBuilderFactor)
+        mimeCapableMailService = new MailService(
+            mailMessageBuilderFactory: mimeMessageBuilderFactor,
+            grailsApplication: grailsApplication)
 
         def simpleMailSender = new MailSender() {
             void send(SimpleMailMessage simpleMessage) {}
@@ -56,7 +60,9 @@ class MailServiceTests extends GroovyTestCase {
             mailSender: simpleMailSender,
             mailMessageContentRenderer: mailMessageContentRenderer
         )
-        nonMimeCapableMailService = new MailService(mailMessageBuilderFactory: simpleMessageBuilderFactory)
+        nonMimeCapableMailService = new MailService(
+            mailMessageBuilderFactory: simpleMessageBuilderFactory,
+            grailsApplication: grailsApplication)
     }
 
     void testSendSimpleMessage() {
