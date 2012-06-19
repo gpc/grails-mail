@@ -171,7 +171,7 @@ sendMail {
             }
         }
 
-        def mailServiceClassName = applicationContext.mailService.class.name
+        def mailServiceClassName = applicationContext.mailService?.metaClass?.theClass?.name
 
         //adding sendMail to all services, besides the mailService of the plugin
         for (serviceClass in application.serviceClasses) {
