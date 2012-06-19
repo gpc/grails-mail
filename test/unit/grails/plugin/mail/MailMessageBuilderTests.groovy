@@ -267,6 +267,29 @@ class MailMessageBuilderTests extends GroovyTestCase {
             }
         }
     }
+	
+	//for issue GPMAIL-60
+	void testAttachCallInBeginningOfDsl() {
+		
+		def servletContext = [getResourceAsStream: { new ByteArrayInputStream("abcdef".bytes) }] as ServletContext
+		processDsl {
+		   multipart true
+		   attach "dummy.bin", "application/binary", new ServletContextResource(servletContext, "path/to/file")
+		   to "fred@g2one.com"
+		   subject "Hello Fred"
+		   body 'How are you?'
+		}
+
+		def msg = testJavaMailSenderBuilder.message.mimeMessage
+		assertTrue msg.content instanceof MimeMultipart
+		assertEquals 2, msg.content.count
+		assertEquals "fred@g2one.com", msg.getHeader("To", " ")
+		assertEquals "Hello Fred", msg.getHeader("Subject", " ")
+
+		def attachment = msg.content.getBodyPart(1)
+		assertEquals "abcdef", attachment.content.text
+		assertEquals "dummy.bin", attachment.fileName
+	}
 
     private List to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()

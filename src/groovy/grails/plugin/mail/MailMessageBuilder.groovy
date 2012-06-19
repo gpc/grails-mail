@@ -345,6 +345,7 @@ class MailMessageBuilder {
 
         assert multipart, "message is not marked as 'multipart'; use 'multipart true' as the first line in your builder DSL"
 
+		getMessage() //ensure that helper is initialized
         if (isAttachment) {
             helper.addAttachment(MimeUtility.encodeWord(id), toAdd, contentType)
         } else {
