@@ -14,16 +14,14 @@ grails.project.dependency.resolution = {
         }
     }
     plugins {
-        if (appName == "grails-mail") {
-            test (":greenmail:1.3.0") {
-                export = false
-            }
-            build(":release:1.0.0") {
-                export = false
-            }
-            build(":tomcat:$grailsVersion") {
-                export = false
-            }
+        test (":greenmail:1.3.0") {
+            export = false
+        }
+        build(":release:2.0.4", ":rest-client-builder:1.0.2") {
+            export = false
+        }
+        build(":tomcat:$grailsVersion") {
+            export = false
         }
     }
 }
