@@ -3,11 +3,12 @@ grails.project.work.dir = "target"
 grails.project.dependency.resolution = {
     inherits("global")
     repositories {
-        grailsHome()
-        mavenRepo "http://download.java.net/maven/2/"
+        grailsCentral()
+        mavenLocal()
+        mavenCentral()
     }
     dependencies {
-        compile "javax.mail:mail:1.4.3"
+        compile "javax.mail:mail:1.4.5"
 
         runtime("org.springframework:spring-test:3.1.0.RELEASE") {
             transitive = false
