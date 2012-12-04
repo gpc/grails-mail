@@ -1,12 +1,15 @@
 grails.project.work.dir = "target"
 
 grails.project.dependency.resolution = {
+
     inherits("global")
+
     repositories {
         grailsCentral()
         mavenLocal()
         mavenCentral()
     }
+
     dependencies {
         compile "javax.mail:mail:1.4.5"
 
@@ -14,14 +17,12 @@ grails.project.dependency.resolution = {
             transitive = false
         }
     }
+
     plugins {
         test (":greenmail:1.3.0") {
             export = false
         }
         build(":release:2.0.4", ":rest-client-builder:1.0.2") {
-            export = false
-        }
-        build(":tomcat:$grailsVersion") {
             export = false
         }
     }

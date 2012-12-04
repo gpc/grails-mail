@@ -29,7 +29,7 @@ import org.springframework.web.servlet.i18n.FixedLocaleResolver
 import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
- * Responsible for rendering a GSP into the content of a mail message.
+ * Renders a GSP into the content of a mail message.
  */
 class MailMessageContentRenderer {
 
@@ -41,7 +41,7 @@ class MailMessageContentRenderer {
     def groovyPagesUriService
     def grailsApplication
 
-    MailMessageContentRender render(Writer out, templateName, model, locale, pluginName = null) {
+    MailMessageContentRender render(Writer out, String templateName, model, locale, String pluginName = null) {
         RenderEnvironment.with(grailsApplication.mainContext, out, locale) { env ->
             def template = createTemplate(templateName, env.controllerName, pluginName)
             if (model instanceof Map) {
@@ -65,9 +65,9 @@ class MailMessageContentRenderer {
             }
         }
 
-        def contextPath = getContextPath(pluginName)
+        String contextPath = getContextPath(pluginName)
 
-        def templateUri
+        String templateUri
         if (contextPath) {
             templateUri = contextPath + groovyPagesUriService.getViewURI(controllerName, templateName)
         } else {
@@ -87,8 +87,8 @@ class MailMessageContentRenderer {
         template
     }
 
-    protected getContextPath(pluginName) {
-        def contextPath = ""
+    protected String getContextPath(String pluginName) {
+        String contextPath = ""
 
         if (pluginName) {
             def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
@@ -115,7 +115,7 @@ class MailMessageContentRenderer {
             this.applicationContext = applicationContext
         }
 
-        private init() {
+        private void init() {
             originalRequestAttributes = RequestContextHolder.getRequestAttributes()
             renderRequestAttributes = GrailsWebUtil.bindMockWebRequest(applicationContext)
 
@@ -136,7 +136,7 @@ class MailMessageContentRenderer {
             WrappedResponseHolder.wrappedResponse = renderRequestAttributes.currentResponse
         }
 
-        private close() {
+        private void close() {
             RequestContextHolder.setRequestAttributes(originalRequestAttributes) // null ok
             WrappedResponseHolder.wrappedResponse = originalRequestAttributes?.currentResponse
         }
