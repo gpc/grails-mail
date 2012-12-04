@@ -18,7 +18,8 @@ package grails.plugin.mail
 import javax.mail.Message
 import javax.mail.internet.MimeUtility
 
-import org.apache.commons.logging.LogFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.InputStreamSource
@@ -38,7 +39,7 @@ import org.springframework.util.Assert
  */
 class MailMessageBuilder {
 
-    private log = LogFactory.getLog(MailMessageBuilder)
+    private Logger log = LoggerFactory.getLogger(getClass())
 
     final MailSender mailSender
     final MailMessageContentRenderer mailMessageContentRenderer

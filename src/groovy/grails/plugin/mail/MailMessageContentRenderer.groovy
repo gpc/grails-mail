@@ -20,15 +20,13 @@ import grails.util.GrailsWebUtil
 
 import org.codehaus.groovy.grails.plugins.PluginManagerHolder
 import org.codehaus.groovy.grails.web.servlet.WrappedResponseHolder
-
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.web.servlet.support.RequestContextUtils
 import org.springframework.web.servlet.DispatcherServlet
 import org.springframework.web.servlet.i18n.FixedLocaleResolver
-
-import org.springframework.context.ApplicationContext
-
-import org.apache.commons.logging.LogFactory
+import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
  * Responsible for rendering a GSP into the content of a mail message.
@@ -37,7 +35,7 @@ class MailMessageContentRenderer {
 
     static String PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
 
-    private log = LogFactory.getLog(MailMessageContentRenderer)
+    private Logger log = LoggerFactory.getLogger(getClass())
 
     def groovyPagesTemplateEngine
     def groovyPagesUriService
