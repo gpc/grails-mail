@@ -27,18 +27,22 @@ class MailService {
     def grailsApplication
     def mailMessageBuilderFactory
 
-    MailMessage sendMail(Closure callable) {
+    MailMessage sendMail(def config, Closure callable) {
         if (isDisabled()) {
             log.warn("Sending emails disabled by configuration option")
             return
         }
 
-        def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
+        def messageBuilder = mailMessageBuilderFactory.createBuilder(config)
         callable.delegate = messageBuilder
         callable.resolveStrategy = Closure.DELEGATE_FIRST
         callable.call()
 
         messageBuilder.sendMessage()
+    }
+
+    MailMessage sendMail(Closure callable) {
+        return sendMail(mailConfig, callable)
     }
 
     def getMailConfig() {
