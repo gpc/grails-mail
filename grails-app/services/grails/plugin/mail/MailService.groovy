@@ -36,7 +36,7 @@ class MailService {
         def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
         callable.delegate = messageBuilder
         callable.resolveStrategy = Closure.DELEGATE_FIRST
-        callable.call()
+        callable.call(messageBuilder)
 
         messageBuilder.sendMessage()
     }
