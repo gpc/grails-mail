@@ -42,7 +42,7 @@ sendMail {
 }
 
 '''
-    def documentation = "http://gpc.github.com/grails-mail/"
+    def documentation = "http://grails.org/plugins/mail"
 
     def license = "APACHE"
     def organization = [ name: "Grails Plugin Collective", url: "http://github.com/gpc" ]
