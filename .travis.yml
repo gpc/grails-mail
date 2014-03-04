@@ -11,7 +11,7 @@ before_script:
 script: grails refresh-dependencies --non-interactive
   && grails test-app --non-interactive
   && grails package-plugin --non-interactive
-  && if [[ $TRAVIS_BRANCH == 'master' ]]; then ./grails publish-plugin --no-scm --allow-overwrite --non-interactive ; else echo "Not on master branch, so not publishing"; fi
+  && if [[ $TRAVIS_BRANCH == 'master' ]]; then grails publish-plugin --no-scm --allow-overwrite --non-interactive ; else echo "Not on master branch, so not publishing"; fi
 env:
   global:
   # travis encrypt -a env.global 'GRAILS_CENTRAL_USERNAME=myusername'
