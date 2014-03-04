@@ -1,4 +1,4 @@
-By default the plugin assumes an unsecured mail server configured on port 25, getting the SMTP host name from the environment variable SMTP_HOST. However you can change this via the grails-app/Config.groovy file. For example here is how you would configure the default sender to send with a Gmail account:
+By default the plugin assumes an unsecured mail server configured on port 25, getting the SMTP host name from the environment variable SMTP_HOST. However you can change this via the grails-app/conf/Config.groovy file. For example here is how you would configure the default sender to send with a Gmail account:
 
 {code}
 grails {
