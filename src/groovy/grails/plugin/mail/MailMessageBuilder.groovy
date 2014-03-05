@@ -15,6 +15,8 @@
  */
 package grails.plugin.mail
 
+import java.util.concurrent.ExecutorService
+
 import javax.mail.Message
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeUtility
@@ -57,6 +59,7 @@ class MailMessageBuilder {
     private String htmlContent
 
     private int multipart = MimeMessageHelper.MULTIPART_MODE_NO
+	private boolean async = false
 
     private List<Inline> inlines = []
 
@@ -96,14 +99,20 @@ class MailMessageBuilder {
         message
     }
 
-    MailMessage sendMessage() {
+    MailMessage sendMessage(ExecutorService executorService) {
         MailMessage message = finishMessage()
 
         if (log.traceEnabled) {
             log.trace("Sending mail ${getDescription(message)}} ...")
         }
 
-        mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+		if(async){
+			executorService.execute({
+				mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+			} as Runnable)
+		}else{
+			mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+		}
 
         if (log.traceEnabled) {
             log.trace("Sent mail ${getDescription(message)}} ...")
@@ -114,6 +123,10 @@ class MailMessageBuilder {
 
     void multipart(boolean multipart) {
         this.multipart = MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED
+    }
+
+    void async(boolean async) {
+        this.async = async
     }
 
     void multipart(int multipartMode) {

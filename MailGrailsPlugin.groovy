@@ -101,6 +101,8 @@ sendMail {
             mailConfig = newMailConfig
             mailConfigHash = newMailConfigHash
 
+			event.ctx.getBean(MailService.class).setPoolSize(mailConfig.poolSize?:null)
+
             def newBeans = beans {
                 configureMailSender(delegate, mailConfig)
             }

@@ -16,6 +16,8 @@
 
 package grails.plugin.mail
 
+import java.util.concurrent.ExecutorService;
+
 import javax.mail.Message
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage
@@ -35,6 +37,8 @@ import org.springframework.web.context.request.RequestContextHolder
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
+import groovy.mock.interceptor.MockFor
+
 import com.icegreen.greenmail.util.ServerSetupTest
 
 class MailServiceTests extends GroovyTestCase {
@@ -47,8 +51,9 @@ class MailServiceTests extends GroovyTestCase {
     MailMessageContentRenderer mailMessageContentRenderer // autowired
 	GrailsApplication grailsApplication // autowired
 
+	@Override
     protected void setUp() {
-
+		super.setUp()
         MailSender mimeMailSender = new JavaMailSenderImpl(host: "localhost", port: ServerSetupTest.SMTP.port)
         MailMessageBuilderFactory mimeMessageBuilderFactor = new MailMessageBuilderFactory(
             mailSender: mimeMailSender,
@@ -57,6 +62,7 @@ class MailServiceTests extends GroovyTestCase {
         mimeCapableMailService = new MailService(
             mailMessageBuilderFactory: mimeMessageBuilderFactor,
             grailsApplication: grailsApplication)
+		mimeCapableMailService.afterPropertiesSet()
 
         MailSender simpleMailSender = new MailSender() {
             void send(SimpleMailMessage simpleMessage) {}
@@ -69,7 +75,15 @@ class MailServiceTests extends GroovyTestCase {
         nonMimeCapableMailService = new MailService(
             mailMessageBuilderFactory: simpleMessageBuilderFactory,
             grailsApplication: grailsApplication)
+		nonMimeCapableMailService.afterPropertiesSet()
     }
+
+	@Override
+	protected void tearDown(){
+		mimeCapableMailService.destroy()
+		nonMimeCapableMailService.destroy()
+		super.tearDown()
+	}
 
     void testSendSimpleMessage() {
         MailMessage message = nonMimeCapableMailService.sendMail {
@@ -78,8 +92,25 @@ class MailServiceTests extends GroovyTestCase {
             body 'this is some text'
             from 'king@g2one.com'
         }
+		assertThat(message, instanceOf(SimpleMailMessage.class));
 
-        assertEquals "Hello John", message.getSubject()
+        assertEquals "Hello John", ((SimpleMailMessage)message).getSubject()
+        assertEquals 'this is some text', message.getText()
+        assertEquals 'fred@g2one.com', message.to[0]
+        assertEquals 'king@g2one.com', message.from
+    }
+
+    void testAsyncSendSimpleMessage() {
+        MailMessage message = nonMimeCapableMailService.sendMail {
+			async true
+            to "fred@g2one.com"
+            title "Hello John"
+            body 'this is some text'
+            from 'king@g2one.com'
+        }
+		assertThat(message, instanceOf(SimpleMailMessage.class));
+
+        assertEquals "Hello John", ((SimpleMailMessage)message).getSubject()
         assertEquals 'this is some text', message.getText()
         assertEquals 'fred@g2one.com', message.to[0]
         assertEquals 'king@g2one.com', message.from
@@ -92,7 +123,8 @@ class MailServiceTests extends GroovyTestCase {
             body 'this is some text'
         }
 
-        assertEquals "Hello John", message.getSubject()
+		assertThat(message, instanceOf(SimpleMailMessage.class));
+        assertEquals "Hello John", ((SimpleMailMessage)message).getSubject()
         assertEquals 'this is some text', message.getText()
         assertEquals "fred@g2one.com", message.getTo()[0]
         assertEquals "ginger@g2one.com", message.getTo()[1]
@@ -140,7 +172,9 @@ class MailServiceTests extends GroovyTestCase {
             body 'this is some text'
         }
 
-        assertEquals "Hello John", message.getSubject()
+		assertThat(message, instanceOf(SimpleMailMessage.class));
+
+        assertEquals "Hello John", ((SimpleMailMessage)message).getSubject()
         assertEquals 'this is some text', message.getText()
         assertEquals 2, message.to.size()
         assertEquals "fred@g2one.com", message.getTo()[0]
