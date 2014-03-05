@@ -1,17 +1,13 @@
 language: groovy
 jdk:
 - openjdk6
-before_install:
-  - sudo add-apt-repository -y ppa:groovy-dev/grails
-  - sudo apt-get update
-  - sudo apt-get install grails-2.2.5 # or the grails version.
 before_script:
   # if we run on the same box as previous build, make sure target is clean
   - rm -rf target
-script: grails refresh-dependencies --non-interactive
-  && grails test-app --non-interactive
-  && grails package-plugin --non-interactive
-  && if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == 'gpc/grails-mail' ]]; then grails publish-plugin --no-scm --allow-overwrite --non-interactive ; else echo "Not on master branch, so not publishing"; fi
+script: ./grailsw refresh-dependencies --non-interactive
+  && ./grailsw test-app --non-interactive
+  && ./grailsw package-plugin --non-interactive
+  && if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == 'gpc/grails-mail' ]]; then ./grailsw publish-plugin --no-scm --allow-overwrite --non-interactive ; else echo "Not on master branch, so not publishing"; fi
 env:
   global:
   # travis encrypt -a env.global 'GRAILS_CENTRAL_USERNAME=myusername'
