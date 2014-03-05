@@ -16,6 +16,7 @@
 package grails.plugin.mail
 
 import javax.mail.Message
+import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeUtility
 
 import org.slf4j.Logger
@@ -55,7 +56,7 @@ class MailMessageBuilder {
     private String textContent
     private String htmlContent
 
-    private boolean multipart = false
+    private int multipart = MimeMessageHelper.MULTIPART_MODE_NO
 
     private List<Inline> inlines = []
 
@@ -112,7 +113,7 @@ class MailMessageBuilder {
     }
 
     void multipart(boolean multipart) {
-        this.multipart = multipart
+        this.multipart = MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED
     }
 
     void multipart(int multipartMode) {
@@ -129,7 +130,7 @@ class MailMessageBuilder {
 
         MailMessage msg = getMessage()
 		if(msg instanceof MimeMailMessage){
-	        msg = ((MimeMailMessage)msg).mimeMessageHelper.mimeMessage
+	        MimeMessage mimeMessage = ((MimeMailMessage)msg).mimeMessageHelper.mimeMessage
 	        hdrs.each { name, value ->
 	            String nameString = name?.toString()
 	            String valueString = value?.toString()
@@ -137,7 +138,7 @@ class MailMessageBuilder {
 	            Assert.hasText(nameString, "header names cannot be null or empty")
 	            Assert.hasText(valueString, "header value for '$nameString' cannot be null")
 	
-	            msg.setHeader(nameString, valueString)
+	            mimeMessage.setHeader(nameString, valueString)
 	        }
 		}else{
 			throw new GrailsMailException("mail message builder is not mime capable so headers cannot be set")

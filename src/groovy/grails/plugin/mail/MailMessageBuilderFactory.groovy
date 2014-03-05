@@ -15,6 +15,7 @@
  */
 package grails.plugin.mail
 
+import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSender
 
 /**
@@ -23,8 +24,8 @@ import org.springframework.mail.javamail.JavaMailSender
  */
 class MailMessageBuilderFactory {
 
-    def mailSender
-    def mailMessageContentRenderer
+    MailSender mailSender
+    MailMessageContentRenderer mailMessageContentRenderer
 
     MailMessageBuilder createBuilder(ConfigObject config) {
         new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
