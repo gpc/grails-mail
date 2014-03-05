@@ -4,7 +4,7 @@ jdk:
 before_install:
   - sudo add-apt-repository -y ppa:groovy-dev/grails
   - sudo apt-get update
-  - sudo apt-get install grails-2.0.0 # or the grails version.
+  - sudo apt-get install grails-2.2.5 # or the grails version.
 before_script:
   # if we run on the same box as previous build, make sure target is clean
   - rm -rf target
