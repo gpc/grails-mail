@@ -15,10 +15,6 @@ grails.project.dependency.resolution = {
 
     dependencies {
         compile "javax.mail:mail:1.4.5"
-
-        runtime("org.springframework:spring-test:3.1.0.RELEASE") {
-            transitive = false
-        }
     }
 
     plugins {
