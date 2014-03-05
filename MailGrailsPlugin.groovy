@@ -47,6 +47,7 @@ sendMail {
     def license = "APACHE"
     def organization = [ name: "Grails Plugin Collective", url: "http://github.com/gpc" ]
     def developers = [
+        [ name: "Craig Andrews", email: "candrews@integralblue.com" ],
         [ name: "Luke Daley", email: "ld@ldaley.com" ],
         [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ],
         [ name: "Jeff Brown", email: "jbrown@vmware.com" ],
