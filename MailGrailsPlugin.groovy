@@ -60,8 +60,8 @@ sendMail {
 
     def observe = ['controllers','services']
 
-    def mailConfigHash
-    def mailConfig
+    Integer mailConfigHash
+    ConfigObject mailConfig
     boolean createdSession = false
 
     def doWithSpring = {
@@ -88,8 +88,8 @@ sendMail {
     }
 
     def onConfigChange = { event ->
-        def newMailConfig = event.source.grails.mail
-        def newMailConfigHash = newMailConfig.hashCode()
+        ConfigObject newMailConfig = event.source.grails.mail
+        Integer newMailConfigHash = newMailConfig.hashCode()
 
         if (newMailConfigHash != mailConfigHash) {
             if (createdSession) {
@@ -164,7 +164,7 @@ sendMail {
             }
         }
 
-        def mailServiceClassName = applicationContext.mailService?.metaClass?.theClass?.name
+        String mailServiceClassName = applicationContext.mailService.metaClass.theClass.name
 
         //adding sendMail to all services, besides the mailService of the plugin
         for (serviceClass in application.serviceClasses) {
