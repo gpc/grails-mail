@@ -15,6 +15,7 @@
  */
 package grails.plugin.mail
 
+import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.springframework.mail.MailMessage
 
 /**
@@ -24,8 +25,8 @@ class MailService {
 
     static transactional = false
 
-    def grailsApplication
-    def mailMessageBuilderFactory
+    GrailsApplication grailsApplication
+    MailMessageBuilderFactory mailMessageBuilderFactory
 
     MailMessage sendMail(Closure callable) {
         if (isDisabled()) {
@@ -33,7 +34,7 @@ class MailService {
             return
         }
 
-        def messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
+        MailMessageBuilder messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
         callable.delegate = messageBuilder
         callable.resolveStrategy = Closure.DELEGATE_FIRST
         callable.call(messageBuilder)
