@@ -36,7 +36,7 @@ class MailService implements InitializingBean, DisposableBean {
 
     GrailsApplication grailsApplication
     MailMessageBuilderFactory mailMessageBuilderFactory
-	ThreadPoolExecutor executorService
+	ThreadPoolExecutor mailExecutorService
 
 	private static final int DEFAULT_POOL_SIZE = 5
 
@@ -51,7 +51,7 @@ class MailService implements InitializingBean, DisposableBean {
         callable.resolveStrategy = Closure.DELEGATE_FIRST
         callable.call(messageBuilder)
 
-        messageBuilder.sendMessage(executorService)
+        messageBuilder.sendMessage(mailExecutorService)
     }
 
     ConfigObject getMailConfig() {
@@ -64,22 +64,22 @@ class MailService implements InitializingBean, DisposableBean {
 
 	void setPoolSize(Integer poolSize){
 		if(poolSize == null) poolSize = DEFAULT_POOL_SIZE
-		executorService.setCorePoolSize(poolSize)
-		executorService.setMaximumPoolSize(poolSize)
+		mailExecutorService.setCorePoolSize(poolSize)
+		mailExecutorService.setMaximumPoolSize(poolSize)
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		executorService.shutdown();
-		executorService.awaitTermination(10, TimeUnit.SECONDS);
+		mailExecutorService.shutdown();
+		mailExecutorService.awaitTermination(10, TimeUnit.SECONDS);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		executorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS,
+		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
 		try{
-			((ThreadPoolExecutor)executorService).allowCoreThreadTimeOut(true)
+			((ThreadPoolExecutor)mailExecutorService).allowCoreThreadTimeOut(true)
 		}catch(MissingMethodException e){
 			log.info("ThreadPoolExecutor.allowCoreThreadTimeOut method is missing; Java < 6 must be running. The thread pool size will never go below ${poolSize}, which isn't harmful, just a tiny bit wasteful of resources.", e)
 		}
