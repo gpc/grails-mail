@@ -108,7 +108,11 @@ class MailMessageBuilder {
 
 		if(async){
 			executorService.execute({
-				mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+				try{
+					mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+				}catch(Throwable t){
+					if(log.errorEnabled) log.error("Failed to send email", t)
+				}
 			} as Runnable)
 		}else{
 			mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
