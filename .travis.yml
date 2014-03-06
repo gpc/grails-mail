@@ -10,8 +10,8 @@ script: ./grailsw refresh-dependencies --non-interactive
   && if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == 'gpc/grails-mail' ]]; then ./doc.sh && ./grailsw publish-plugin --no-scm --allow-overwrite --non-interactive ; else echo "Not on master branch, so not publishing"; fi
 env:
   global:
-  - GIT_NAME=Craig Andrews
-  - GIT_EMAIL=candrews@integralblue.com
+  - GIT_NAME="Craig Andrews"
+  - GIT_EMAIL="candrews@integralblue.com"
   # travis encrypt -a env.global 'GRAILS_CENTRAL_USERNAME=myusername'
   # travis encrypt -a env.global 'GRAILS_CENTRAL_PASSWORD=mypassword'
   # travis encrypt -a env.global 'GH_TOKEN=token' # get the token from https://github.com/settings/applications
