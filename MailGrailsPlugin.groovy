@@ -20,7 +20,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 import grails.plugin.mail.*
 
 class MailGrailsPlugin {
-    def version = "1.0.3-SNAPSHOT"
+    def version = "1.0.3"
     def grailsVersion = "1.3 > *"
 
     def author = "Grails Plugin Collective"
