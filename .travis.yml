@@ -7,6 +7,7 @@ before_script:
 script: ./grailsw refresh-dependencies --non-interactive
   && ./grailsw test-app --non-interactive
   && ./grailsw package-plugin --non-interactive
+  && ./grailsw doc --pdf --non-interactive
   && if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == 'gpc/grails-mail' ]]; then ./doc.sh && ./grailsw publish-plugin --no-scm --allow-overwrite --non-interactive ; else echo "Not on master branch, so not publishing"; fi
 env:
   global:
