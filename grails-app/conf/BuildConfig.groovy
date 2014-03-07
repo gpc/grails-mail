@@ -17,7 +17,7 @@ grails.project.dependency.resolution = {
 		compile "javax.mail:javax.mail-api:1.5.1"
         runtime "com.sun.mail:javax.mail:1.5.1"
 
-        compile("org.springframework:spring-test:3.1.0.RELEASE") {
+        compile("org.springframework:spring-test:3.1.4.RELEASE") {
             // Grails 2.3 and higher can use Aether/Maven instead of Ivy
             // which does not support:
             // transitive = false
