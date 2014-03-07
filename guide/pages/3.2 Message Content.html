@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>3.2 Message Content 1.0.4-SNAPSHOT</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/1.%20Introduction.html"><strong>1</strong><span>Introduction</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/2.%20Configuration.html"><strong>2</strong><span>Configuration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/3.%20Sending%20Email.html"><strong>3</strong><span>Sending Email</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/4.%20Testing.html"><strong>4</strong><span>Testing</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Send email from Grails applications</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2.%20Configuration.html">&lt;&lt; <strong>2</strong><span>Configuration</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/4.%20Testing.html"><strong>4</strong><span>Testing</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>3.2 Message Content - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Grails Plugin Collective</p>
+
+                    <p><strong>Version:</strong> 1.0.4-SNAPSHOT</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h2 id="3.2 Message Content">3.2 Message Content</h2>
+Message content is specified by either the <code>text</code> and/or <code>html</code> methods that specify either the plain text or HTML content respectively.<p class="paragraph"/><blockquote class="note">
+As of version 1.0, the <code>body</code> method that could be used to specify the message content has been deprecated (but is still there). The <code>body</code> method requires the user to specify the content type of the message using a GSP directive such as:<p class="paragraph"/>&#60;%&#64; page contentType="text/html" %&#62;
+</blockquote><p class="paragraph"/><h3>HTML Email</h3><p class="paragraph"/>To send HTML mail you can use the <code>html</code> method. This will set the content type of the message to <code>text/html</code>.<p class="paragraph"/>You can either supply a string value…<p class="paragraph"/><div class="code"><pre>sendMail &#123;
+    to <span class="java&#45;quote">"user@somewhere.org"</span>
+    subject <span class="java&#45;quote">"Hello John"</span>
+    html <span class="java&#45;quote">"&#60;b&#62;Hello&#60;/b&#62; World"</span>
+&#125;</pre></div><p class="paragraph"/>Or a view to render to form the content…<p class="paragraph"/><div class="code"><pre>sendMail &#123;
+    to <span class="java&#45;quote">"user@somewhere.org"</span>
+    subject <span class="java&#45;quote">"Hello John"</span>
+    html view: <span class="java&#45;quote">"/emails/hello"</span>, model: &#91;param1: <span class="java&#45;quote">"value1"</span>, param2: <span class="java&#45;quote">"value2"</span>&#93;
+&#125;</pre></div><p class="paragraph"/>See the section on using views for more details of the parameters to this version of <code>html</code>.<p class="paragraph"/><h3>Plain Text Email</h3><p class="paragraph"/>To send plain text mail you can use the <code>text</code> method. This will set the content type of the message to <code>text/plain</code>.<p class="paragraph"/>You can either supply a string value…<p class="paragraph"/><div class="code"><pre>sendMail &#123;
+    to <span class="java&#45;quote">"user@somewhere.org"</span>
+    subject <span class="java&#45;quote">"Hello John"</span>
+    text <span class="java&#45;quote">"Hello World"</span>
+&#125;</pre></div><p class="paragraph"/>Or a view to render to form the content…<p class="paragraph"/><div class="code"><pre>sendMail &#123;
+    to <span class="java&#45;quote">"user@somewhere.org"</span>
+    subject <span class="java&#45;quote">"Hello John"</span>
+    text view: <span class="java&#45;quote">"/emails/hello"</span>, model: &#91;param1: <span class="java&#45;quote">"value1"</span>, param2: <span class="java&#45;quote">"value2"</span>&#93;
+&#125;</pre></div><p class="paragraph"/>See the section on using views for more details of the parameters to this version of <code>text</code>.<p class="paragraph"/><h3>Plain Text <strong class="bold">and</strong> HTML</h3><p class="paragraph"/>It is possible to send a multipart message that contains both plain text and HTML versions of the message. In this situation, the mail reading client is responsible for selecting the variant to display to the user.<p class="paragraph"/>To do this, simply use both the <code>html</code> and <code>text</code> methods…<p class="paragraph"/><div class="code"><pre>sendMail &#123;
+    to <span class="java&#45;quote">"user@somewhere.org"</span>
+    subject <span class="java&#45;quote">"Hello John"</span>
+    text view: <span class="java&#45;quote">"/emails/text&#45;hello"</span>, model: &#91;param1: <span class="java&#45;quote">"value1"</span>, param2: <span class="java&#45;quote">"value2"</span>&#93;
+    html view: <span class="java&#45;quote">"/emails/html&#45;hello"</span>, model: &#91;param1: <span class="java&#45;quote">"value1"</span>, param2: <span class="java&#45;quote">"value2"</span>&#93;
+&#125;</pre></div><p class="paragraph"/><h3>Using Views</h3><p class="paragraph"/>Both the <code>text</code> and <code>html</code> methods support specifying a view to render to form the content. These are the accepted parameters:
+<ul class="star">
+<li>The  <em class="italic">view</em>  is the absolute path (or relative to the current controller if during a request) to the GSP, just like the existing Grails <code>render</code> method.</li>
+<li>The  <em class="italic">plugin</em>  parameter is only necessary if the  view you wish to render comes from a plugin, just like the existing Grails <code>render</code> method.</li>
+<li>The  <em class="italic">model</em>  parameter is a map representing the model the GSP will see for rendering data, just like the existing Grails <code>render</code> method.</li>
+</ul><p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2.%20Configuration.html">&lt;&lt; <strong>2</strong><span>Configuration</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/4.%20Testing.html"><strong>4</strong><span>Testing</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.
+    Developed by the <a href='http://gpc.github.com'>Grails Plugin Collective</a>
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>

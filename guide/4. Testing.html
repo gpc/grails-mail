@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>4 Testing 1.0.4-SNAPSHOT</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/1.%20Introduction.html"><strong>1</strong><span>Introduction</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/2.%20Configuration.html"><strong>2</strong><span>Configuration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/3.%20Sending%20Email.html"><strong>3</strong><span>Sending Email</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/4.%20Testing.html"><strong>4</strong><span>Testing</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Send email from Grails applications</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/3.%20Sending%20Email.html">&lt;&lt; <strong>3</strong><span>Sending Email</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+
+
+                <div class="project">
+                    <h1>4 Testing - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Grails Plugin Collective</p>
+
+                    <p><strong>Version:</strong> 1.0.4-SNAPSHOT</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h1 id="4. Testing">4 Testing</h1>
+Typically, you don't want to actually send email as part of your automated tests. Besides wrapping all calls to <code>sendMail</code> in an environment sensitive guard (which is a very bad idea), you can use one of the following techniques to deal with this.<p class="paragraph"/><h3>Disabling mail sending</h3><p class="paragraph"/>You can effectively disable mail sending globally in your test by setting the following value in your application for the test environment.<p class="paragraph"/><div class="code"><pre>grails.mail.disabled = <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>This will effectively cause all calls to <code>sendMail()</code> to be a non operation, with a warning being logged that mail is disabled. The advantage of this technique is that it is cheap. The disadvantage is that it makes it impossible to test that mail would be sent and to inspect any aspects of the sent mail.<p class="paragraph"/><h3>Using an override address</h3><p class="paragraph"/>You can  <em class="italic">override</em>  any and all recipient email addresses in <code>sendMail()</code> calls to force messages to be delivered to a certain mailbox.<p class="paragraph"/><div class="code"><pre>grails.mail.overrideAddress = <span class="java&#45;quote">"test&#64;myorg.com"</span></pre></div><p class="paragraph"/>All <code>to</code>, <code>cc</code> and <code>bcc</code> addresses will be replaced by this value if set. The advantage of this mechanism is that it allows you to test using a real SMTP server. The disadvantage is that it requires a real SMTP server and makes it difficult to test address determination logic.<p class="paragraph"/><h3>Using the GreenMail plugin</h3><p class="paragraph"/>The preferred approach is to use the existing <a href="http://www.grails.org/plugin/greenmail" target="blank">grails-greenmail</a> plugin to run an in-memory SMTP server inside your application. This allows you to fully exercise your mail sending code and to inspect sent mail to assert correct values for recipient addresses etc.<p class="paragraph"/>The advantage of this approach is that it is as close as possible to real world and gives you access to the sent email in your tests. The disadvantage is that it is another plugin dependency.<p class="paragraph"/>Consult the documentation for the plugin for more information.
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/3.%20Sending%20Email.html">&lt;&lt; <strong>3</strong><span>Sending Email</span></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    Copies of this document may be made for your own use and for distribution to others, provided that you do not charge any fee for such copies and further provided that each copy contains this Copyright Notice, whether distributed in print or electronically.
+    Developed by the <a href='http://gpc.github.com'>Grails Plugin Collective</a>
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
