@@ -17,8 +17,12 @@
 package grails.plugin.mail
 
 import grails.util.GrailsWebUtil
+import groovy.text.Template
 
+import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+import org.codehaus.groovy.grails.web.pages.GroovyPagesUriService
 import org.codehaus.groovy.grails.web.servlet.WrappedResponseHolder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,17 +37,17 @@ import org.springframework.web.servlet.support.RequestContextUtils
  */
 class MailMessageContentRenderer {
 
-    static String PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
+    static final String PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
 
-    private Logger log = LoggerFactory.getLogger(getClass())
+    private static final Logger log = LoggerFactory.getLogger(MailMessageContentRenderer.class)
 
-    def groovyPagesTemplateEngine
-    def groovyPagesUriService
-    def grailsApplication
+    GroovyPagesTemplateEngine groovyPagesTemplateEngine
+    GroovyPagesUriService groovyPagesUriService
+    GrailsApplication grailsApplication
 
     MailMessageContentRender render(Writer out, String templateName, model, locale, String pluginName = null) {
         RenderEnvironment.with(grailsApplication.mainContext, out, locale) { env ->
-            def template = createTemplate(templateName, env.controllerName, pluginName)
+            Template template = createTemplate(templateName, env.controllerName, pluginName)
             if (model instanceof Map) {
                 template.make(model).writeTo(out)
             } else {
@@ -54,7 +58,7 @@ class MailMessageContentRenderer {
         }
     }
 
-    protected createTemplate(String templateName, String controllerName, String pluginName) {
+    protected Template createTemplate(String templateName, String controllerName, String pluginName) {
         if (templateName.startsWith("/")) {
             if (!controllerName) {
                 controllerName = ""
@@ -74,7 +78,7 @@ class MailMessageContentRenderer {
             templateUri = groovyPagesUriService.getDeployedViewURI(controllerName, templateName)
         }
 
-        def template = groovyPagesTemplateEngine.createTemplateForUri(templateUri)
+        Template template = groovyPagesTemplateEngine.createTemplateForUri(templateUri)
 
         if (!template) {
             if (pluginName) {

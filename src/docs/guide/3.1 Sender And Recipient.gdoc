@@ -17,7 +17,7 @@ You can supply multiple values for @to@, @cc@ and @bcc@.
 
 {code}
 sendMail {
-    to "someone@org.com", "someone.else@org.com"
+    to "someone@org.com", "someone.else\@org.com"
     …
 }
 {code}
@@ -34,7 +34,7 @@ The sender address of the email is configured by the @from@ method.
 
 {code}
 sendMail {
-    from "me@org.com"
+    from "me\@org.com"
     …
 }
 {code}

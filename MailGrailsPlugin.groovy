@@ -20,7 +20,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 import grails.plugin.mail.*
 
 class MailGrailsPlugin {
-    def version = "1.0.2-SNAPSHOT"
+    def version = "1.0.5-SNAPSHOT"
     def grailsVersion = "1.3 > *"
 
     def author = "Grails Plugin Collective"
@@ -42,11 +42,12 @@ sendMail {
 }
 
 '''
-    def documentation = "http://gpc.github.com/grails-mail/"
+    def documentation = "http://grails.org/plugins/mail"
 
     def license = "APACHE"
     def organization = [ name: "Grails Plugin Collective", url: "http://github.com/gpc" ]
     def developers = [
+        [ name: "Craig Andrews", email: "candrews@integralblue.com" ],
         [ name: "Luke Daley", email: "ld@ldaley.com" ],
         [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ],
         [ name: "Jeff Brown", email: "jbrown@vmware.com" ],
@@ -59,8 +60,8 @@ sendMail {
 
     def observe = ['controllers','services']
 
-    def mailConfigHash
-    def mailConfig
+    Integer mailConfigHash
+    ConfigObject mailConfig
     boolean createdSession = false
 
     def doWithSpring = {
@@ -87,8 +88,8 @@ sendMail {
     }
 
     def onConfigChange = { event ->
-        def newMailConfig = event.source.grails.mail
-        def newMailConfigHash = newMailConfig.hashCode()
+        ConfigObject newMailConfig = event.source.grails.mail
+        Integer newMailConfigHash = newMailConfig.hashCode()
 
         if (newMailConfigHash != mailConfigHash) {
             if (createdSession) {
@@ -99,6 +100,8 @@ sendMail {
 
             mailConfig = newMailConfig
             mailConfigHash = newMailConfigHash
+
+			event.ctx.getBean(MailService.class).setPoolSize(mailConfig.poolSize?:null)
 
             def newBeans = beans {
                 configureMailSender(delegate, mailConfig)
@@ -163,7 +166,7 @@ sendMail {
             }
         }
 
-        def mailServiceClassName = applicationContext.mailService?.metaClass?.theClass?.name
+        String mailServiceClassName = applicationContext.mailService.metaClass.theClass.name
 
         //adding sendMail to all services, besides the mailService of the plugin
         for (serviceClass in application.serviceClasses) {

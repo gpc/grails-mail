@@ -15,7 +15,10 @@
  */
 package grails.plugin.mail
 
+import java.util.concurrent.ExecutorService
+
 import javax.mail.Message
+import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeUtility
 
 import org.slf4j.Logger
@@ -39,7 +42,7 @@ import org.springframework.util.Assert
  */
 class MailMessageBuilder {
 
-    private Logger log = LoggerFactory.getLogger(getClass())
+    private static final Logger log = LoggerFactory.getLogger(MailMessageBuilder.class)
 
     final MailSender mailSender
     final MailMessageContentRenderer mailMessageContentRenderer
@@ -55,14 +58,15 @@ class MailMessageBuilder {
     private String textContent
     private String htmlContent
 
-    private multipart = false
+    private int multipart = MimeMessageHelper.MULTIPART_MODE_NO
+	private boolean async = false
 
     private List<Inline> inlines = []
 
     private static class Inline {
         String id
         String contentType
-        def toAdd
+        InputStreamSource toAdd
     }
 
     MailMessageBuilder(MailSender mailSender, ConfigObject config, MailMessageContentRenderer mailMessageContentRenderer = null) {
@@ -95,14 +99,24 @@ class MailMessageBuilder {
         message
     }
 
-    MailMessage sendMessage() {
-        def message = finishMessage()
+    MailMessage sendMessage(ExecutorService executorService) {
+        MailMessage message = finishMessage()
 
         if (log.traceEnabled) {
             log.trace("Sending mail ${getDescription(message)}} ...")
         }
 
-        mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+		if(async){
+			executorService.execute({
+				try{
+					mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+				}catch(Throwable t){
+					if(log.errorEnabled) log.error("Failed to send email", t)
+				}
+			} as Runnable)
+		}else{
+			mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+		}
 
         if (log.traceEnabled) {
             log.trace("Sent mail ${getDescription(message)}} ...")
@@ -112,7 +126,11 @@ class MailMessageBuilder {
     }
 
     void multipart(boolean multipart) {
-        this.multipart = multipart
+        this.multipart = MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED
+    }
+
+    void async(boolean async) {
+        this.async = async
     }
 
     void multipart(int multipartMode) {
@@ -127,17 +145,21 @@ class MailMessageBuilder {
             throw new GrailsMailException("You must use a JavaMailSender to customise the headers.")
         }
 
-        def msg = getMessage()
-        msg = msg.mimeMessageHelper.mimeMessage
-        hdrs.each { name, value ->
-            def nameString = name?.toString()
-            def valueString = value?.toString()
-
-            Assert.hasText(nameString, "header names cannot be null or empty")
-            Assert.hasText(valueString, "header value for '$nameString' cannot be null")
-
-            msg.setHeader(nameString, valueString)
-        }
+        MailMessage msg = getMessage()
+		if(msg instanceof MimeMailMessage){
+	        MimeMessage mimeMessage = ((MimeMailMessage)msg).mimeMessageHelper.mimeMessage
+	        hdrs.each { name, value ->
+	            String nameString = name?.toString()
+	            String valueString = value?.toString()
+	
+	            Assert.hasText(nameString, "header names cannot be null or empty")
+	            Assert.hasText(valueString, "header value for '$nameString' cannot be null")
+	
+	            mimeMessage.setHeader(nameString, valueString)
+	        }
+		}else{
+			throw new GrailsMailException("mail message builder is not mime capable so headers cannot be set")
+		}
     }
 
     void to(Object[] args) {
@@ -215,7 +237,7 @@ class MailMessageBuilder {
     void body(Map params) {
         Assert.notEmpty(params, "body cannot be null or empty")
 
-        def render = doRender(params)
+        MailMessageContentRender render = doRender(params)
 
         if (render.html) {
             html(render.out.toString()) // @todo Spring mail helper will not set correct mime type if we give it XHTML
@@ -339,7 +361,7 @@ class MailMessageBuilder {
         inlines << new Inline(id: contentId, contentType: contentType, toAdd: source)
     }
 
-    protected doAdd(String id, String contentType, toAdd, boolean isAttachment) {
+    protected doAdd(String id, String contentType, InputStreamSource toAdd, boolean isAttachment) {
         if (!mimeCapable) {
             throw new GrailsMailException("Message is not an instance of org.springframework.mail.javamail.MimeMessage, cannot attach bytes!")
         }
@@ -379,7 +401,7 @@ class MailMessageBuilder {
     }
 
     MailMessage finishMessage() {
-        def message = getMessage()
+        MailMessage message = getMessage()
 
         if (htmlContent) {
             if (textContent) {
