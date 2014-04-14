@@ -122,13 +122,13 @@ class MailMessageBuilder {
 		if(async){
 			executorService.execute({
 				try{
-                    mailSender.send(sendingMsg)
+					mailSender.send(sendingMsg)
 				}catch(Throwable t){
 					if(log.errorEnabled) log.error("Failed to send email", t)
 				}
 			} as Runnable)
 		}else{
-            mailSender.send(sendingMsg)
+			mailSender.send(sendingMsg)
 		}
 
         if (log.traceEnabled) {

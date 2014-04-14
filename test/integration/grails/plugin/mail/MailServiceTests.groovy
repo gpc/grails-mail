@@ -39,6 +39,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 
 import groovy.mock.interceptor.MockFor
 
+import grails.plugin.greenmail.GreenMail
 import com.icegreen.greenmail.util.ServerSetupTest
 
 class MailServiceTests extends GroovyTestCase {
@@ -50,7 +51,7 @@ class MailServiceTests extends GroovyTestCase {
 
     MailMessageContentRenderer mailMessageContentRenderer // autowired
 	GrailsApplication grailsApplication // autowired
-    def greenMail
+	GreenMail greenMail
 
 	@Override
     protected void setUp() {
@@ -83,7 +84,7 @@ class MailServiceTests extends GroovyTestCase {
 	protected void tearDown(){
 		mimeCapableMailService.destroy()
 		nonMimeCapableMailService.destroy()
-        greenMail.deleteAllMessages()
+		greenMail.deleteAllMessages()
 		super.tearDown()
 	}
 
