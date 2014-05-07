@@ -18,9 +18,8 @@ package grails.plugin.mail
 
 import grails.util.GrailsWebUtil
 import groovy.text.Template
-
-import org.codehaus.groovy.grails.commons.GrailsApplication;
-import org.codehaus.groovy.grails.plugins.PluginManagerHolder
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.plugins.GrailsPluginManager
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.codehaus.groovy.grails.web.pages.GroovyPagesUriService
 import org.codehaus.groovy.grails.web.servlet.WrappedResponseHolder
@@ -44,6 +43,7 @@ class MailMessageContentRenderer {
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
     GroovyPagesUriService groovyPagesUriService
     GrailsApplication grailsApplication
+    GrailsPluginManager grailsPluginManager
 
     MailMessageContentRender render(Writer out, String templateName, model, locale, String pluginName = null) {
         RenderEnvironment.with(grailsApplication.mainContext, out, locale) { env ->
@@ -95,7 +95,7 @@ class MailMessageContentRenderer {
         String contextPath = ""
 
         if (pluginName) {
-            def plugin = PluginManagerHolder.pluginManager.getGrailsPlugin(pluginName)
+            def plugin = grailsPluginManager.getGrailsPlugin(pluginName)
             if (plugin && !plugin.isBasePlugin()) {
                 contextPath = plugin.pluginPath + "/grails-app/views"
             }
@@ -111,7 +111,6 @@ class MailMessageContentRenderer {
 
         private originalRequestAttributes
         private renderRequestAttributes
-        private originalOut
 
         RenderEnvironment(ApplicationContext applicationContext, Writer out, Locale locale = null) {
             this.out = out
@@ -154,8 +153,7 @@ class MailMessageContentRenderer {
 
         /**
          * Establish an environment with a specific locale
-         */
-        static with(ApplicationContext applicationContext, Writer out, Locale locale, Closure block) {
+         */        static with(ApplicationContext applicationContext, Writer out, Locale locale, Closure block) {
             def env = new RenderEnvironment(applicationContext, out, locale)
             env.init()
             try {
