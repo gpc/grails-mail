@@ -55,7 +55,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        test (":greenmail:1.3.0") {
+        test (":greenmail:1.3.4") {
             export = false
         }
         build ":tomcat:$grailsVersion", ':release:2.2.1', ':rest-client-builder:1.0.3', {
