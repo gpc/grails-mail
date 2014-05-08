@@ -40,19 +40,25 @@ class MailService implements InitializingBean, DisposableBean {
 
 	private static final int DEFAULT_POOL_SIZE = 5
 
-    MailMessage sendMail(Closure callable) {
+    MailMessage sendMail(def config, Closure callable) {
         if (isDisabled()) {
             log.warn("Sending emails disabled by configuration option")
             return
         }
 
-        MailMessageBuilder messageBuilder = mailMessageBuilderFactory.createBuilder(mailConfig)
+
+        MailMessageBuilder messageBuilder = mailMessageBuilderFactory.createBuilder(config)
         callable.delegate = messageBuilder
         callable.resolveStrategy = Closure.DELEGATE_FIRST
         callable.call(messageBuilder)
 
         messageBuilder.sendMessage(mailExecutorService)
     }
+
+    MailMessage sendMail(Closure callable) {
+        return sendMail(mailConfig, callable)
+    }
+
 
     ConfigObject getMailConfig() {
         grailsApplication.config.grails.mail
