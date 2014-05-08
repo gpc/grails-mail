@@ -39,6 +39,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 
 import groovy.mock.interceptor.MockFor
 
+import grails.plugin.greenmail.GreenMail
 import com.icegreen.greenmail.util.ServerSetupTest
 import grails.test.mixin.integration.IntegrationTestMixin
 import grails.test.mixin.*
@@ -55,6 +56,7 @@ class MailServiceTests  {
 
     MailMessageContentRenderer mailMessageContentRenderer // autowired
 	GrailsApplication grailsApplication // autowired
+	GreenMail greenMail
 
 	@Before
     void setUp() {
@@ -83,6 +85,7 @@ class MailServiceTests  {
 	void tearDown(){
 		mimeCapableMailService.destroy()
 		nonMimeCapableMailService.destroy()
+		greenMail.deleteAllMessages()
 	}
 
     void testSendSimpleMessage() {
@@ -183,6 +186,35 @@ class MailServiceTests  {
         assertEquals 2, message.cc.size()
         assertEquals "marge@g2one.com", message.cc[0]
         assertEquals "ed@g2one.com", message.cc[1]
+    }
+
+    void testSendMailWithEnvelopeFrom() {
+        def message = mimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            title "Hello John"
+            body 'this is some text'
+            from 'king@g2one.com'
+            envelopeFrom 'peter@g2one.com'
+        }
+
+        def msg = message.mimeMessage
+        assertEquals "Hello John", msg.getSubject()
+        assertEquals "king@g2one.com", msg.getFrom()[0].toString()
+
+        def greenMsg = greenMail.getReceivedMessages()[0]
+        assertEquals "<peter@g2one.com>", greenMsg.getHeader("Return-Path", ",")
+    }
+
+    void testSendMailWithEnvelopeFromAndBasicMailSender() {
+        shouldFail(GrailsMailException) {
+            def message = nonMimeCapableMailService.sendMail {
+                to "fred@g2one.com"
+                title "Hello John"
+                body 'this is some text'
+                from 'king@g2one.com'
+                envelopeFrom 'peter@g2one.com'
+            }
+        }
     }
 
     void testSendHtmlMail() {

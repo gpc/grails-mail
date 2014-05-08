@@ -32,6 +32,8 @@ import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMailMessage
 import org.springframework.mail.javamail.MimeMessageHelper
+import com.sun.mail.smtp.SMTPMessage
+
 import org.springframework.util.Assert
 
 /**
@@ -57,6 +59,7 @@ class MailMessageBuilder {
 
     private String textContent
     private String htmlContent
+    private String envelopeFrom
 
     private int multipart = MimeMessageHelper.MULTIPART_MODE_NO
 	private boolean async = false
@@ -106,16 +109,26 @@ class MailMessageBuilder {
             log.trace("Sending mail ${getDescription(message)}} ...")
         }
 
+        def sendingMsg = message instanceof MimeMailMessage ? message.mimeMessage : message
+        if(envelopeFrom) {
+            if(!mimeCapable) {
+                throw new GrailsMailException("You must use a JavaMailSender to set the envelopeFrom.")
+            }
+
+            sendingMsg = new SMTPMessage(sendingMsg)
+            sendingMsg.envelopeFrom = envelopeFrom
+        }
+
 		if(async){
 			executorService.execute({
 				try{
-					mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+					mailSender.send(sendingMsg)
 				}catch(Throwable t){
 					if(log.errorEnabled) log.error("Failed to send email", t)
 				}
 			} as Runnable)
 		}else{
-			mailSender.send(message instanceof MimeMailMessage ? message.mimeMessage : message)
+			mailSender.send(sendingMsg)
 		}
 
         if (log.traceEnabled) {
@@ -216,6 +229,12 @@ class MailMessageBuilder {
         getMessage().from = from.toString()
     }
 
+    void envelopeFrom(CharSequence envFrom) {
+        Assert.hasText(envFrom, "envelope from cannot be null or 0 length")
+        
+        envelopeFrom = envFrom.toString()
+    }
+    
     void title(CharSequence title) {
         Assert.notNull(title, "title cannot be null")
 
