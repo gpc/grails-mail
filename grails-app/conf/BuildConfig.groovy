@@ -1,8 +1,12 @@
 grails.project.repos.grailsCentral.username = System.getenv("GRAILS_CENTRAL_USERNAME")
+
 grails.project.repos.grailsCentral.password = System.getenv("GRAILS_CENTRAL_PASSWORD")
 
 grails.project.work.dir = "target"
 
+grails.project.fork = false
+
+grails.project.dependency.resolver = "maven"
 grails.project.dependency.resolution = {
 
     inherits("global")
@@ -17,7 +21,7 @@ grails.project.dependency.resolution = {
 		compile "javax.mail:javax.mail-api:1.5.1"
         runtime "com.sun.mail:javax.mail:1.5.1"
 
-        compile("org.springframework:spring-test:3.1.4.RELEASE") {
+        compile("org.springframework:spring-test:4.0.4.RELEASE") {
             // Grails 2.3 and higher can use Aether/Maven instead of Ivy
             // which does not support:
             // transitive = false
@@ -58,7 +62,7 @@ grails.project.dependency.resolution = {
         test (":greenmail:1.3.4") {
             export = false
         }
-        build ":tomcat:$grailsVersion", ':release:2.2.1', ':rest-client-builder:1.0.3', {
+        build ":tomcat:7.0.52.1", ':release:3.0.1', ':rest-client-builder:1.0.3', {
             export = false
         }
     }
