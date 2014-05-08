@@ -4,7 +4,7 @@ set -e
 ./grailsw test-app --non-interactive
 ./grailsw package-plugin --non-interactive
 ./grailsw doc --pdf --non-interactive
-if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == 'gpc/grails-mail' && TRAVIS_PULL_REQUEST == 'false' ]]; then
+if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == 'gpc/grails-mail' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
   git config --global user.name "$GIT_NAME"
   git config --global user.email "$GIT_EMAIL"
   git config --global credential.helper "store --file=~/.git-credentials"
@@ -21,4 +21,7 @@ if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG == 'gpc/grails-mail' && TR
   ./grailsw publish-plugin --no-scm --allow-overwrite --non-interactive
 else
   echo "Not on master branch, so not publishing"
+  echo "TRAVIS_BRANCH: $TRAVIS_BRANCH"
+  echo "TRAVIS_REPO_SLUG: $TRAVIS_REPO_SLUG"
+  echo "TRAVIS_PULL_REQUEST: $TRAVIS_PULL_REQUEST"
 fi
