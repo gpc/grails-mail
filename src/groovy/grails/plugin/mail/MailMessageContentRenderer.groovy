@@ -43,7 +43,7 @@ class MailMessageContentRenderer {
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
     GroovyPagesUriService groovyPagesUriService
     GrailsApplication grailsApplication
-    GrailsPluginManager grailsPluginManager
+    GrailsPluginManager pluginManager
 
     MailMessageContentRender render(Writer out, String templateName, model, locale, String pluginName = null) {
         RenderEnvironment.with(grailsApplication.mainContext, out, locale) { env ->
@@ -95,7 +95,7 @@ class MailMessageContentRenderer {
         String contextPath = ""
 
         if (pluginName) {
-            def plugin = grailsPluginManager.getGrailsPlugin(pluginName)
+            def plugin = pluginManager.getGrailsPlugin(pluginName)
             if (plugin && !plugin.isBasePlugin()) {
                 contextPath = plugin.pluginPath + "/grails-app/views"
             }
