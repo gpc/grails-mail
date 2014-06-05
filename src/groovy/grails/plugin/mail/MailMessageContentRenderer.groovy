@@ -274,13 +274,13 @@ class MailMessageContentRenderer {
                         throw new UnsupportedOperationException("You cannot read the protocol in non-request rendering operations")
                     }
                     if (methodName == 'getScheme') {
-                        throw new UnsupportedOperationException("You cannot read the scheme in non-request rendering operations")
+                        return new URI(requestURI).scheme
                     }
                     if (methodName == 'getServerName') {
-                        throw new UnsupportedOperationException("You cannot read server name in non-request rendering operations")
+                        return new URI(requestURI).host
                     }
                     if (methodName == 'getServerPort') {
-                        throw new UnsupportedOperationException("You cannot read the server port in non-request rendering operations")
+                        return new URI(requestURI).host
                     }
                     if (methodName == 'getReader') {
                         throw new UnsupportedOperationException("You cannot read input in non-request rendering operations")
