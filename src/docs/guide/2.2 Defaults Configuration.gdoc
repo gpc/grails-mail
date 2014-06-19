@@ -11,3 +11,9 @@ You can also set the default "to" address to use for messages in Config using:
 {code}
 grails.mail.default.to = "user@yourhost.com"
 {code}
+
+You can also set the default "bcc" address to use for messages in Config using:
+
+{code}
+grails.mail.default.bcc = "user@yourhost.com"
+{code}
