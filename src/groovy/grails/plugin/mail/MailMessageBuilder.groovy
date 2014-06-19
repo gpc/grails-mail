@@ -52,6 +52,7 @@ class MailMessageBuilder {
     final String defaultFrom
     final String defaultTo
     final String defaultBcc
+    final String defaultCc
     final String overrideAddress
 
     private MailMessage message
@@ -81,6 +82,7 @@ class MailMessageBuilder {
         this.defaultFrom = overrideAddress ?: (config.default.from ?: null)
         this.defaultTo = overrideAddress ?: (config.default.to ?: null)
         this.defaultBcc = overrideAddress ?: (config.default.bcc ?: null)
+        this.defaultCc = overrideAddress ?: (config.default.cc ?: null)
     }
 
     private MailMessage getMessage() {
@@ -102,6 +104,10 @@ class MailMessageBuilder {
 
             if (defaultBcc) {
                 message.setBcc(defaultBcc)
+            }
+
+            if (defaultCc) {
+                message.setCc(defaultCc)
             }
         }
 
