@@ -32,6 +32,7 @@ import grails.util.GrailsWebUtil
 import groovy.text.Template
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.codehaus.groovy.grails.web.pages.GroovyPagesUriService
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
@@ -121,6 +122,7 @@ class MailMessageContentRenderer {
         final Writer out
         final Locale locale
         final ApplicationContext applicationContext
+		final LinkGenerator grailsLinkGenerator
 
         private originalRequestAttributes
         private renderRequestAttributes
@@ -129,6 +131,7 @@ class MailMessageContentRenderer {
             this.out = out
             this.locale = locale
             this.applicationContext = applicationContext
+			this.grailsLinkGenerator = applicationContext.getBean('grailsLinkGenerator', LinkGenerator.class)
         }
 
         private void init() {
@@ -141,7 +144,7 @@ class MailMessageContentRenderer {
                 renderLocale = RequestContextUtils.getLocale(originalRequestAttributes.request)
             }
 
-            renderRequestAttributes = new GrailsWebRequest(PageRenderRequestCreator.createInstance("/mail/render", renderLocale),
+            renderRequestAttributes = new GrailsWebRequest(PageRenderRequestCreator.createInstance(grailsLinkGenerator.serverBaseURL, "/mail/render", renderLocale),
                 PageRenderResponseCreator.createInstance(out instanceof PrintWriter ? out : new PrintWriter(out), renderLocale), null, applicationContext)
 
             if (originalRequestAttributes) {
@@ -191,7 +194,8 @@ class MailMessageContentRenderer {
      */
     static class PageRenderRequestCreator {
 
-        static HttpServletRequest createInstance(final String requestURI, Locale localeToUse = Locale.getDefault()) {
+        static HttpServletRequest createInstance(final String serverBaseURL, final String requestURI, Locale localeToUse = Locale.getDefault()) {
+            final URI serverBaseURI = new URI(serverBaseURL)
 
             def params = new ConcurrentHashMap()
             def attributes = new ConcurrentHashMap()
@@ -274,13 +278,24 @@ class MailMessageContentRenderer {
                         throw new UnsupportedOperationException("You cannot read the protocol in non-request rendering operations")
                     }
                     if (methodName == 'getScheme') {
-                        return new URI(requestURI).scheme
+                        return serverBaseURI.scheme
                     }
                     if (methodName == 'getServerName') {
-                        return new URI(requestURI).host
+                        return serverBaseURI.host
                     }
                     if (methodName == 'getServerPort') {
-                        return new URI(requestURI).host
+                        int port = serverBaseURI.port
+                        if(port == -1){
+                        switch(serverBaseURI.scheme?.toLowerCase()){
+								case 'http':
+									port = 80
+									break
+								case 'https':
+									port = 443
+									break
+							}
+						}
+						return port
                     }
                     if (methodName == 'getReader') {
                         throw new UnsupportedOperationException("You cannot read input in non-request rendering operations")
