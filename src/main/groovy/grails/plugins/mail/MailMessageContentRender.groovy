@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package grails.plugin.mail
+package grails.plugins.mail
 
 /**
  * Represents the result of rendering a message content view.

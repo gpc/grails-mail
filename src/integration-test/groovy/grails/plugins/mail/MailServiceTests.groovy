@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package grails.plugin.mail
+package grails.plugins.mail
 
 import java.util.concurrent.ExecutorService;
 
