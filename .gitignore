@@ -1,6 +1,8 @@
 # Eclipse
 .classpath
 .project
+.gradle/
+build/
 .settings/
 target-eclipse/
 
@@ -17,3 +19,4 @@ docs
 plugin.xml
 *.zip
 web-app
+

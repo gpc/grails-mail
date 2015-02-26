@@ -30,13 +30,13 @@ import javax.servlet.http.HttpServletResponse
 
 import grails.util.GrailsWebUtil
 import groovy.text.Template
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.plugins.GrailsPluginManager
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
-import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
-import org.codehaus.groovy.grails.web.pages.GroovyPagesUriService
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.codehaus.groovy.grails.web.servlet.WrappedResponseHolder
+import grails.core.GrailsApplication
+import grails.plugins.GrailsPluginManager
+import grails.web.mapping.LinkGenerator
+import org.grails.gsp.GroovyPagesTemplateEngine
+import grails.web.pages.GroovyPagesUriService
+import org.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.web.servlet.WrappedResponseHolder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext

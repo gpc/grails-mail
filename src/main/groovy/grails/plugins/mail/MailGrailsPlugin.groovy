@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package grails.plugin.mail
 
 import org.springframework.jndi.JndiObjectFactoryBean
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
-import grails.plugin.mail.*
-
 class MailGrailsPlugin {
-    def version = "1.0.8-SNAPSHOT"
-    def grailsVersion = "1.3 > *"
+    def grailsVersion = "3.0 > *"
 
     def author = "Grails Plugin Collective"
     def authorEmail = "grails.plugin.collective@gmail.com"
@@ -79,13 +77,7 @@ sendMail {
         }
     }
 
-    def doWithApplicationContext = { applicationContext ->
-        configureSendMail(application, applicationContext)
-    }
 
-    def onChange = { event ->
-        configureSendMail(event.application, event.ctx)
-    }
 
     def onConfigChange = { event ->
         ConfigObject newMailConfig = event.source.grails.mail
@@ -158,23 +150,4 @@ sendMail {
         }
     }
 
-    def configureSendMail(application, applicationContext) {
-        //adding sendMail to controllers
-        for (controllerClass in application.controllerClasses) {
-            controllerClass.metaClass.sendMail = { Closure dsl ->
-                applicationContext.mailService.sendMail(dsl)
-            }
-        }
-
-        String mailServiceClassName = applicationContext.mailService.metaClass.theClass.name
-
-        //adding sendMail to all services, besides the mailService of the plugin
-        for (serviceClass in application.serviceClasses) {
-            if (serviceClass.clazz.name != mailServiceClassName) {
-                serviceClass.metaClass.sendMail = { Closure dsl ->
-                    applicationContext.mailService.sendMail(dsl)
-                }
-            }
-        }
-    }
 }
