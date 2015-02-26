@@ -16,5 +16,8 @@
 package grails.plugins.mail
 
 trait SendMail {
-
+	def applicationContext
+	public sendMail(Closure dsl) {		
+        applicationContext.mailService.sendMail(dsl)
+	}
 }

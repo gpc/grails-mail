@@ -58,6 +58,10 @@ sendMail {
 
     def observe = ['controllers','services']
 
+     def pluginExcludes = [
+            "grails-app/views/_testemails/*.gsp"
+    ]
+
     Integer mailConfigHash
     ConfigObject mailConfig
     boolean createdSession = false
