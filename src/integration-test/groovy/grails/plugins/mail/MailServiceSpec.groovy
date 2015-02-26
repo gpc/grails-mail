@@ -40,31 +40,30 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.Transactional
 import com.icegreen.greenmail.junit.GreenMailRule
 import spock.lang.*
-import static org.junit.Assert.*
 
 @Integration
 class MailServiceSpec extends Specification  {
 
     static transactional = false
 
-    def mimeCapableMailService
-    def nonMimeCapableMailService
+    MailService mimeCapableMailService
+    MailService nonMimeCapableMailService
 
-    // MailMessageContentRenderer mailMessageContentRenderer // autowired
-	// GrailsApplication grailsApplication // autowired
-	GreenMailRule greenMail
+    MailMessageContentRenderer mailMessageContentRenderer // autowired
+    GrailsApplication grailsApplication // autowired
+    @Shared GreenMailRule greenMail = new GreenMailRule(ServerSetupTest.SMTP)
 
     def setup() {
-        greenMail = new GreenMailRule(ServerSetupTest.SMTP)
+        println "Looking for Application ${grailsApplication}"
         MailSender mimeMailSender = new JavaMailSenderImpl(host: "localhost", port: ServerSetupTest.SMTP.port)
         MailMessageBuilderFactory mimeMessageBuilderFactor = new MailMessageBuilderFactory(
             mailSender: mimeMailSender,
             mailMessageContentRenderer: mailMessageContentRenderer
         )
-        mimeCapableMailService = new MailService(
+        this.mimeCapableMailService = new MailService(
             mailMessageBuilderFactory: mimeMessageBuilderFactor,
             grailsApplication: grailsApplication)
-		mimeCapableMailService.afterPropertiesSet()
+        mimeCapableMailService.afterPropertiesSet()
 
         MailSender simpleMailSender = new SimpleMailSender()
         MailMessageBuilderFactory simpleMessageBuilderFactory = new MailMessageBuilderFactory(
@@ -74,40 +73,39 @@ class MailServiceSpec extends Specification  {
         nonMimeCapableMailService = new MailService(
             mailMessageBuilderFactory: simpleMessageBuilderFactory,
             grailsApplication: grailsApplication)
-		nonMimeCapableMailService.afterPropertiesSet()
+        nonMimeCapableMailService.afterPropertiesSet()
     }
 
-	def cleanup() {
-		// mimeCapableMailService.destroy()
-		// nonMimeCapableMailService.destroy()
-		// greenMail.deleteAllMessages()
-	}
+    def cleanup() {
+        mimeCapableMailService.destroy()
+        nonMimeCapableMailService.destroy()
+    }
 
     void testSendSimpleMessage() {
-        // when:
-        // MailMessage message = nonMimeCapableMailService.sendMail {
-        //     to "fred@g2one.com"
-        //     title "Hello John"
-        //     body 'this is some text'
-        //     from 'king@g2one.com'
-        // }
-        // then:
-        //  message instanceof SimpleMailMessage
-        // "Hello John" == ((SimpleMailMessage)message).getSubject()
-        // 'this is some text'  ==message.getText()
-        // 'fred@g2one.com' == message.to[0]
-        // 'king@g2one.com' == message.from
+        when:
+        MailMessage message = nonMimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            title "Hello John"
+            body 'this is some text'
+            from 'king@g2one.com'
+        }
+        then:
+         message instanceof SimpleMailMessage
+        "Hello John" == ((SimpleMailMessage)message).getSubject()
+        'this is some text'  ==message.getText()
+        'fred@g2one.com' == message.to[0]
+        'king@g2one.com' == message.from
     }
 
   //   void testAsyncSendSimpleMessage() {
   //       MailMessage message = nonMimeCapableMailService.sendMail {
-		// 	async true
+    //  async true
   //           to "fred@g2one.com"
   //           title "Hello John"
   //           body 'this is some text'
   //           from 'king@g2one.com'
   //       }
-		// assertThat(message, instanceOf(SimpleMailMessage.class));
+    // assertThat(message, instanceOf(SimpleMailMessage.class));
 
   //       assert "Hello John" == ((SimpleMailMessage)message).getSubject()
   //       assert 'this is some text' == message.getText()
@@ -122,7 +120,7 @@ class MailServiceSpec extends Specification  {
   //           body 'this is some text'
   //       }
 
-		// assertThat(message, instanceOf(SimpleMailMessage.class));
+    // assertThat(message, instanceOf(SimpleMailMessage.class));
   //       assertEquals "Hello John", ((SimpleMailMessage)message).getSubject()
   //       assertEquals 'this is some text', message.getText()
   //       assertEquals "fred@g2one.com", message.getTo()[0]
@@ -171,7 +169,7 @@ class MailServiceSpec extends Specification  {
   //           body 'this is some text'
   //       }
 
-		// assertThat(message, instanceOf(SimpleMailMessage.class));
+    // assertThat(message, instanceOf(SimpleMailMessage.class));
 
   //       assertEquals "Hello John", ((SimpleMailMessage)message).getSubject()
   //       assertEquals 'this is some text', message.getText()
@@ -317,7 +315,7 @@ class MailServiceSpec extends Specification  {
   //           subject "Hello Fred"
   //           body 'How are you?'
   //       }
-		// assertThat(message, instanceOf(MimeMailMessage.class));
+    // assertThat(message, instanceOf(MimeMailMessage.class));
 
   //       MimeMessage msg = ((MimeMailMessage)message).mimeMessageHelper.mimeMessage
   //       assertEquals "user@grails.codehaus.org", msg.getHeader("X-Mailing-List", ", ")
@@ -351,7 +349,7 @@ class MailServiceSpec extends Specification  {
   //           subject "Hello"
   //           body(view: '/_testemails/i18ntest', model: [name: 'Luis'])
   //       }
-		// assertThat(message, instanceOf(MimeMailMessage.class));
+    // assertThat(message, instanceOf(MimeMailMessage.class));
   //       MimeMessage msg = ((MimeMailMessage)message).mimeMessageHelper.mimeMessage
   //       final def slurper = new XmlSlurper()
   //       def html = slurper.parseText(msg.content)
@@ -364,7 +362,7 @@ class MailServiceSpec extends Specification  {
   //           subject "Hello"
   //           body(view: '/_testemails/i18ntest', model: [name: 'Luis'])
   //       }
-		// assertThat(message, instanceOf(MimeMailMessage.class));
+    // assertThat(message, instanceOf(MimeMailMessage.class));
 
   //       msg = ((MimeMailMessage)message).mimeMessageHelper.mimeMessage
   //       html = slurper.parseText(msg.content)
@@ -383,7 +381,7 @@ class MailServiceSpec extends Specification  {
   //           attachBytes 'fileName', 'text/plain', 'Hello World'.getBytes("US-ASCII")
   //           html 'this is some text'
   //       }
-		// assertThat(message, instanceOf(MimeMailMessage.class));
+    // assertThat(message, instanceOf(MimeMailMessage.class));
 
   //       def content = ((MimeMailMessage)message).mimeMessage.content
   //       assertEquals 2, content.count
@@ -431,7 +429,7 @@ class MailServiceSpec extends Specification  {
   //           text 'this is some text <img src="cid:abc123" />'
   //           inline 'abc123', 'image/png', bytes
   //       }
-		// assertThat(message, instanceOf(MimeMailMessage.class));
+    // assertThat(message, instanceOf(MimeMailMessage.class));
 
   //       def inlinePart = ((MimeMailMessage)message).mimeMessage.content.getBodyPart(0).content.getBodyPart("<abc123>")
   //       assert inlinePart.inputStream.bytes == bytes
@@ -456,8 +454,8 @@ class MailServiceSpec extends Specification  {
   //           html '<html><head></head><body>How are you?</body></html>'
   //           text 'How are you?'
   //       }.mimeMessage
-	
-		// assertThat(msg.content, instanceOf(MimeMultipart.class));
+  
+    // assertThat(msg.content, instanceOf(MimeMultipart.class));
 
   //       MimeMultipart mp = msg.content.getBodyPart(0).content.getBodyPart(0).content
 
@@ -479,7 +477,7 @@ class MailServiceSpec extends Specification  {
   //           html '<html><head></head><body>How are you?</body></html>'
   //       }.mimeMessage
 
-		// assertThat(msg.content, instanceOf(MimeMultipart.class));
+    // assertThat(msg.content, instanceOf(MimeMultipart.class));
 
   //       MimeMultipart mp = msg.content.getBodyPart(0).content.getBodyPart(0).content
 
@@ -502,21 +500,21 @@ class MailServiceSpec extends Specification  {
   //       }.mimeMessage
 
   //       assertThat(msg.content, instanceOf(MimeMultipart.class));
-		
-		// MimeMultipart content = (MimeMultipart) msg.content
-		
+    
+    // MimeMultipart content = (MimeMultipart) msg.content
+    
   //       assertThat(content.getBodyPart(0), instanceOf(MimeBodyPart.class));
-		// MimeBodyPart mimeBodyPart = content.getBodyPart(0)
+    // MimeBodyPart mimeBodyPart = content.getBodyPart(0)
 
   //       MimeMultipart mp = mimeBodyPart.content
 
   //       assert mp.count == 2
-		
-		// assertThat(mp.getBodyPart(0), instanceOf(MimeBodyPart.class));
+    
+    // assertThat(mp.getBodyPart(0), instanceOf(MimeBodyPart.class));
   //       assert ((MimeBodyPart)mp.getBodyPart(0)).contentType.startsWith('text/plain')
   //       assert ((MimeBodyPart)mp.getBodyPart(0)).content == 'How are you?'
-		
-		// assertThat(mp.getBodyPart(1), instanceOf(MimeBodyPart.class));
+    
+    // assertThat(mp.getBodyPart(1), instanceOf(MimeBodyPart.class));
   //       assert ((MimeBodyPart)mp.getBodyPart(1)).contentType.startsWith('text/html')
   //       assert ((MimeBodyPart)mp.getBodyPart(1)).content == '<html><head></head><body>How are you?</body></html>'
   //   }
