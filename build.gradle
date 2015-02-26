@@ -61,14 +61,14 @@ dependencyManagement {
 dependencies {
 
   //FIXME: THese should be of type provided when fixed
-  compile 'org.springframework.boot:spring-boot-starter-logging'
-  compile "org.springframework.boot:spring-boot-starter-actuator"
-  compile "org.springframework.boot:spring-boot-autoconfigure"
-  compile "org.springframework.boot:spring-boot-starter-tomcat"
+  provided 'org.springframework.boot:spring-boot-starter-logging'
+  provided "org.springframework.boot:spring-boot-starter-actuator"
+  provided "org.springframework.boot:spring-boot-autoconfigure"
+  provided "org.springframework.boot:spring-boot-starter-tomcat"
 
-  compile "org.grails:grails-web-boot"
-  compile "org.grails:grails-dependencies"
-  compile 'javax.servlet:javax.servlet-api:3.1.0'
+  provided "org.grails:grails-web-boot"
+  provided "org.grails:grails-dependencies"
+  provided 'javax.servlet:javax.servlet-api:3.1.0'
   //End FIXME
 
   testCompile "org.grails:grails-plugin-testing"

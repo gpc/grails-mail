@@ -81,6 +81,10 @@ class MailServiceSpec extends Specification  {
         nonMimeCapableMailService.destroy()
     }
 
+    def cleanupSpec() {
+        greenMail.stop()
+    }
+
     void testSendSimpleMessage() {
         when:
         MailMessage message = nonMimeCapableMailService.sendMail {

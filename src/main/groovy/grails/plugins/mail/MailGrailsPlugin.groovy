@@ -15,10 +15,13 @@
  */
 package grails.plugins.mail
 
+import grails.plugins.Plugin
 import org.springframework.jndi.JndiObjectFactoryBean
 import org.springframework.mail.javamail.JavaMailSenderImpl
+import groovy.util.logging.Commons
 
-class MailGrailsPlugin {
+@Commons
+class MailGrailsPlugin extends Plugin {
     def grailsVersion = "3.0 > *"
 
     def author = "Grails Plugin Collective"
@@ -66,24 +69,28 @@ sendMail {
     ConfigObject mailConfig
     boolean createdSession = false
 
-    def doWithSpring = {
-        mailConfig = application.config.grails.mail
-        mailConfigHash = mailConfig.hashCode()
 
-        configureMailSender(delegate, mailConfig)
+     Closure doWithSpring() { 
+        {->
+            mailConfig = grailsApplication.config.grails.mail
+            mailConfigHash = mailConfig.hashCode()
 
-        mailMessageBuilderFactory(MailMessageBuilderFactory) {
-            it.autowire = true
-        }
+            configureMailSender(delegate, mailConfig)
 
-        mailMessageContentRenderer(MailMessageContentRenderer) {
-            it.autowire = true
-        }
+            mailMessageBuilderFactory(MailMessageBuilderFactory) {
+                it.autowire = true
+            }
+
+            mailMessageContentRenderer(MailMessageContentRenderer) {
+                it.autowire = true
+            }
+        } 
     }
+    
 
 
 
-    def onConfigChange = { event ->
+    void onConfigChange(Map<String, Object> event) {
         ConfigObject newMailConfig = event.source.grails.mail
         Integer newMailConfigHash = newMailConfig.hashCode()
 
