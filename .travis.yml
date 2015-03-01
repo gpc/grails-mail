@@ -1,17 +1,15 @@
 language: groovy
 jdk:
-- openjdk6
+- openjdk7
 before_script:
-  # if we run on the same box as previous build, make sure target is clean
-  - rm -rf target
+- rm -rf target
 script: ./travis-build.sh
 env:
   global:
-  - GIT_NAME="Craig Andrews"
-  - GIT_EMAIL="candrews@integralblue.com"
-  # travis encrypt -a env.global 'GRAILS_CENTRAL_USERNAME=myusername'
-  # travis encrypt -a env.global 'GRAILS_CENTRAL_PASSWORD=mypassword'
-  # travis encrypt -a env.global 'GH_TOKEN=token' # get the token from https://github.com/settings/applications
-  - secure: CIS/FGNl7M5NrRZp+A2uKKMU6ORRY92WAzQlzQyEH9OfOxBAZYvqVsU5ykiHY0pBb1uy4zBwugXTzepCrXyEtWdrXYk6UQmzYKvrwleZ8pYMYeFLQeBIeUWAkaz4vqJHtg5wBO/RkBAGPk2FgNKfM/e7BVTjylrRwOgxYp4biAQ=
-  - secure: a/74SNGlocNgvjGbYShPUsijOuMZZgsLOu8m7ILuL12m6/sK7VBxjgCFrvV1vtJanlsotxdrRdW1md1QDMNDsYcZzAlaLZ/pdVU/8vzLanuqy4n7PrJ1MtFtRvG7YePol2wjdvPPLXUivsLssXG0uyj3EymETGO0IGgfuMiSxec=
-  - secure: NGaelvSQUBbPHoHo2V3TyEen/FMUzBTHvWndsvb3tUoxj1+d2J/BD1Ew9YgpzRiQQpdFc5XpJijGFWjedVWWlb8AMQXTZpV74bvWgH2aOuiNrE7jR1oPf1TkfjE4L/C5g0Ix/wlDE+abN1PrvxWKdkcBzPUHijOlgOrUIt54Lek=
+  - GIT_NAME="Jeff Scott Brown"
+  - GIT_EMAIL="jeff@jeffandbetsy.net"
+  - secure: ghezWIO/n18JeNIR01xQwhd/T3WRHpc8ktl9KZCq41WeI2PKFoRBVsWpNZXa/Kt/7aXgTVD8CLUtvKNZlb239WVQDrFIoavFKcyPbtgGaJYJ5IQV/T5/a8ERVK3qQEgfCCMtBUedMhbDFeh1dfsE579Je98UbFhQK5pUB1kqF5Y=
+  - secure: DMPBvolzED1ru0f2ZrG1ZFoC7klH/x45sY0lNE+M6pPSvDSNX4caoHqgyw0iJFvjAqclrWMWG4i5Sws9rlk6eEmH8Q32K/kGAdpNtGt3gvfyXiumpjqluDMifS5WFkTeerMlf6zR8pLIuY5hQ3wxoB7+4pvuuhqqFyTiqENOWp0=
+  - secure: gePUtjNko89/kmEyOYcQGwhD0TW7jfrmpEYIUJz2L0L13J9JrrFKQFq7QB7uy3HOn1QkfzPUgECCMyfct7rzK25oNdIrG4VHPnNKJxUA1EcPs4h+1gXApmom1FWhmmYA9CG/GL3wT2ExikXHPsK0O0B/OQ2O0xlTxVHXK87L4V4=
+  - secure: dTZV67vqc9VxVA9+LG6sfAQqC28SRF4k794mLxYbX/ovh1xZCI7ToqZUKBeNbpgVunqCcidw6MRRWNOo5HTAom6TXDAanO/8oI3XjTdkHYQ93LNg2vU1gIE62WO6LmwOHqSJWUqEEoyvQJswwViR5sb7ZcVUzrFyFjuPSc4fkjA=
+  - secure: WJg8wCxGOQyoJGtD6rnXBwp/Qn6nN99vR0ibImjOLeBN734Ycwn8Yq17MGoP/TCcap0AU4pg7CraRQDkw06ZK17rGxVXRP/xxlwmwL3/hRpq+luWV2BKlWL1z0Snvalnyku3vNxkIl6edgPxLjciD3JZiKXs2T1i8RjHW9ZxQ7c=
