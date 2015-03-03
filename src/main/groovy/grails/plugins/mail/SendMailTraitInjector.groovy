@@ -17,18 +17,11 @@ package grails.plugins.mail
 
 import grails.compiler.traits.TraitInjector
 import groovy.transform.CompileStatic
-import org.grails.io.support.GrailsResourceUtils
 import org.grails.core.DefaultGrailsControllerClass
 import org.grails.core.DefaultGrailsServiceClass
 
-import java.util.regex.Pattern
-
 @CompileStatic
 class SendMailTraitInjector implements TraitInjector {
-
-    static Pattern CONTROLLER_PATTERN = Pattern.compile(".+/${GrailsResourceUtils.GRAILS_APP_DIR}/controllers/(.+)Controller\\.groovy")
-    static Pattern SERVICES_PATTERN = Pattern.compile(".+/${GrailsResourceUtils.GRAILS_APP_DIR}/services/(.+)Service\\.groovy")
-    static Pattern EXCLUDE_PATTERN = Pattern.compile(".+/${GrailsResourceUtils.GRAILS_APP_DIR}/services/(.+)/MailService\\.groovy")
 
     @Override
     Class getTrait() {
@@ -38,10 +31,5 @@ class SendMailTraitInjector implements TraitInjector {
     @Override
     String[] getArtefactTypes() {
         [DefaultGrailsServiceClass.SERVICE, DefaultGrailsControllerClass.CONTROLLER] as String[]
-    }
-
-    @Override
-    boolean shouldInject(URL url) {
-        url != null && (CONTROLLER_PATTERN.matcher(url.file).find() || SERVICES_PATTERN.matcher(url.file).find()) && !EXCLUDE_PATTERN.matcher(url.file).find()
     }
 }
