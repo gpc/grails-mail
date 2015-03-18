@@ -26,6 +26,7 @@ import javax.mail.internet.MimeMultipart
 import grails.core.DefaultGrailsApplication
 import grails.core.GrailsApplication;
 import org.springframework.core.io.FileSystemResource
+import org.springframework.beans.factory.annotation.*
 import org.springframework.mail.MailMessage
 import org.springframework.mail.MailSender
 import org.springframework.mail.SimpleMailMessage
@@ -48,6 +49,7 @@ class MailServiceSpec extends Specification  {
     MailService nonMimeCapableMailService
 
     MailMessageContentRenderer mailMessageContentRenderer // autowired
+    @Autowired
     GrailsApplication grailsApplication // autowired
 
     def setup() {
