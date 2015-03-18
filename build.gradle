@@ -1,42 +1,37 @@
 buildscript {
     ext {
-      grailsVersion = project.grailsVersion
+        grailsVersion = project.grailsVersion
     }
     repositories {
         mavenLocal()
-        mavenCentral()
-        jcenter()
         maven { url "https://repo.grails.org/grails/core" }
-        maven { url "https://repo.grails.org/grails/repo" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.1.1'
     }
 }
 
 plugins {
-    id "io.spring.dependency-management" version "0.3.1.RELEASE"
+    id "io.spring.dependency-management" version "0.4.0.RELEASE"
     id "com.jfrog.bintray" version "1.1"
 }
 
-version "2.0.0.BUILD-SNAPSHOT"
+version "2.0.0-SNAPSHOT"
 group "org.grails.plugins"
 
-apply plugin: "spring-boot"
-apply plugin: "asset-pipeline"
-apply plugin: "org.grails.grails-plugin"
-apply plugin: "org.grails.grails-gsp"
 apply plugin: 'maven-publish'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: "spring-boot"
+apply plugin: "org.grails.grails-plugin"
+apply plugin: "org.grails.grails-gsp"
 // Used for publishing to central repository, remove if not needed
 apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
 apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
 
 ext {
-  grailsVersion = project.grailsVersion
-  gradleWrapperVersion = project.gradleWrapperVersion
+    grailsVersion = project.grailsVersion
+    gradleWrapperVersion = project.gradleWrapperVersion
 }
 
 sourceCompatibility = 1.7
@@ -44,11 +39,9 @@ targetCompatibility = 1.7
 
 
 repositories {
-  mavenLocal()
-  jcenter()
-  mavenCentral()
-
-  maven { url "https://repo.grails.org/grails/core" }
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://repo.grails.org/grails/core" }
 }
 
 dependencyManagement {
@@ -59,40 +52,24 @@ dependencyManagement {
 }
 
 dependencies {
+    provided 'org.springframework.boot:spring-boot-starter-logging'
+    provided "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-autoconfigure"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
 
-  //FIXME: THese should be of type provided when fixed
-  provided 'org.springframework.boot:spring-boot-starter-logging'
-  provided "org.springframework.boot:spring-boot-starter-actuator"
-  provided "org.springframework.boot:spring-boot-autoconfigure"
-  provided "org.springframework.boot:spring-boot-starter-tomcat"
+    provided "org.grails:grails-web-boot"
+    provided "org.grails:grails-dependencies"
+    provided 'javax.servlet:javax.servlet-api:3.1.0'
 
-  provided "org.grails:grails-web-boot"
-  provided "org.grails:grails-dependencies"
-  provided 'javax.servlet:javax.servlet-api:3.1.0'
-  //End FIXME
+    testCompile "com.icegreen:greenmail:1.4.0"
+    testCompile "org.grails:grails-plugin-testing"
 
-  testCompile "org.grails:grails-plugin-testing"
-  testCompile "com.icegreen:greenmail:1.4.0"
+    console "org.grails:grails-console"
 
-  compile "javax.mail:javax.mail-api:1.5.1"
-  compile "com.sun.mail:javax.mail:1.5.1"
-
-  console "org.grails:grails-console"
-}
-
-eclipse {
-    classpath {
-        plusConfigurations += [configurations.provided]
-    }
-}
-
-idea {
-    module {
-        scopes.PROVIDED.plus += [configurations.provided]
-    }
+    compile "javax.mail:javax.mail-api:1.5.1"
+    compile "com.sun.mail:javax.mail:1.5.1"
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = gradleWrapperVersion
+    gradleVersion = gradleWrapperVersion
 }
-
