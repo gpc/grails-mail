@@ -34,11 +34,9 @@ import org.springframework.mail.javamail.MimeMailMessage
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.web.context.request.RequestContextHolder
 
-// import grails.plugin.greenmail.GreenMail
-import com.icegreen.greenmail.util.ServerSetupTest
 import grails.test.mixin.integration.Integration
+import com.icegreen.greenmail.util.ServerSetupTest
 import grails.transaction.Transactional
-import com.icegreen.greenmail.junit.GreenMailRule
 import spock.lang.*
 
 @Integration
@@ -51,7 +49,6 @@ class MailServiceSpec extends Specification  {
 
     MailMessageContentRenderer mailMessageContentRenderer // autowired
     GrailsApplication grailsApplication // autowired
-    @Shared GreenMailRule greenMail = new GreenMailRule(ServerSetupTest.SMTP)
 
     def setup() {
         println "Looking for Application ${grailsApplication}"
@@ -79,10 +76,6 @@ class MailServiceSpec extends Specification  {
     def cleanup() {
         mimeCapableMailService.destroy()
         nonMimeCapableMailService.destroy()
-    }
-
-    def cleanupSpec() {
-        greenMail.stop()
     }
 
     void testSendSimpleMessage() {
