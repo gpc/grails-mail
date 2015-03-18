@@ -15,8 +15,6 @@
  */
 package grails.plugins.mail
 
-import grails.util.GrailsUtil
-
 import javax.mail.Message
 import javax.mail.Session
 import javax.mail.internet.MimeMessage
@@ -50,27 +48,6 @@ class MailMessageBuilderTests extends GroovyTestCase {
 
         def mockBasicMailSender = [:] as MailSender
         testBasicMailSenderBuilder = new MailMessageBuilder(mockBasicMailSender, config)
-    }
-
-    void testStreamCharBufferForGrails12() {
-        if (!GrailsUtil.grailsVersion.startsWith("1.2")) {
-            return
-        }
-
-        processDsl {
-            to "fred@g2one.com"
-            subject "Hello Fred"
-
-            def text = getClass().classLoader.loadClass("org.codehaus.groovy.grails.web.util.StreamCharBuffer").newInstance()
-            text.writer << 'How are you?'
-            body text
-        }
-
-        def msg = testJavaMailSenderBuilder.message.mimeMessage
-        assertEquals 1, to(msg).size()
-        assertEquals "fred@g2one.com", to(msg)[0].toString()
-        assertEquals "Hello Fred", msg.subject
-        assertEquals "How are you?", msg.content
     }
 
     /**
@@ -176,7 +153,7 @@ class MailMessageBuilderTests extends GroovyTestCase {
         assertEquals "john@g2one.com", msg.from[0].toString()
         assertEquals "peter@g2one.com", testJavaMailSenderBuilder.envelopeFrom
     }
-    
+
     void testAttachment() {
         processDsl {
             multipart true
@@ -282,10 +259,10 @@ class MailMessageBuilderTests extends GroovyTestCase {
             }
         }
     }
-	
+
 	//for issue GPMAIL-60
 	void testAttachCallInBeginningOfDsl() {
-		
+
 		def servletContext = [getResourceAsStream: { new ByteArrayInputStream("abcdef".bytes) }] as ServletContext
 		processDsl {
 		   multipart true
