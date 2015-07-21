@@ -156,7 +156,7 @@ sendMail {
                 if (config.protocol)
                     protocol = config.protocol
                 if (config.props instanceof Map && config.props)
-                    javaMailProperties = config.props
+                    javaMailProperties = config.props.toFlatConfig()
             }
         }
     }
