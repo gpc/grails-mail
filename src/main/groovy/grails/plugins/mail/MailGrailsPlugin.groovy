@@ -108,12 +108,8 @@ sendMail {
 
 			event.ctx.getBean(MailService.class).setPoolSize(mailConfig.poolSize?:null)
 
-            def newBeans = beans {
+            beans {
                 configureMailSender(delegate, mailConfig)
-            }
-
-            newBeans.beanDefinitions.each { name, definition ->
-                event.ctx.registerBeanDefinition(name, definition)
             }
         }
     }
