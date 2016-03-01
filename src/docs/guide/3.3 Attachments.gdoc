@@ -39,7 +39,7 @@ In the case of the variants that take a @File@ that do not specify a content typ
 
 {code}
 sendMail {
-    mutipart true
+    multipart true
     to "someone@org.com"
     attach "yourfile.txt", "text/plain", "Hello!" as byte[]
 }
@@ -53,7 +53,7 @@ To attach an image as an inline resource you could do…
 
 {code}
 sendMail {
-    mutipart true
+    multipart true
     to "someone@org.com"
     inline "logo", "image/jpeg", new File("logo.jpg")
     html view: "/email/welcome"
