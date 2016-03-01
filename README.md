@@ -1,5 +1,5 @@
 The Grails mail plugin provides a convenient DSL for _sending_ email. It supports plain text, html, attachments, inline resources and i18n among other features.
-[![Build Status](https://travis-ci.org/grails3-plugins/mail.svg?branch=v2.0.0.RC1)](https://travis-ci.org/grails3-plugins/mail)
+[![Build Status](https://travis-ci.org/grails3-plugins/mail.svg?branch=v2.0.0)](https://travis-ci.org/grails3-plugins/mail)
 
 Mail can be sent using the @mailService@ via the @sendMail@ method. Here is an example…
 
@@ -18,7 +18,7 @@ The plugin is released under the [Apache License 2.0](http://www.apache.org/lice
 
 ## Issues
 
-Issues can be raised via the [Codehaus Jira](http://jira.codehaus.org/browse/GRAILSPLUGINS/component/13340 "Grails Plugins: Grails-Mail - jira.codehaus.org").
+Issues can be raised via  [GitHub Issues](https://github.com/gpc/grails-mail/issues).
 
 ## Contributing
 
