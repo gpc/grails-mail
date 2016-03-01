@@ -50,13 +50,15 @@ sendMail {
     def developers = [
         [ name: "Craig Andrews", email: "candrews@integralblue.com" ],
         [ name: "Luke Daley", email: "ld@ldaley.com" ],
-        [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ],
-        [ name: "Jeff Brown", email: "jbrown@vmware.com" ],
-        [ name: "Graeme Rocher", email: "grocher@vmware.com" ],
-        [ name: "Marc Palmer", email: "marc@grailsrocks.com" ]
+        [ name: "Peter Ledbrook", email: "p.ledbrook@cacoethes.co.uk" ],
+        [ name: "Jeff Brown", email: "brownj@ociweb.com" ],
+        [ name: "Graeme Rocher", email: "rocherg@ociweb.com" ],
+        [ name: "Marc Palmer", email: "marc@grailsrocks.com" ],
+        [ name: "Søren Berg Glasius", email: "glasiuss@ociweb.com" ],
+
     ]
 
-    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMAIL" ]
+    def issueManagement = [ system: "GitHub", url: "https://github.com/gpc/mail/issues" ]
     def scm = [ url: "http://github.com/gpc/grails-mail" ]
 
     def observe = ['controllers','services']
