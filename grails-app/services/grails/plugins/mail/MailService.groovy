@@ -39,7 +39,7 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
 
 	private static final Integer DEFAULT_POOL_SIZE = 5
 
-    MailMessage sendMail(Config config, @DelegatesTo(MailMessageBuilder) Closure callable) {
+    MailMessage sendMail(Config config, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
         if (isDisabled()) {
             log.warn("Sending emails disabled by configuration option")
             return
@@ -53,13 +53,13 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
         return messageBuilder.sendMessage(mailExecutorService)
     }
 
-    MailMessage sendMail(@DelegatesTo(MailMessageBuilder) Closure callable) {
+    MailMessage sendMail(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
         return sendMail(configuration, callable)
     }
 
 
     boolean isDisabled() {
-        configuration.getProperty('disabled',Boolean, false)
+        configuration.getProperty('grails.mail.disabled',Boolean, false)
     }
 
 	void setPoolSize(Integer poolSize){
@@ -77,7 +77,7 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
 	public void afterPropertiesSet() throws Exception {
 		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
-		Integer poolSize = configuration.getProperty('poolSize', Integer)
+		Integer poolSize = configuration.getProperty('grails.mail.poolSize', Integer)
 		try{
 			((ThreadPoolExecutor)mailExecutorService).allowCoreThreadTimeOut(true)
 		}catch(MissingMethodException e){
