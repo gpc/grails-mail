@@ -16,12 +16,15 @@
 
 package grails.plugins.mail
 
+import groovy.transform.CompileStatic
+
 /**
  * Represents the result of rendering a message content view.
  */
+@CompileStatic
 class MailMessageContentRender {
 
-    private static HTML_CONTENT_TYPES = ['text/html', 'text/xhtml']
+    private static String[] HTML_CONTENT_TYPES = ['text/html', 'text/xhtml']
 
     final Writer out
     final String contentType

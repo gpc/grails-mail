@@ -43,8 +43,8 @@ class MailMessageBuilderSpec extends Specification {
 	private static String defaultTo = "to@grailsplugin.com"
 
 	static doWithConfig(config) {
-		config.default.from = defaultFrom
-		config.default.to = defaultTo
+		config.grails.mail.default.from = defaultFrom
+		config.grails.mail.default.to = defaultTo
 	}
 
 	def setup() {

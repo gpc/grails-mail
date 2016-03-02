@@ -27,9 +27,14 @@ import org.springframework.mail.MailSender
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.mail.javamail.MimeMailMessage
+import org.springframework.mail.javamail.MimeMessageHelper
+import org.springframework.web.context.request.RequestContextHolder
+import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 
 import javax.mail.Message
+import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 
@@ -44,7 +49,9 @@ class MailServiceSpec extends Specification  {
     MailMessageContentRenderer mailMessageContentRenderer // autowired
     @Autowired
     GrailsApplication grailsApplication // autowired
-    public static GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP)
+
+	@Shared
+    public GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP)
 
 
     def setupSpec() {
@@ -55,15 +62,14 @@ class MailServiceSpec extends Specification  {
       greenMail.stop()
     }
     def setup() {
-        println "Looking for Application ${grailsApplication}"
         MailSender mimeMailSender = new JavaMailSenderImpl(host: "localhost", port: ServerSetupTest.SMTP.port)
         MailMessageBuilderFactory mimeMessageBuilderFactor = new MailMessageBuilderFactory(
             mailSender: mimeMailSender,
             mailMessageContentRenderer: mailMessageContentRenderer
         )
-        this.mimeCapableMailService = new MailService(
+        mimeCapableMailService = new MailService(
             mailMessageBuilderFactory: mimeMessageBuilderFactor,
-            grailsApplication: grailsApplication)
+            configuration: grailsApplication.config)
         mimeCapableMailService.afterPropertiesSet()
 
         MailSender simpleMailSender = new SimpleMailSender()
@@ -73,7 +79,7 @@ class MailServiceSpec extends Specification  {
         )
         nonMimeCapableMailService = new MailService(
             mailMessageBuilderFactory: simpleMessageBuilderFactory,
-            grailsApplication: grailsApplication)
+            configuration: grailsApplication.config)
         nonMimeCapableMailService.afterPropertiesSet()
     }
 
@@ -141,7 +147,7 @@ class MailServiceSpec extends Specification  {
             body 'this is some text'
         }
       then:
-        message.getTo()[0] == "fred@g2one.com" 
+        message.getTo()[0] == "fred@g2one.com"
         message.getTo()[1] == "ginger@g2one.com"
     }
 
@@ -201,7 +207,7 @@ class MailServiceSpec extends Specification  {
 
     void testSendMailWithEnvelopeFrom() {
       given:
-        
+
         def message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             title "Hello John"
@@ -220,7 +226,7 @@ class MailServiceSpec extends Specification  {
 
     void testSendMailWithEnvelopeFromAndBasicMailSender() {
         when:
-            def message = nonMimeCapableMailService.sendMail {
+            nonMimeCapableMailService.sendMail {
                 to "fred@g2one.com"
                 title "Hello John"
                 body 'this is some text'
@@ -241,7 +247,7 @@ class MailServiceSpec extends Specification  {
         }
       then:
         message.getMimeMessage().getSubject() == "Hello John"
-        message.mimeMessage.contentType.startsWith('text/html') == true
+        message.mimeMessage.contentType.startsWith('text/html')
         message.getMimeMessage().getContent() == '<b>Hello</b> World'
     }
 
@@ -254,7 +260,7 @@ class MailServiceSpec extends Specification  {
         }
       then:
         message.getMimeMessage().getSubject() == "Hello John"
-        message.mimeMessage.contentType.startsWith('text/plain') == true
+        message.mimeMessage.contentType.startsWith('text/plain')
         message.getMimeMessage().getContent().trim() == 'Message is: hello'
     }
 
@@ -266,7 +272,7 @@ class MailServiceSpec extends Specification  {
             text view: '/_testemails/test', model: [msg: 'hello']
         }
       then:
-        message.mimeMessage.contentType.startsWith('text/plain') == true
+      message.mimeMessage.contentType.startsWith('text/plain')
         message.getMimeMessage().getContent().trim() == 'Message is: hello'
     }
 
@@ -279,7 +285,7 @@ class MailServiceSpec extends Specification  {
         }
       then:
         message.getMimeMessage().getSubject() == "Hello John"
-        message.mimeMessage.contentType.startsWith('text/html') == true
+        message.mimeMessage.contentType.startsWith('text/html')
         message.getMimeMessage().getContent().trim() == '<b>Message is: hello</b>'
     }
 
@@ -292,7 +298,7 @@ class MailServiceSpec extends Specification  {
         }
       then:
          message.getMimeMessage().getSubject() == "Hello John"
-        message.mimeMessage.contentType.startsWith('text/html') == true
+         message.mimeMessage.contentType.startsWith('text/html')
          message.getMimeMessage().getContent().trim() == '<b>Message is: hello</b>'
     }
 
@@ -313,7 +319,7 @@ class MailServiceSpec extends Specification  {
         message.getMimeMessage().getSubject() == "Hello John"
         message.getMimeMessage().getContent().trim() == 'Condition is true'
         message2.getMimeMessage().getSubject() == "Hello John"
-        message2.getMimeMessage().getContentType()?.startsWith('text/plain') == true
+        message2.getMimeMessage().getContentType()?.startsWith('text/plain')
         message2.getMimeMessage().getContent().trim() == ''
     }
 
@@ -326,7 +332,7 @@ class MailServiceSpec extends Specification  {
         }
       then:
         message.getMimeMessage().getSubject() == "Hello John"
-        message.getMimeMessage().getContentType()?.startsWith('text/plain') == true
+        message.getMimeMessage().getContentType()?.startsWith('text/plain')
         message.getMimeMessage().getContent().trim() == 'Message is:'
     }
 
@@ -346,7 +352,7 @@ class MailServiceSpec extends Specification  {
         MimeMessage msg = ((MimeMailMessage)message).mimeMessageHelper.mimeMessage
       then:
         message instanceof MimeMailMessage
-          
+
         msg.getHeader("X-Mailing-List")[0] == "user@grails.codehaus.org"
         msg.getHeader("Sender")[0] == "dilbert@somewhere.org"
         to(msg) == ["fred@g2one.com"]
@@ -458,7 +464,7 @@ class MailServiceSpec extends Specification  {
             inline 'abc123', 'image/png', bytes
         }
         def inlinePart = ((MimeMailMessage)message).mimeMessage.content.getBodyPart(0).content.getBodyPart("<abc123>")
-      then: 
+      then:
         inlinePart.inputStream.bytes == bytes
     }
 
@@ -470,7 +476,7 @@ class MailServiceSpec extends Specification  {
             html '<html><head></head><body>How are you?</body></html>'
         }.mimeMessage
       then:
-        msg.contentType.startsWith("text/html") == true
+      msg.contentType.startsWith("text/html")
         msg.content == '<html><head></head><body>How are you?</body></html>'
     }
 
@@ -510,62 +516,66 @@ class MailServiceSpec extends Specification  {
         mp.getBodyPart(1).content == '<html><head></head><body>How are you?</body></html>'
     }
 
-  //   void testMultipartMode() {
-  //       MimeMessage msg = mimeCapableMailService.sendMail {
-  //           multipart MimeMessageHelper.MULTIPART_MODE_RELATED
-  //           to "fred@g2one.com"
-  //           subject "test"
-  //           text 'How are you?'
-  //           html '<html><head></head><body>How are you?</body></html>'
-  //       }.mimeMessage
+    void testMultipartMode() {
+        when:
+        MimeMessage msg = mimeCapableMailService.sendMail {
+            multipart MimeMessageHelper.MULTIPART_MODE_RELATED
+            to "fred@g2one.com"
+            subject "test"
+            text 'How are you?'
+            html '<html><head></head><body>How are you?</body></html>'
+        }.mimeMessage
 
-  //       assertThat(msg.content, instanceOf(MimeMultipart.class));
-    
-    // MimeMultipart content = (MimeMultipart) msg.content
-    
-  //       assertThat(content.getBodyPart(0), instanceOf(MimeBodyPart.class));
-    // MimeBodyPart mimeBodyPart = content.getBodyPart(0)
+        then:
+        msg.content instanceof MimeMultipart
 
-  //       MimeMultipart mp = mimeBodyPart.content
+        and:
+        MimeMultipart content = (MimeMultipart) msg.content
 
-  //       assert mp.count == 2
-    
-    // assertThat(mp.getBodyPart(0), instanceOf(MimeBodyPart.class));
-  //       assert ((MimeBodyPart)mp.getBodyPart(0)).contentType.startsWith('text/plain')
-  //       assert ((MimeBodyPart)mp.getBodyPart(0)).content == 'How are you?'
-    
-    // assertThat(mp.getBodyPart(1), instanceOf(MimeBodyPart.class));
-  //       assert ((MimeBodyPart)mp.getBodyPart(1)).contentType.startsWith('text/html')
-  //       assert ((MimeBodyPart)mp.getBodyPart(1)).content == '<html><head></head><body>How are you?</body></html>'
-  //   }
+        content.getBodyPart(0) instanceof MimeBodyPart
 
-    // void testContentTypeDoesNotGetChanged() {
-    //   when:
-    //     String originalContentType = RequestContextHolder.currentRequestAttributes().currentResponse.contentType
+        and:
+        MimeBodyPart mimeBodyPart = content.getBodyPart(0)
+        MimeMultipart mp = mimeBodyPart.content
 
-    //     MimeMailMessage message = mimeCapableMailService.sendMail {
-    //         to "fred@g2one.com"
-    //         subject "Hello John"
-    //         body(view: '/_testemails/test', model: [msg: 'hello'])
-    //     }
-    //   then:
-    //     message.getMimeMessage().getSubject() == "Hello John"
-    //     message.mimeMessage.contentType.startsWith('text/plain') == true
-    //     message.getMimeMessage().getContent().trim() == 'Message is: hello'
-    //     RequestContextHolder.currentRequestAttributes().currentResponse.contentType == originalContentType
-    // }
+        mp.count == 2
+        mp.getBodyPart(0) instanceof MimeBodyPart
+        ((MimeBodyPart) mp.getBodyPart(0)).contentType.startsWith('text/plain')
+        ((MimeBodyPart) mp.getBodyPart(0)).content == 'How are you?'
 
-  //   void testViewResolutionFromPlugin() {
-  //       MimeMailMessage message = mimeCapableMailService.sendMail {
-  //           to "fred@g2one.com"
-  //           subject "Hello John"
-  //           body view: '/email/email', plugin: 'for-plugin-view-resolution'
-  //       }
+        mp.getBodyPart(1) instanceof MimeBodyPart
+        ((MimeBodyPart) mp.getBodyPart(1)).contentType.startsWith('text/html')
+        ((MimeBodyPart) mp.getBodyPart(1)).content == '<html><head></head><body>How are you?</body></html>'
+    }
 
-  //        message.getMimeMessage().getSubject() == "Hello John"
-  //       message.mimeMessage.contentType.startsWith('text/plain') == true
-  //       assertEquals 'This is from a plugin!!!', message.getMimeMessage().getContent().trim()
-  //   }
+    @Ignore('Not possible to get the currentResponse')
+    void testContentTypeDoesNotGetChanged() {
+        when:
+        String originalContentType = RequestContextHolder.currentRequestAttributes().currentResponse.contentType
+
+        MimeMailMessage message = mimeCapableMailService.sendMail {
+            to "fred@g2one.com"
+            subject "Hello John"
+            body(view: '/_testemails/test', model: [msg: 'hello'])
+        }
+        then:
+        message.getMimeMessage().getSubject() == "Hello John"
+        message.mimeMessage.contentType.startsWith('text/plain') == true
+        message.getMimeMessage().getContent().trim() == 'Message is: hello'
+        RequestContextHolder.currentRequestAttributes().currentResponse.contentType == originalContentType
+    }
+
+//    void testViewResolutionFromPlugin() {
+//        MimeMailMessage message = mimeCapableMailService.sendMail {
+//            to "fred@g2one.com"
+//            subject "Hello John"
+//            body view: '/email/email', plugin: 'for-plugin-view-resolution'
+//        }
+//
+//        message.getMimeMessage().getSubject() == "Hello John"
+//        message.mimeMessage.contentType.startsWith('text/plain') == true
+//        assertEquals 'This is from a plugin!!!', message.getMimeMessage().getContent().trim()
+//    }
 
     private List<String> to(MimeMessage msg) {
         msg.getRecipients(Message.RecipientType.TO)*.toString()

@@ -15,9 +15,14 @@
  */
 package grails.plugins.mail
 
+import grails.artefact.Enhances
+import org.grails.core.DefaultGrailsControllerClass
+import org.grails.core.DefaultGrailsServiceClass
+
+@Enhances([DefaultGrailsServiceClass.SERVICE, DefaultGrailsControllerClass.CONTROLLER])
 trait SendMail {
 	def applicationContext
-	public sendMail(Closure dsl) {		
+	public sendMail(@DelegatesTo(MailMessageBuilder) Closure dsl) {
         applicationContext.mailService.sendMail(dsl)
 	}
 }
