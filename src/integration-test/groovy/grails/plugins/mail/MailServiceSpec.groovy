@@ -16,30 +16,22 @@
 
 package grails.plugins.mail
 
-import java.util.concurrent.ExecutorService;
-
-import javax.mail.Message
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
-
-import grails.core.DefaultGrailsApplication
-import grails.core.GrailsApplication;
 import com.icegreen.greenmail.util.GreenMail
+import com.icegreen.greenmail.util.ServerSetupTest
+import grails.core.GrailsApplication
+import grails.test.mixin.integration.Integration
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.FileSystemResource
-import org.springframework.beans.factory.annotation.*
 import org.springframework.mail.MailMessage
 import org.springframework.mail.MailSender
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.mail.javamail.MimeMailMessage
-import org.springframework.mail.javamail.MimeMessageHelper
-import org.springframework.web.context.request.RequestContextHolder
-import com.icegreen.greenmail.junit.GreenMailRule
-import grails.test.mixin.integration.Integration
-import com.icegreen.greenmail.util.ServerSetupTest
-import grails.transaction.Transactional
-import spock.lang.*
+import spock.lang.Specification
+
+import javax.mail.Message
+import javax.mail.internet.MimeMessage
+import javax.mail.internet.MimeMultipart
 
 @Integration
 class MailServiceSpec extends Specification  {
@@ -52,7 +44,7 @@ class MailServiceSpec extends Specification  {
     MailMessageContentRenderer mailMessageContentRenderer // autowired
     @Autowired
     GrailsApplication grailsApplication // autowired
-    public static GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP);
+    public static GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP)
 
 
     def setupSpec() {
