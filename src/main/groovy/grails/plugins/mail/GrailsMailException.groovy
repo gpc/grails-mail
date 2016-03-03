@@ -15,9 +15,9 @@
  */
 package grails.plugins.mail
 
-class GrailsMailException extends RuntimeException {
+import groovy.transform.CompileStatic
+import groovy.transform.InheritConstructors
 
-    GrailsMailException(String s, Throwable t = null) {
-        super(s, t)
-    }
-}
+@InheritConstructors
+@CompileStatic
+class GrailsMailException extends RuntimeException {}

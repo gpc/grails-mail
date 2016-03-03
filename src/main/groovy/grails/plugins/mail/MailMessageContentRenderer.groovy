@@ -16,27 +16,16 @@
 
 package grails.plugins.mail
 
-import java.lang.reflect.InvocationHandler
-import java.lang.reflect.Method
-import java.lang.reflect.Proxy
-import java.util.concurrent.ConcurrentHashMap
-
-import javax.servlet.ServletContext
-import javax.servlet.http.Cookie
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-
-
-
-import grails.util.GrailsWebUtil
-import groovy.text.Template
 import grails.core.GrailsApplication
 import grails.plugins.GrailsPluginManager
 import grails.web.mapping.LinkGenerator
-import org.grails.gsp.GroovyPagesTemplateEngine
 import grails.web.pages.GroovyPagesUriService
-import org.grails.web.servlet.mvc.GrailsWebRequest
+import groovy.text.Template
+import groovy.transform.CompileStatic
+import org.grails.gsp.GroovyPageTemplate
+import org.grails.gsp.GroovyPagesTemplateEngine
 import org.grails.web.servlet.WrappedResponseHolder
+import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
@@ -45,13 +34,18 @@ import org.springframework.web.servlet.DispatcherServlet
 import org.springframework.web.servlet.i18n.FixedLocaleResolver
 import org.springframework.web.servlet.support.RequestContextUtils
 
+import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
+import java.util.concurrent.ConcurrentHashMap
 /**
  * Renders a GSP into the content of a mail message.
  */
+@CompileStatic
 class MailMessageContentRenderer {
-
-    static final String PATH_TO_MAILVIEWS = "/WEB-INF/grails-app/views"
-
     private static final Logger log = LoggerFactory.getLogger(MailMessageContentRenderer.class)
 
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
@@ -59,8 +53,8 @@ class MailMessageContentRenderer {
     GrailsApplication grailsApplication
     GrailsPluginManager pluginManager
 
-    MailMessageContentRender render(Writer out, String templateName, model, locale, String pluginName = null) {
-        RenderEnvironment.with(grailsApplication.mainContext, out, locale) { env ->
+    MailMessageContentRender render(Writer out, String templateName, Map model, Locale locale, String pluginName = null) {
+        RenderEnvironment.with(grailsApplication.mainContext, out, locale) { RenderEnvironment env ->
             Template template = createTemplate(templateName, env.controllerName, pluginName)
             if (model instanceof Map) {
                 template.make(model).writeTo(out)
@@ -69,10 +63,10 @@ class MailMessageContentRenderer {
             }
 
             new MailMessageContentRender(out, template.metaInfo.contentType)
-        }
+        } as MailMessageContentRender
     }
 
-    protected Template createTemplate(String templateName, String controllerName, String pluginName) {
+    protected GroovyPageTemplate createTemplate(String templateName, String controllerName, String pluginName) {
         if (templateName.startsWith("/")) {
             if (!controllerName) {
                 controllerName = ""
@@ -92,7 +86,7 @@ class MailMessageContentRenderer {
             templateUri = groovyPagesUriService.getDeployedViewURI(controllerName, templateName)
         }
 
-        Template template = groovyPagesTemplateEngine.createTemplateForUri(templateUri)
+        GroovyPageTemplate template = groovyPagesTemplateEngine.createTemplateForUri(templateUri) as GroovyPageTemplate
 
         if (!template) {
             if (pluginName) {
@@ -119,25 +113,25 @@ class MailMessageContentRenderer {
     }
 
     private static class RenderEnvironment {
-        final Writer out
+        final PrintWriter out
         final Locale locale
         final ApplicationContext applicationContext
 		final LinkGenerator grailsLinkGenerator
 
-        private originalRequestAttributes
-        private renderRequestAttributes
+        private GrailsWebRequest originalRequestAttributes
+        private GrailsWebRequest renderRequestAttributes
 
         RenderEnvironment(ApplicationContext applicationContext, Writer out, Locale locale = null) {
-            this.out = out
+            this.out = out instanceof PrintWriter ? out as PrintWriter : new PrintWriter(out)
             this.locale = locale
             this.applicationContext = applicationContext
 			this.grailsLinkGenerator = applicationContext.getBean('grailsLinkGenerator', LinkGenerator.class)
         }
 
         private void init() {
-            originalRequestAttributes = RequestContextHolder.getRequestAttributes()
+            originalRequestAttributes = RequestContextHolder.getRequestAttributes() as GrailsWebRequest
 
-            def renderLocale
+            def renderLocale = Locale.getDefault()
             if (locale) {
                 renderLocale = locale
             } else if (originalRequestAttributes) {
@@ -145,7 +139,7 @@ class MailMessageContentRenderer {
             }
 
             renderRequestAttributes = new GrailsWebRequest(PageRenderRequestCreator.createInstance(grailsLinkGenerator.serverBaseURL, "/mail/render", renderLocale),
-                PageRenderResponseCreator.createInstance(out instanceof PrintWriter ? out : new PrintWriter(out), renderLocale), null, applicationContext)
+                PageRenderResponseCreator.createInstance(out, renderLocale), null, applicationContext)
 
             if (originalRequestAttributes) {
                 renderRequestAttributes.controllerName = originalRequestAttributes.controllerName
@@ -343,6 +337,7 @@ class MailMessageContentRenderer {
                     }
                     if (methodName == 'getLocales') {
                         def iterator = [localeToUse].iterator()
+                        //noinspection UnnecessaryQualifiedReference
                         PageRenderRequestCreator.iteratorAsEnumeration(iterator)
                     }
 
@@ -418,7 +413,7 @@ class MailMessageContentRenderer {
                         return bufferSize
                     }
                     if (methodName == 'setBufferSize') {
-                        bufferSize = args[0]
+                        bufferSize = args[0] as Integer
                         return null
                     }
 

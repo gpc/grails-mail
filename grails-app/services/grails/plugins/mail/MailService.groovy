@@ -15,63 +15,56 @@
  */
 package grails.plugins.mail
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit;
-
-import grails.core.GrailsApplication;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
+import grails.config.Config
+import grails.core.support.GrailsConfigurationAware
+import groovy.transform.CompileStatic
+import org.springframework.beans.factory.DisposableBean
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.mail.MailMessage
 
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 /**
  * Provides the entry point to the mail sending API.
  */
-class MailService implements InitializingBean, DisposableBean {
+@CompileStatic
+class MailService implements InitializingBean, DisposableBean, GrailsConfigurationAware {
 
     static transactional = false
 
-    GrailsApplication grailsApplication
+    Config configuration
     MailMessageBuilderFactory mailMessageBuilderFactory
 	ThreadPoolExecutor mailExecutorService
 
-	private static final int DEFAULT_POOL_SIZE = 5
+	private static final Integer DEFAULT_POOL_SIZE = 5
 
-    MailMessage sendMail(def config, Closure callable) {
+    MailMessage sendMail(Config config, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
         if (isDisabled()) {
             log.warn("Sending emails disabled by configuration option")
             return
         }
-
 
         MailMessageBuilder messageBuilder = mailMessageBuilderFactory.createBuilder(config)
         callable.delegate = messageBuilder
         callable.resolveStrategy = Closure.DELEGATE_FIRST
         callable.call(messageBuilder)
 
-        messageBuilder.sendMessage(mailExecutorService)
+        return messageBuilder.sendMessage(mailExecutorService)
     }
 
-    MailMessage sendMail(Closure callable) {
-        return sendMail(mailConfig, callable)
+    MailMessage sendMail(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
+        return sendMail(configuration, callable)
     }
 
-
-    ConfigObject getMailConfig() {
-        grailsApplication.config.grails.mail
-    }
 
     boolean isDisabled() {
-        mailConfig.disabled
+        configuration.getProperty('grails.mail.disabled',Boolean, false)
     }
 
 	void setPoolSize(Integer poolSize){
-		if(poolSize == null) poolSize = DEFAULT_POOL_SIZE
-		mailExecutorService.setCorePoolSize(poolSize)
-		mailExecutorService.setMaximumPoolSize(poolSize)
+		mailExecutorService.setCorePoolSize(poolSize ?: DEFAULT_POOL_SIZE)
+		mailExecutorService.setMaximumPoolSize(poolSize ?: DEFAULT_POOL_SIZE)
 	}
 
 	@Override
@@ -82,13 +75,14 @@ class MailService implements InitializingBean, DisposableBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>());
+		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+
+		Integer poolSize = configuration.getProperty('grails.mail.poolSize', Integer)
 		try{
 			((ThreadPoolExecutor)mailExecutorService).allowCoreThreadTimeOut(true)
 		}catch(MissingMethodException e){
 			log.info("ThreadPoolExecutor.allowCoreThreadTimeOut method is missing; Java < 6 must be running. The thread pool size will never go below ${poolSize}, which isn't harmful, just a tiny bit wasteful of resources.", e)
 		}
-		setPoolSize(mailConfig.poolSize?:null)
+		setPoolSize(poolSize)
 	}
 }

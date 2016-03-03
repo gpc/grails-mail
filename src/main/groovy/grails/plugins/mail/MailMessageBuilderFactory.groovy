@@ -15,6 +15,8 @@
  */
 package grails.plugins.mail
 
+import grails.config.Config
+import groovy.transform.CompileStatic
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSender
 
@@ -22,12 +24,13 @@ import org.springframework.mail.javamail.JavaMailSender
  * Responsible for creating builder instances, which have dependencies and
  * are not threadsafe.
  */
+@CompileStatic
 class MailMessageBuilderFactory {
 
     MailSender mailSender
     MailMessageContentRenderer mailMessageContentRenderer
 
-    MailMessageBuilder createBuilder(ConfigObject config) {
+    MailMessageBuilder createBuilder(Config config) {
         new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
     }
 

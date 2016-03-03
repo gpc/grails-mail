@@ -15,12 +15,8 @@
  */
 package grails.plugins.mail
 
-import java.util.concurrent.ExecutorService
-
-import javax.mail.Message
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeUtility
-
+import com.sun.mail.smtp.SMTPMessage
+import grails.config.Config
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
@@ -32,9 +28,12 @@ import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMailMessage
 import org.springframework.mail.javamail.MimeMessageHelper
-import com.sun.mail.smtp.SMTPMessage
-
 import org.springframework.util.Assert
+
+import javax.mail.Message
+import javax.mail.internet.MimeMessage
+import javax.mail.internet.MimeUtility
+import java.util.concurrent.ExecutorService
 
 /**
  * Provides a DSL style interface to mail message sending/generation.
@@ -72,13 +71,13 @@ class MailMessageBuilder {
         InputStreamSource toAdd
     }
 
-    MailMessageBuilder(MailSender mailSender, ConfigObject config, MailMessageContentRenderer mailMessageContentRenderer = null) {
+    MailMessageBuilder(MailSender mailSender, Config config, MailMessageContentRenderer mailMessageContentRenderer = null) {
         this.mailSender = mailSender
         this.mailMessageContentRenderer = mailMessageContentRenderer
 
-        this.overrideAddress = config.overrideAddress ?: null
-        this.defaultFrom = overrideAddress ?: (config.default.from ?: null)
-        this.defaultTo = overrideAddress ?: (config.default.to ?: null)
+        this.overrideAddress = config.getProperty('grails.mail.overrideAddress')
+        this.defaultFrom = overrideAddress ?: config.getProperty('grails.mail.default.from')
+        this.defaultTo = overrideAddress ?: config.getProperty('grails.mail.default.to')
     }
 
     private MailMessage getMessage() {
