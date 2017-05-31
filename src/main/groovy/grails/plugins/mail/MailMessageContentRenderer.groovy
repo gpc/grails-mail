@@ -289,7 +289,7 @@ class MailMessageContentRenderer {
                     }
                     if (methodName == 'getServerPort') {
                         if(serverBaseURI == null){
-                            throw new UnsupportedOperationException("You cannot read the servername in non-request rendering operations")
+                            throw new UnsupportedOperationException("You cannot read the server port in non-request rendering operations")
                         }
                         else{
                             int port = serverBaseURI?.port
