@@ -120,6 +120,7 @@ class MailMessageContentRenderer {
 
         private GrailsWebRequest originalRequestAttributes
         private GrailsWebRequest renderRequestAttributes
+        private HttpServletResponse originalWrappedResponse
 
         RenderEnvironment(ApplicationContext applicationContext, Writer out, Locale locale = null) {
             this.out = out instanceof PrintWriter ? out as PrintWriter : new PrintWriter(out)
@@ -130,6 +131,7 @@ class MailMessageContentRenderer {
 
         private void init() {
             originalRequestAttributes = RequestContextHolder.getRequestAttributes() as GrailsWebRequest
+            originalWrappedResponse = WrappedResponseHolder.wrappedResponse
 
             def renderLocale = Locale.getDefault()
             if (locale) {
@@ -143,9 +145,9 @@ class MailMessageContentRenderer {
 
             if (originalRequestAttributes) {
                 renderRequestAttributes.controllerName = originalRequestAttributes.controllerName
-            }            
+            }
 
-            RequestContextHolder.setRequestAttributes(renderRequestAttributes) 
+            RequestContextHolder.setRequestAttributes(renderRequestAttributes)
 
             renderRequestAttributes.request.setAttribute(DispatcherServlet.LOCALE_RESOLVER_ATTRIBUTE, new FixedLocaleResolver(defaultLocale: renderLocale))
             renderRequestAttributes.setOut(out)
@@ -154,7 +156,7 @@ class MailMessageContentRenderer {
 
         private void close() {
             RequestContextHolder.setRequestAttributes(originalRequestAttributes) // null ok
-            WrappedResponseHolder.wrappedResponse = originalRequestAttributes?.currentResponse
+            WrappedResponseHolder.wrappedResponse = originalWrappedResponse
         }
 
         /**
@@ -166,7 +168,7 @@ class MailMessageContentRenderer {
 
         /**
          * Establish an environment with a specific locale
-         */        
+         */
          static with(ApplicationContext applicationContext, Writer out, Locale locale, Closure block) {
             def env = new RenderEnvironment(applicationContext, out, locale)
             env.init()
@@ -366,7 +368,7 @@ class MailMessageContentRenderer {
                 }
             })
         }
-        
+
         private static Enumeration iteratorAsEnumeration(Iterator iterator) {
             new Enumeration() {
                 @Override
@@ -449,5 +451,5 @@ class MailMessageContentRenderer {
                 }
             })
         }
-    }    
+    }
 }
