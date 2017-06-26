@@ -191,7 +191,7 @@ class MailMessageContentRenderer {
     static class PageRenderRequestCreator {
 
         static HttpServletRequest createInstance(final String serverBaseURL, final String requestURI, Locale localeToUse = Locale.getDefault()) {
-            final URI serverBaseURI = new URI(serverBaseURL)
+            final URI serverBaseURI = serverBaseURL!=null? new URI(serverBaseURL):null
 
             def params = new ConcurrentHashMap()
             def attributes = new ConcurrentHashMap()
@@ -274,24 +274,39 @@ class MailMessageContentRenderer {
                         throw new UnsupportedOperationException("You cannot read the protocol in non-request rendering operations")
                     }
                     if (methodName == 'getScheme') {
-                        return serverBaseURI.scheme
+                        if(serverBaseURI == null){
+                            throw new UnsupportedOperationException("You cannot read the scheme in non-request rendering operations")
+                        }
+                        else{
+                            return serverBaseURI.scheme    
+                        }                        
                     }
                     if (methodName == 'getServerName') {
-                        return serverBaseURI.host
+                        if(serverBaseURI == null){
+                            throw new UnsupportedOperationException("You cannot read the servername in non-request rendering operations")
+                        }
+                        else{
+                            return serverBaseURI.host
+                        }
                     }
                     if (methodName == 'getServerPort') {
-                        int port = serverBaseURI.port
-                        if(port == -1){
-                        switch(serverBaseURI.scheme?.toLowerCase()){
-								case 'http':
-									port = 80
-									break
-								case 'https':
-									port = 443
-									break
-							}
-						}
-						return port
+                        if(serverBaseURI == null){
+                            throw new UnsupportedOperationException("You cannot read the server port in non-request rendering operations")
+                        }
+                        else{
+                            int port = serverBaseURI?.port
+                            if(port == -1){
+                                switch(serverBaseURI?.scheme?.toLowerCase()){
+                                    case 'http':
+                                        port = 80
+                                        break
+                                    case 'https':
+                                        port = 443
+                                        break
+                                }
+                            }
+                            return port
+                        }
                     }
                     if (methodName == 'getReader') {
                         throw new UnsupportedOperationException("You cannot read input in non-request rendering operations")
