@@ -63,8 +63,8 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
     }
 
 	void setPoolSize(Integer poolSize){
-		mailExecutorService.setCorePoolSize(poolSize ?: DEFAULT_POOL_SIZE)
 		mailExecutorService.setMaximumPoolSize(poolSize ?: DEFAULT_POOL_SIZE)
+		mailExecutorService.setCorePoolSize(poolSize ?: DEFAULT_POOL_SIZE)
 	}
 
 	@Override
