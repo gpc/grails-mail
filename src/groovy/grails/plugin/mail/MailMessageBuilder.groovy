@@ -163,7 +163,7 @@ class MailMessageBuilder {
     }
 
     void headers(Map hdrs) {
-        Assert.notEmpty(hdrs, "headers cannot be null")
+        Assert.notNull(hdrs, "headers cannot be null")
 
         // The message must be of type MimeMailMessage to add headers.
         if (!mimeCapable) {
