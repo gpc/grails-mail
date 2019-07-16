@@ -18,6 +18,7 @@ package grails.plugins.mail
 import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.mail.MailMessage
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Provides the entry point to the mail sending API.
  */
+@Slf4j
 @CompileStatic
 class MailService implements InitializingBean, DisposableBean, GrailsConfigurationAware {
 

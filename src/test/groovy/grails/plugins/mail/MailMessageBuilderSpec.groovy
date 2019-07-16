@@ -15,8 +15,7 @@
  */
 package grails.plugins.mail
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import org.grails.testing.GrailsUnitTest
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.web.context.support.ServletContextResource
@@ -33,8 +32,7 @@ import javax.servlet.ServletContext
 /**
  * Test case for {@link MailMessageBuilder}.
  */
-@TestMixin(GrailsUnitTestMixin)
-class MailMessageBuilderSpec extends Specification {
+class MailMessageBuilderSpec extends Specification implements GrailsUnitTest {
 
 	MailMessageBuilder testJavaMailSenderBuilder
 	MailMessageBuilder testBasicMailSenderBuilder
@@ -42,10 +40,10 @@ class MailMessageBuilderSpec extends Specification {
 	private static String defaultFrom = "from@grailsplugin.com"
 	private static String defaultTo = "to@grailsplugin.com"
 
-	static doWithConfig(config) {
+	Closure doWithConfig() {{ config ->
 		config.grails.mail.default.from = defaultFrom
 		config.grails.mail.default.to = defaultTo
-	}
+	}}
 
 	def setup() {
 

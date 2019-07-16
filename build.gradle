@@ -8,35 +8,29 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
-plugins {
-    id "io.spring.dependency-management" version "0.5.4.RELEASE"
-    id "com.jfrog.bintray" version "1.2"
-}
-
-version "2.0.1"
+version "4.0.0"
 group "org.grails.plugins"
 
-apply plugin: 'maven-publish'
+
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: "spring-boot"
-apply plugin: "org.grails.grails-plugin"
+apply plugin:"org.grails.grails-plugin"
+apply plugin:"org.grails.grails-plugin-publish"
 apply plugin: "org.grails.grails-gsp"
 apply plugin: "org.grails.grails-doc"
-// Used for publishing to central repository, remove if not needed
-apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
-apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
+
 
 ext {
     grailsVersion = project.grailsVersion
     gradleWrapperVersion = project.gradleWrapperVersion
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 
 repositories {
@@ -53,24 +47,23 @@ dependencyManagement {
 }
 
 dependencies {
-    provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
-    provided "org.springframework.boot:spring-boot-autoconfigure"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    compile "org.springframework.boot:spring-boot-autoconfigure"
+    profile "org.grails.profiles:web-plugin"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-tomcat"
+    compile "org.grails:grails-dependencies"
+    compile "org.grails:grails-web-boot"
 
-    provided "org.grails:grails-web-boot"
-    provided "org.grails:grails-dependencies"
     provided 'javax.servlet:javax.servlet-api:3.1.0'
 
-    testCompile "com.icegreen:greenmail:1.4.0"
-    testCompile "org.grails:grails-plugin-testing"
+    testCompile "com.icegreen:greenmail:1.5.10"
+    testCompile 'org.grails:grails-web-testing-support:2.0.0'
 
-    console "org.grails:grails-console"
-
-    compile "javax.mail:javax.mail-api:1.5.1"
-    compile "com.sun.mail:javax.mail:1.5.1"
+    compile "javax.mail:javax.mail-api:1.6.2"
+    compile "com.sun.mail:javax.mail:1.6.2"
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
     gradleVersion = gradleWrapperVersion
 }
