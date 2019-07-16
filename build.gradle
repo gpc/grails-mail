@@ -47,18 +47,17 @@ dependencyManagement {
 }
 
 dependencies {
-    compile "org.springframework.boot:spring-boot-starter-logging"
-    compile "org.springframework.boot:spring-boot-autoconfigure"
-    profile "org.grails.profiles:web-plugin"
-    compile "org.springframework.boot:spring-boot-starter-actuator"
-    compile "org.springframework.boot:spring-boot-starter-tomcat"
-    compile "org.grails:grails-dependencies"
-    compile "org.grails:grails-web-boot"
+    provided 'org.springframework.boot:spring-boot-starter-logging'
+    provided "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-autoconfigure"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
 
+    provided "org.grails:grails-web-boot"
+    provided "org.grails:grails-dependencies"
     provided 'javax.servlet:javax.servlet-api:3.1.0'
 
-    testCompile "com.icegreen:greenmail:1.5.10"
     testCompile 'org.grails:grails-web-testing-support:2.0.0'
+    testCompile "com.icegreen:greenmail:1.5.10"
 
     compile "javax.mail:javax.mail-api:1.6.2"
     compile "com.sun.mail:javax.mail:1.6.2"
