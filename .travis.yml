@@ -1,6 +1,7 @@
 language: groovy
 jdk:
 - openjdk8
+- openjdk11
 before_script:
 - rm -rf target
 script: "./travis-build.sh"
