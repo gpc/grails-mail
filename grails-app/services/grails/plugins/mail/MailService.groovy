@@ -71,13 +71,13 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
 
 	@Override
 	public void destroy() throws Exception {
-		mailExecutorService.shutdown();
+		mailExecutorService.shutdown()
 		mailExecutorService.awaitTermination(10, TimeUnit.SECONDS);
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
 
 		Integer poolSize = configuration.getProperty('grails.mail.poolSize', Integer)
 		try{

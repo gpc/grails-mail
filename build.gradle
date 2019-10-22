@@ -26,7 +26,6 @@ apply plugin: "org.grails.grails-doc"
 
 ext {
     grailsVersion = project.grailsVersion
-    gradleWrapperVersion = project.gradleWrapperVersion
 }
 
 sourceCompatibility = 1.8
@@ -61,8 +60,4 @@ dependencies {
 
     compile "javax.mail:javax.mail-api:1.6.2"
     compile "com.sun.mail:javax.mail:1.6.2"
-}
-
-wrapper {
-    gradleVersion = gradleWrapperVersion
 }
