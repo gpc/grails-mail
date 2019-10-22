@@ -16,6 +16,12 @@ Please see the [User Guide](http://gpc.github.com/grails-mail/ "Grails Mail Plug
 
 The plugin is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html "Apache License, Version 2.0 - The Apache Software Foundation") and is produced under the [Grails Plugin Collective](http://gpc.github.com/).
 
+## Versions
+
+* 3.x - Compatible with Grails 4
+* 2.x - Compatible with Grails 3
+* 1.x - Compatible with Grails 2
+
 ## Issues
 
 Issues can be raised via  [GitHub Issues](https://github.com/gpc/grails-mail/issues).
