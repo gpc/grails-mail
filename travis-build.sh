@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 rm -rf *.zip
-./gradlew clean check assemble
+./gradlew clean check assemble || EXIT_STATUS=$?
 
 if [ "${TRAVIS_JDK_VERSION}" == "openjdk11" ] ; then
   exit $EXIT_STATUS
