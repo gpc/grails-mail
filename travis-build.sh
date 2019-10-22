@@ -3,6 +3,10 @@ set -e
 rm -rf *.zip
 ./gradlew clean check assemble
 
+if [ "${TRAVIS_JDK_VERSION}" == "openjdk11" ] ; then
+  exit $EXIT_STATUS
+fi
+
 filename=$(find build/libs -name "*.jar" | head -1)
 filename=$(basename "$filename")
 
