@@ -12,7 +12,7 @@ Mail can be sent using the @mailService@ via the @sendMail@ method. Here is an e
        text 'this is some text'
     }
 
-Please see the [User Guide](http://gpc.github.com/grails-mail/ "Grails Mail Plugin @ GitHub") for more information.
+Please see the [User Guide](https://gpc.github.io/grails-mail/ "Grails Mail Plugin @ GitHub") for more information.
 
 The plugin is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html "Apache License, Version 2.0 - The Apache Software Foundation") and is produced under the [Grails Plugin Collective](http://gpc.github.com/).
 
