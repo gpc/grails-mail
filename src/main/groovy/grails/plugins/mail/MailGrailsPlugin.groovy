@@ -68,13 +68,13 @@ sendMail {
     ]
 
     Integer mailConfigHash
-    ConfigObject mailConfig
+    MailConfig mailConfig
     boolean createdSession = false
 
 
      Closure doWithSpring() { 
         {->
-            mailConfig = grailsApplication.config.grails.mail
+            mailConfig = new MailConfig(grailsApplication.config)
             mailConfigHash = mailConfig.hashCode()
 
             configureMailSender(delegate, mailConfig)
@@ -93,7 +93,7 @@ sendMail {
 
 
     void onConfigChange(Map<String, Object> event) {
-        ConfigObject newMailConfig = event.source.grails.mail
+        MailConfig newMailConfig = new MailConfig(event.source)
         Integer newMailConfigHash = newMailConfig.hashCode()
 
         if (newMailConfigHash != mailConfigHash) {
@@ -114,7 +114,7 @@ sendMail {
         }
     }
 
-    def configureMailSender(builder, config) {
+    def configureMailSender(builder, MailConfig config) {
         builder.with {
             if (config.jndiName && !springConfig.containsBean("mailSession")) {
                 mailSession(JndiObjectFactoryBean) {
@@ -153,8 +153,8 @@ sendMail {
                     password = config.password
                 if (config.protocol)
                     protocol = config.protocol
-                if (config.props instanceof Map && config.props)
-                    javaMailProperties = config.props.toFlatConfig()
+                if (config.props)
+                    javaMailProperties = config.props
             }
         }
     }

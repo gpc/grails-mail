@@ -35,13 +35,13 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
 
     static transactional = false
 
-    Config configuration
+    MailConfig configuration
     MailMessageBuilderFactory mailMessageBuilderFactory
 	ThreadPoolExecutor mailExecutorService
 
 	private static final Integer DEFAULT_POOL_SIZE = 5
 
-    MailMessage sendMail(Config config, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
+    MailMessage sendMail(MailConfig config, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
         if (isDisabled()) {
             log.warn("Sending emails disabled by configuration option")
             return
@@ -55,18 +55,27 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
         return messageBuilder.sendMessage(mailExecutorService)
     }
 
+	MailMessage sendMail(Config config, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
+		return sendMail(new MailConfig(config), callable)
+	}
+
     MailMessage sendMail(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
         return sendMail(configuration, callable)
     }
 
 
     boolean isDisabled() {
-        configuration.getProperty('grails.mail.disabled',Boolean, false)
+        configuration.disabled
     }
 
 	void setPoolSize(Integer poolSize){
 		mailExecutorService.setMaximumPoolSize(poolSize ?: DEFAULT_POOL_SIZE)
 		mailExecutorService.setCorePoolSize(poolSize ?: DEFAULT_POOL_SIZE)
+	}
+
+	@Override
+	void setConfiguration(Config config) {
+		configuration = new MailConfig(config)
 	}
 
 	@Override
@@ -79,7 +88,7 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
 	public void afterPropertiesSet() throws Exception {
 		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
 
-		Integer poolSize = configuration.getProperty('grails.mail.poolSize', Integer)
+		Integer poolSize = configuration.poolSize
 		try{
 			((ThreadPoolExecutor)mailExecutorService).allowCoreThreadTimeOut(true)
 		}catch(MissingMethodException e){

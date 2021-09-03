@@ -30,7 +30,7 @@ class MailMessageBuilderFactory {
     MailSender mailSender
     MailMessageContentRenderer mailMessageContentRenderer
 
-    MailMessageBuilder createBuilder(Config config) {
+    MailMessageBuilder createBuilder(MailConfig config) {
         new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
     }
 

@@ -72,12 +72,16 @@ class MailMessageBuilder {
     }
 
     MailMessageBuilder(MailSender mailSender, Config config, MailMessageContentRenderer mailMessageContentRenderer = null) {
+        this(mailSender, new MailConfig(config), mailMessageContentRenderer)
+    }
+
+    MailMessageBuilder(MailSender mailSender, MailConfig config, MailMessageContentRenderer mailMessageContentRenderer = null) {
         this.mailSender = mailSender
         this.mailMessageContentRenderer = mailMessageContentRenderer
 
-        this.overrideAddress = config.getProperty('grails.mail.overrideAddress')
-        this.defaultFrom = overrideAddress ?: config.getProperty('grails.mail.default.from')
-        this.defaultTo = overrideAddress ?: config.getProperty('grails.mail.default.to')
+        this.overrideAddress = config.overrideAddress
+        this.defaultFrom = overrideAddress ?: config.from
+        this.defaultTo = overrideAddress ?: config.to
     }
 
     private MailMessage getMessage() {
