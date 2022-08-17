@@ -69,7 +69,7 @@ class MailServiceSpec extends Specification  {
         )
         mimeCapableMailService = new MailService(
             mailMessageBuilderFactory: mimeMessageBuilderFactor,
-            configuration: grailsApplication.config)
+                mailConfigurationProperties: new MailConfigurationProperties())
         mimeCapableMailService.afterPropertiesSet()
 
         MailSender simpleMailSender = new SimpleMailSender()
@@ -79,7 +79,7 @@ class MailServiceSpec extends Specification  {
         )
         nonMimeCapableMailService = new MailService(
             mailMessageBuilderFactory: simpleMessageBuilderFactory,
-            configuration: grailsApplication.config)
+                mailConfigurationProperties: new MailConfigurationProperties())
         nonMimeCapableMailService.afterPropertiesSet()
     }
 

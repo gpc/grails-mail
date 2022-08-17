@@ -40,21 +40,19 @@ class MailMessageBuilderSpec extends Specification implements GrailsUnitTest {
 	private static String defaultFrom = "from@grailsplugin.com"
 	private static String defaultTo = "to@grailsplugin.com"
 
-	Closure doWithConfig() {{ config ->
-		config.grails.mail.default.from = defaultFrom
-		config.grails.mail.default.to = defaultTo
-	}}
-
 	def setup() {
+		MailConfigurationProperties properties = new MailConfigurationProperties()
+		properties.default.from = defaultFrom
+		properties.default.to = defaultTo
 
 		MailSender mockJavaMailSender = Stub(JavaMailSender) {
 			createMimeMessage() >> new MimeMessage(Session.getInstance(new Properties()))
 		}
 
-		testJavaMailSenderBuilder = new MailMessageBuilder(mockJavaMailSender, grailsApplication.config)
+		testJavaMailSenderBuilder = new MailMessageBuilder(mockJavaMailSender, properties)
 
 		MailSender mockBasicMailSender = Stub(MailSender)
-		testBasicMailSenderBuilder = new MailMessageBuilder(mockBasicMailSender, grailsApplication.config)
+		testBasicMailSenderBuilder = new MailMessageBuilder(mockBasicMailSender, properties)
 	}
 
 	/**

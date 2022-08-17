@@ -15,7 +15,6 @@
  */
 package grails.plugins.mail
 
-import grails.config.Config
 import groovy.transform.CompileStatic
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSender
@@ -30,8 +29,8 @@ class MailMessageBuilderFactory {
     MailSender mailSender
     MailMessageContentRenderer mailMessageContentRenderer
 
-    MailMessageBuilder createBuilder(MailConfig config) {
-        new MailMessageBuilder(mailSender, config, mailMessageContentRenderer)
+    MailMessageBuilder createBuilder(MailConfigurationProperties properties) {
+        new MailMessageBuilder(mailSender, properties, mailMessageContentRenderer)
     }
 
     boolean isMimeCapable() {
