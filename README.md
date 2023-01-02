@@ -14,7 +14,7 @@ Mail can be sent using the @mailService@ via the @sendMail@ method. Here is an e
 
 Please see the [User Guide](https://grails3-plugins.github.io/mail/ "Grails Mail Plugin @ GitHub") for more information.
 
-The plugin is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html "Apache License, Version 2.0 - The Apache Software Foundation") and is produced under the [Grails Plugin Collective](http://gpc.github.com/).
+The plugin is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html "Apache License, Version 2.0 - The Apache Software Foundation").
 
 ## Versions
 
