@@ -16,7 +16,6 @@
 package grails.plugins.mail
 
 import com.sun.mail.smtp.SMTPMessage
-import grails.config.Config
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
@@ -71,13 +70,13 @@ class MailMessageBuilder {
         InputStreamSource toAdd
     }
 
-    MailMessageBuilder(MailSender mailSender, Config config, MailMessageContentRenderer mailMessageContentRenderer = null) {
+    MailMessageBuilder(MailSender mailSender, MailConfigurationProperties properties, MailMessageContentRenderer mailMessageContentRenderer = null) {
         this.mailSender = mailSender
         this.mailMessageContentRenderer = mailMessageContentRenderer
 
-        this.overrideAddress = config.getProperty('grails.mail.overrideAddress')
-        this.defaultFrom = overrideAddress ?: config.getProperty('grails.mail.default.from')
-        this.defaultTo = overrideAddress ?: config.getProperty('grails.mail.default.to')
+        this.overrideAddress = properties.overrideAddress
+        this.defaultFrom = overrideAddress ?: properties.default.from
+        this.defaultTo = overrideAddress ?: properties.default.to
     }
 
     private MailMessage getMessage() {

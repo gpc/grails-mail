@@ -16,38 +16,47 @@
 package grails.plugins.mail
 
 import grails.config.Config
-import grails.core.support.GrailsConfigurationAware
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.bind.Bindable
+import org.springframework.boot.context.properties.bind.Binder
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource
+import org.springframework.boot.context.properties.source.ConfigurationPropertySources
+import org.springframework.core.env.PropertiesPropertySource
+import org.springframework.core.env.PropertySource
 import org.springframework.mail.MailMessage
 
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
+
 /**
  * Provides the entry point to the mail sending API.
  */
 @Slf4j
 @CompileStatic
-class MailService implements InitializingBean, DisposableBean, GrailsConfigurationAware {
+class MailService implements InitializingBean, DisposableBean {
 
     static transactional = false
 
-    Config configuration
+	MailConfigurationProperties mailConfigurationProperties
     MailMessageBuilderFactory mailMessageBuilderFactory
 	ThreadPoolExecutor mailExecutorService
 
 	private static final Integer DEFAULT_POOL_SIZE = 5
 
-    MailMessage sendMail(Config config, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
+	private static final Bindable<MailConfigurationProperties> CONFIG_BINDABLE = Bindable.of(MailConfigurationProperties)
+
+    MailMessage sendMail(MailConfigurationProperties properties, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
         if (isDisabled()) {
             log.warn("Sending emails disabled by configuration option")
             return
         }
 
-        MailMessageBuilder messageBuilder = mailMessageBuilderFactory.createBuilder(config)
+        MailMessageBuilder messageBuilder = mailMessageBuilderFactory.createBuilder(properties)
         callable.delegate = messageBuilder
         callable.resolveStrategy = Closure.DELEGATE_FIRST
         callable.call(messageBuilder)
@@ -55,13 +64,23 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
         return messageBuilder.sendMessage(mailExecutorService)
     }
 
+	MailMessage sendMail(Config config, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
+		return sendMail(toMailProperties(config), callable)
+	}
+
     MailMessage sendMail(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure callable) {
-        return sendMail(configuration, callable)
+        return sendMail(mailConfigurationProperties, callable)
     }
 
+	private static MailConfigurationProperties toMailProperties(Config config) {
+		PropertySource propertySource = new PropertiesPropertySource('mailProperties', config.toProperties())
+		Iterable<ConfigurationPropertySource> configurationPropertySources = ConfigurationPropertySources.from(propertySource)
+		Binder binder = new Binder(configurationPropertySources)
+		return binder.bind(MailConfigurationProperties.PREFIX, CONFIG_BINDABLE).get()
+	}
 
     boolean isDisabled() {
-        configuration.getProperty('grails.mail.disabled',Boolean, false)
+        mailConfigurationProperties.disabled
     }
 
 	void setPoolSize(Integer poolSize){
@@ -79,7 +98,7 @@ class MailService implements InitializingBean, DisposableBean, GrailsConfigurati
 	public void afterPropertiesSet() throws Exception {
 		mailExecutorService = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
 
-		Integer poolSize = configuration.getProperty('grails.mail.poolSize', Integer)
+		Integer poolSize = mailConfigurationProperties.poolSize
 		try{
 			((ThreadPoolExecutor)mailExecutorService).allowCoreThreadTimeOut(true)
 		}catch(MissingMethodException e){

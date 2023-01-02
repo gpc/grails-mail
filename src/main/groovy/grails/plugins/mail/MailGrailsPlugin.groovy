@@ -16,8 +16,6 @@
 package grails.plugins.mail
 
 import grails.plugins.Plugin
-import org.springframework.jndi.JndiObjectFactoryBean
-import org.springframework.mail.javamail.JavaMailSenderImpl
 import groovy.util.logging.Commons
 
 @Commons
@@ -67,96 +65,9 @@ sendMail {
             "grails-app/views/_testemails/*.gsp"
     ]
 
-    Integer mailConfigHash
-    ConfigObject mailConfig
-    boolean createdSession = false
-
-
-     Closure doWithSpring() { 
-        {->
-            mailConfig = grailsApplication.config.grails.mail
-            mailConfigHash = mailConfig.hashCode()
-
-            configureMailSender(delegate, mailConfig)
-
-            mailMessageBuilderFactory(MailMessageBuilderFactory) {
-                it.autowire = true
-            }
-
-            mailMessageContentRenderer(MailMessageContentRenderer) {
-                it.autowire = true
-            }
-        } 
-    }
-    
-
-
-
-    void onConfigChange(Map<String, Object> event) {
-        ConfigObject newMailConfig = event.source.grails.mail
-        Integer newMailConfigHash = newMailConfig.hashCode()
-
-        if (newMailConfigHash != mailConfigHash) {
-            if (createdSession) {
-                event.ctx.removeBeanDefinition("mailSession")
-            }
-
-            event.ctx.removeBeanDefinition("mailSender")
-
-            mailConfig = newMailConfig
-            mailConfigHash = newMailConfigHash
-
-			event.ctx.getBean(MailService.class).setPoolSize(mailConfig.poolSize?:null)
-
-            beans {
-                configureMailSender(delegate, mailConfig)
-            }
+    Closure doWithSpring() {
+        { ->
+            mailConfiguration(MailConfiguration)
         }
     }
-
-    def configureMailSender(builder, config) {
-        builder.with {
-            if (config.jndiName && !springConfig.containsBean("mailSession")) {
-                mailSession(JndiObjectFactoryBean) {
-                    jndiName = config.jndiName
-                }
-                createdSession = true
-            } else {
-                createdSession = false
-            }
-
-            mailSender(JavaMailSenderImpl) {
-                if (config.host) {
-                    host = config.host
-                } else if (!config.jndiName) {
-                    def envHost = System.getenv()['SMTP_HOST']
-                    if (envHost) {
-                        host = envHost
-                    } else {
-                        host = "localhost"
-                    }
-                }
-
-                if (config.encoding) {
-                    defaultEncoding = config.encoding
-                } else if (!config.jndiName) {
-                    defaultEncoding = "utf-8"
-                }
-
-                if (config.jndiName)
-                    session = ref('mailSession')
-                if (config.port)
-                    port = config.port
-                if (config.username)
-                    username = config.username
-                if (config.password)
-                    password = config.password
-                if (config.protocol)
-                    protocol = config.protocol
-                if (config.props instanceof Map && config.props)
-                    javaMailProperties = config.props.toFlatConfig()
-            }
-        }
-    }
-
 }
