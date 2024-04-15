@@ -1,3 +1,18 @@
+/*
+ * Copyright 2022-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package grails.plugins.mail
 
 import grails.core.GrailsApplication
@@ -30,7 +45,7 @@ class MailConfiguration {
     @ConditionalOnMissingBean(name = 'mailSession')
     @ConditionalOnProperty(prefix = 'grails.mail', name = 'jndiName')
     JndiObjectFactoryBean mailSession(MailConfigurationProperties mailProperties) {
-        JndiObjectFactoryBean factory = new JndiObjectFactoryBean()
+        def factory = new JndiObjectFactoryBean()
         factory.jndiName = mailProperties.jndiName
         return factory
     }
@@ -40,7 +55,7 @@ class MailConfiguration {
             @Autowired(required = false) @Qualifier('mailSession') Session mailSession,
             MailConfigurationProperties mailProperties) {
 
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl()
+        def mailSender = new JavaMailSenderImpl()
         if (mailProperties.host) {
             mailSender.host = mailProperties.host
         } else if (!mailProperties.jndiName) {
@@ -81,10 +96,7 @@ class MailConfiguration {
     MailMessageBuilderFactory mailMessageBuilderFactory(
             MailSender mailSender,
             MailMessageContentRenderer mailMessageContentRenderer) {
-        MailMessageBuilderFactory factory = new MailMessageBuilderFactory()
-        factory.mailSender = mailSender
-        factory.mailMessageContentRenderer = mailMessageContentRenderer
-        return factory
+        return new MailMessageBuilderFactory(mailSender, mailMessageContentRenderer)
     }
 
     @Bean
@@ -93,11 +105,6 @@ class MailConfiguration {
             GroovyPagesUriService groovyPagesUriService,
             GrailsApplication grailsApplication,
             GrailsPluginManager pluginManager) {
-        MailMessageContentRenderer renderer = new MailMessageContentRenderer()
-        renderer.groovyPagesTemplateEngine = groovyPagesTemplateEngine
-        renderer.groovyPagesUriService = groovyPagesUriService
-        renderer.grailsApplication = grailsApplication
-        renderer.pluginManager = pluginManager
-        return renderer
+        return new MailMessageContentRenderer(groovyPagesTemplateEngine, groovyPagesUriService, grailsApplication, pluginManager)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,15 @@
 package grails.plugins.mail
 
 import grails.plugins.Plugin
-import groovy.util.logging.Commons
 
-@Commons
 class MailGrailsPlugin extends Plugin {
-    def grailsVersion = "3.0 > *"
-
-    def author = "Grails Plugin Collective"
-    def authorEmail = "grails.plugin.collective@gmail.com"
-    def title = "Provides Mail support to a running Grails application"
+    
+    def grailsVersion = '6.0.0 > *'
+    def author = 'The Grails team'
+    def authorEmail = 'info@grails.org'
+    def title = 'Provides Mail support to a running Grails application'
     def description = '''\
-This plug-in provides a MailService class as well as configuring the necessary beans within
+This plugin provides a MailService class as well as configuring the necessary beans within
 the Spring ApplicationContext.
 
 It also adds a "sendMail" method to all controller classes. A typical example usage is:
@@ -39,34 +37,35 @@ sendMail {
     subject "Hello John"
     text "this is some text"
 }
-
 '''
-    def documentation = "http://grails.org/plugins/mail"
+    def documentation = 'https://grails.github.io/grails-mail/'
 
-    def license = "APACHE"
-    def organization = [ name: "Grails Plugin Collective", url: "http://github.com/gpc" ]
+    def license = 'Apache 2.0 License'
+    def organization = [name: 'Grails', url: 'https://grails.org']
     def developers = [
-        [ name: "Craig Andrews", email: "candrews@integralblue.com" ],
-        [ name: "Luke Daley", email: "ld@ldaley.com" ],
-        [ name: "Peter Ledbrook", email: "p.ledbrook@cacoethes.co.uk" ],
-        [ name: "Jeff Brown", email: "brownj@ociweb.com" ],
-        [ name: "Graeme Rocher", email: "rocherg@ociweb.com" ],
-        [ name: "Marc Palmer", email: "marc@grailsrocks.com" ],
-        [ name: "Søren Berg Glasius", email: "glasiuss@ociweb.com" ],
-
+        [name: 'Craig Andrews', email: 'candrews@integralblue.com'],
+        [name: 'Luke Daley', email: 'ld@ldaley.com'],
+        [name: 'Peter Ledbrook', email: 'p.ledbrook@cacoethes.co.uk'],
+        [name: 'Jeff Brown', email: 'brownj@ociweb.com'],
+        [name: 'Graeme Rocher', email: 'rocherg@ociweb.com'],
+        [name: 'Marc Palmer', email: 'marc@grailsrocks.com'],
+        [name: 'Søren Berg Glasius', email: 'soeren@glasius.dk'],
+        [name: 'Mattias Reichel', email: 'mattias.reichel@gmail.com']
     ]
 
-    def issueManagement = [ system: "GitHub", url: "https://github.com/gpc/mail/issues" ]
-    def scm = [ url: "http://github.com/gpc/grails-mail" ]
+    def issueManagement = [system: 'GitHub', url: 'https://github.com/grails/grails-mail/issues']
+    def scm = [url: 'https://github.com/grails/grails-mail']
 
-    def observe = ['controllers','services']
+    def observe = ['controllers', 'services']
 
-     def pluginExcludes = [
-            "grails-app/views/_testemails/*.gsp"
+    def pluginExcludes = [
+        'grails-app/i18n/*.properties',
+        'grails-app/views/_testemails/*.gsp'
     ]
 
+    @Override
     Closure doWithSpring() {
-        { ->
+        return {
             mailConfiguration(MailConfiguration)
         }
     }

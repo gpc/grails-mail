@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 the original author or authors.
+ * Copyright 2008-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,18 @@ class MailMessageBuilderFactory {
 
     MailSender mailSender
     MailMessageContentRenderer mailMessageContentRenderer
+
+    MailMessageBuilderFactory() {}
+
+    /**
+     * @param mailSender
+     * @param mailMessageContentRenderer
+     * @since 4.0.0
+     */
+    MailMessageBuilderFactory(MailSender mailSender, MailMessageContentRenderer mailMessageContentRenderer) {
+        this.mailSender = mailSender
+        this.mailMessageContentRenderer = mailMessageContentRenderer
+    }
 
     MailMessageBuilder createBuilder(MailConfigurationProperties properties) {
         new MailMessageBuilder(mailSender, properties, mailMessageContentRenderer)

@@ -1,67 +1,63 @@
-buildscript {
-    ext {
-        grailsVersion = project.grailsVersion
-    }
-    repositories {
-        mavenLocal()
-        maven { url "https://repo.grails.org/grails/core" }
-    }
-    dependencies {
-        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
-    }
+plugins {
+    id 'groovy'
+    id 'java-library'
+    id 'io.github.gradle-nexus.publish-plugin'
+    id 'maven-publish'
+    id 'signing'
 }
 
-version "3.0.1.BUILD-SNAPSHOT"
-group "org.grails.plugins"
+version = projectVersion
+group = 'org.grails.plugins'
+ext.set('grailsVersion', libs.versions.grails.asProvider().get())
+ext.set('isReleaseVersion', !version.toString().endsWith('-SNAPSHOT'))
+ext.set('isSnapshot', !isReleaseVersion)
 
-
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: "org.grails.grails-plugin"
-apply plugin: "org.grails.grails-plugin-publish"
-apply plugin: "org.grails.grails-gsp"
-apply plugin: "org.grails.grails-doc"
-apply plugin: "com.jfrog.artifactory"
-
-
-ext {
-    grailsVersion = project.grailsVersion
-}
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
+apply plugin: 'org.grails.grails-plugin' // Needs to be applied after grailsVersion has been set
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven { url "https://repo.grails.org/grails/core" }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.grails:grails-bom:$grailsVersion"
-    }
-    applyMavenExclusions false
+    maven { url = 'https://repo.grails.org/grails/core' }
 }
 
 dependencies {
-    provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
-    provided "org.springframework.boot:spring-boot-autoconfigure"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
 
-    provided "org.grails:grails-web-boot"
-    provided "org.grails:grails-dependencies"
-    provided 'javax.servlet:javax.servlet-api:3.1.0'
+    api libs.groovy.core // Used in public api
+    api libs.javamail.api // Used in public api
+    api libs.spring.context // Used in public api
+    api libs.spring.context.support // Used in public api
 
-    testCompile 'org.grails:grails-web-testing-support:2.0.0'
-    testCompile "com.icegreen:greenmail:1.5.10"
+    // These three libraries are used in public api, but not in a way
+    // that is meant to be consumed by users of the plugin.
+    // Therefore they are set to implementation to not expose unnecessarily
+    // to the compileClasspath of plugin users.
+    implementation libs.grails.core
+    implementation libs.grails.gsp
+    implementation libs.grails.web.common
 
-    compile "javax.mail:javax.mail-api:1.6.2"
-    compile "com.sun.mail:javax.mail:1.6.2"
+    implementation libs.grails.web.urlmappings
+    implementation libs.javamail.impl
+    implementation libs.spring.beans
+    implementation libs.springboot.autoconfigure
+
+    testImplementation libs.grails.testing.support.core
+    testImplementation libs.spock.core
+
+    integrationTestImplementation libs.greenmail
+    integrationTestImplementation libs.spring.web
+
+    integrationTestRuntimeOnly libs.grails.testing.support.web
+    integrationTestRuntimeOnly libs.slf4j.nop // Get rid of warning about missing slf4j implementation during test task
+    integrationTestRuntimeOnly libs.springboot.starter.tomcat
 }
 
-apply from: "${rootProject.projectDir}/gradle/grailsPublish.gradle"
-apply from: "${rootProject.projectDir}/gradle/artifactoryPublish.gradle"
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
+
+apply from: layout.projectDirectory.file('gradle/java-config.gradle')
+apply from: layout.projectDirectory.file('gradle/grails-plugin-config.gradle')
+apply from: layout.projectDirectory.file('gradle/documentation-config.gradle')
+apply from: layout.projectDirectory.file('gradle/publishing.gradle')

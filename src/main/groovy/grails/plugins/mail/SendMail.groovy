@@ -21,13 +21,16 @@ import org.grails.core.DefaultGrailsControllerClass
 import org.grails.core.DefaultGrailsServiceClass
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
+import org.springframework.mail.MailMessage
 
-@Enhances([DefaultGrailsServiceClass.SERVICE, DefaultGrailsControllerClass.CONTROLLER])
 @CompileStatic
+@Enhances([DefaultGrailsServiceClass.SERVICE, DefaultGrailsControllerClass.CONTROLLER])
 trait SendMail {
+
 	@Autowired
 	ApplicationContext applicationContext
-	public sendMail(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure dsl) {
+
+	MailMessage sendMail(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MailMessageBuilder) Closure dsl) {
         applicationContext.getBean('mailService', MailService).sendMail(dsl)
 	}
 }

@@ -1,0 +1,33 @@
+[versions]
+grails = '6.2.0'
+grails-testing-support = '3.2.1'
+greenmail = '1.6.15'
+groovy = '3.0.21'
+gsp = '6.2.1'
+javamail = '1.6.2'
+slf4j = '1.7.36'
+spring = '5.3.34'
+springboot = '2.7.18'
+spock = '2.3-groovy-3.0'
+
+[libraries]
+grails-core = { module = 'org.grails:grails-core', version.ref = 'grails' }
+grails-gsp = { module = 'org.grails:grails-gsp', version.ref = 'gsp' }
+grails-testing-support-core = { module = 'org.grails:grails-testing-support', version.ref = 'grails-testing-support' }
+grails-testing-support-web = { module = 'org.grails:grails-web-testing-support', version.ref = 'grails-testing-support' }
+grails-web-common = { module = 'org.grails:grails-web-common', version.ref = 'grails' }
+grails-web-urlmappings = { module = 'org.grails:grails-web-url-mappings', version.ref = 'grails' }
+greenmail = { module = 'com.icegreen:greenmail', version.ref = 'greenmail' }
+groovy-core = { module = 'org.codehaus.groovy:groovy', version.ref = 'groovy' }
+grails-docs = { module = 'org.grails:grails-docs', version.ref = 'grails' }
+groovy-templates = { module = 'org.codehaus.groovy:groovy-templates', version.ref = 'groovy' }
+javamail-api = { module = 'javax.mail:javax.mail-api', version.ref = 'javamail' }
+javamail-impl = { module = 'com.sun.mail:javax.mail', version.ref = 'javamail' }
+slf4j-nop = { module = 'org.slf4j:slf4j-nop', version.ref = 'slf4j' }
+spring-beans = { module = 'org.springframework:spring-beans', version.ref = 'spring' }
+spring-context = { module = 'org.springframework:spring-context', version.ref = 'spring' }
+spring-context-support = { module = 'org.springframework:spring-context-support', version.ref = 'spring' }
+spring-web = { module = 'org.springframework:spring-web', version.ref = 'spring' }
+springboot-autoconfigure = { module = 'org.springframework.boot:spring-boot-autoconfigure', version.ref = 'springboot' }
+springboot-starter-tomcat = { module = 'org.springframework.boot:spring-boot-starter-tomcat', version.ref = 'springboot' }
+spock-core = { module = 'org.spockframework:spock-core', version.ref = 'spock' }
