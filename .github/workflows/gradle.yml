@@ -29,10 +29,10 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v3
+      - name: Run tests
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-        with:
-          arguments: check
+        run: ./gradlew check
 
   publish_snapshot:
     name: Build Project and Publish Snapshot release
@@ -44,34 +44,26 @@ jobs:
       - uses: gradle/wrapper-validation-action@v2
       - uses: actions/setup-java@v4
         with: { java-version: 11, distribution: temurin }
-
+      - uses: gradle/actions/setup-gradle@v3
       - name: Build Project
-        uses: gradle/actions/setup-gradle@v3
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-        with:
-          arguments: build
-
+        run: ./gradlew build
       - name: Publish Snapshot version to Artifactory (repo.grails.org)
         if: success()
-        uses: gradle/actions/setup-gradle@v3
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
           ORG_GRADLE_PROJECT_artifactoryPublishUsername: ${{ secrets.ARTIFACTORY_USERNAME }}
           ORG_GRADLE_PROJECT_artifactoryPublishPassword: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        with:
-          arguments: |
-            -Dorg.gradle.internal.publish.checksums.insecure=true
-            publish
-
+        run: |
+          ./gradlew
+          -Dorg.gradle.internal.publish.checksums.insecure=true
+          publish
       - name: Generate Snapshot Documentation
         if: success()
-        uses: gradle/actions/setup-gradle@v3
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-        with:
-          arguments: docs
-
+        run: ./gradlew docs
       - name: Publish Snapshot Documentation to Github Pages
         if: success()
         uses: micronaut-projects/github-pages-deploy-action@grails
