@@ -31,9 +31,9 @@ import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.util.Assert
 import org.springframework.util.StringUtils
 
-import javax.mail.Message
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeUtility
+import jakarta.mail.Message
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeUtility
 import java.util.concurrent.ExecutorService
 
 /**

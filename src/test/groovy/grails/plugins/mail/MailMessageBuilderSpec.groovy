@@ -22,12 +22,12 @@ import org.springframework.web.context.support.ServletContextResource
 import spock.lang.Issue
 import spock.lang.Specification
 
-import javax.mail.Message
-import javax.mail.Session
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
-import javax.mail.internet.MimeUtility
-import javax.servlet.ServletContext
+import jakarta.mail.Message
+import jakarta.mail.Session
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMultipart
+import jakarta.mail.internet.MimeUtility
+import jakarta.servlet.ServletContext
 
 /**
  * Test case for {@link MailMessageBuilder}.

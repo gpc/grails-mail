@@ -30,7 +30,7 @@ import org.springframework.jndi.JndiObjectFactoryBean
 import org.springframework.mail.MailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
 
-import javax.mail.Session
+import jakarta.mail.Session
 
 @Configuration
 @CompileStatic

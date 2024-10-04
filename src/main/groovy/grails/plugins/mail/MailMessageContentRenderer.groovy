@@ -32,9 +32,9 @@ import org.springframework.web.servlet.DispatcherServlet
 import org.springframework.web.servlet.i18n.FixedLocaleResolver
 import org.springframework.web.servlet.support.RequestContextUtils
 
-import javax.servlet.http.Cookie
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy

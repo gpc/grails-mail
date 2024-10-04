@@ -19,6 +19,7 @@ package grails.plugins.mail
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetupTest
 import grails.testing.mixin.integration.Integration
+import groovy.xml.XmlSlurper
 import org.grails.io.support.ClassPathResource
 import org.springframework.core.io.FileSystemResource
 import org.springframework.mail.MailMessage
@@ -32,10 +33,10 @@ import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
-import javax.mail.Message
-import javax.mail.internet.MimeBodyPart
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
+import jakarta.mail.Message
+import jakarta.mail.internet.MimeBodyPart
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMultipart
 
 @Integration
 class MailServiceSpec extends Specification  {

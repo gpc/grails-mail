@@ -42,6 +42,7 @@ dependencies {
     testImplementation libs.grails.testing.support.core
     testImplementation libs.spock.core
 
+    integrationTestImplementation libs.groovy.xml
     integrationTestImplementation libs.greenmail
     integrationTestImplementation libs.spring.web
 
