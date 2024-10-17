@@ -11,7 +11,7 @@ grails-bom = { module = 'org.grails:grails-bom', version.ref = 'grails' }
 grails-core = { module = 'org.grails:grails-core' }
 greenmail = { module = 'com.icegreen:greenmail', version.ref = 'greenmail' }
 grails-docs = { module = 'org.grails:grails-docs' }
-grails-gsp = { module = 'org.grails.plugins:gsp' }
+grails-gsp = { module = 'org.grails:grails-gsp' }
 grails-testing-support-core = { module = 'org.grails:grails-testing-support' }
 grails-testing-support-web = { module = 'org.grails:grails-web-testing-support' }
 grails-web-common = { module = 'org.grails:grails-web-common' }
