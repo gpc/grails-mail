@@ -8,7 +8,7 @@ plugins {
 
 version = projectVersion
 group = 'org.grails.plugins'
-ext.set('grailsVersion', libs.versions.grails.asProvider().get())
+ext.set('grailsVersion', libs.versions.grails.get())
 ext.set('isReleaseVersion', !version.toString().endsWith('-SNAPSHOT'))
 ext.set('isSnapshot', !isReleaseVersion)
 
@@ -21,36 +21,39 @@ repositories {
 
 dependencies {
 
-    compileOnly libs.grails.core // Used in public api, but provided
-    compileOnly libs.groovy.core // Used in public api, but provided
-    compileOnly libs.servlet.api // Provided
+    implementation(platform(libs.grails.bom))
 
-    api libs.javamail.api // Used in public api
-    api libs.spring.context // Used in public api
-    api libs.spring.context.support // Used in public api
+    compileOnly libs.servlet.api // Provided by the servlet container
+    compileOnly 'org.grails:grails-core' // Provided as this is a Grails plugin
+    compileOnly 'org.apache.groovy:groovy' // Used in public api, but Groovy is always provided
+
+    compileOnlyApi libs.javamail.api // Used in public api
+    api 'org.springframework:spring-context' // Used in public api
+    api 'org.springframework:spring-context-support' // Used in public api
 
     // These two libraries are used in public api, but not in a way
     // that is meant to be consumed by users of the plugin.
     // Therefore they are set to implementation to not expose unnecessarily
     // to the compileClasspath of plugin users.
-    implementation libs.grails.gsp
-    implementation libs.grails.web.common
+    implementation 'org.grails.plugins:gsp'
+    implementation 'org.grails:grails-web-common'
 
-    implementation libs.grails.web.urlmappings
-    implementation libs.javamail.impl
-    implementation libs.spring.beans
+    implementation libs.javamail.impl // Needs to be implementation (not runtimeOnly), as SMTPMessage is used in MailMessageBuilder
     implementation libs.springboot.autoconfigure
+    implementation 'org.grails:grails-web-url-mappings'
+    implementation 'org.springframework:spring-beans'
 
     testRuntimeOnly libs.slf4j.simple
     testImplementation libs.servlet.api
-    testImplementation libs.spock.core
+    testImplementation 'org.grails:grails-testing-support'
+    testImplementation 'org.spockframework:spock-core'
 
-    integrationTestImplementation libs.groovy.xml
     integrationTestImplementation libs.greenmail
-    integrationTestImplementation libs.spring.web
+    integrationTestImplementation 'org.apache.groovy:groovy-xml'
+    integrationTestImplementation 'org.springframework:spring-web'
 
-    integrationTestRuntimeOnly libs.grails.testing.support.web
     integrationTestRuntimeOnly libs.springboot.starter.tomcat
+    integrationTestRuntimeOnly 'org.grails:grails-web-testing-support'
 }
 
 tasks.withType(Test).configureEach {
