@@ -41,7 +41,7 @@ dependencies {
     implementation libs.spring.beans
     implementation libs.springboot.autoconfigure
 
-    testImplementation libs.grails.testing.support.core
+    testRuntimeOnly libs.slf4j.simple
     testImplementation libs.servlet.api
     testImplementation libs.spock.core
 
@@ -50,14 +50,13 @@ dependencies {
     integrationTestImplementation libs.spring.web
 
     integrationTestRuntimeOnly libs.grails.testing.support.web
-    integrationTestRuntimeOnly libs.slf4j.nop // Get rid of warning about missing slf4j implementation during test task
     integrationTestRuntimeOnly libs.springboot.starter.tomcat
 }
 
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
     testLogging {
-        events 'passed', 'skipped', 'failed'
+        events 'passed', 'skipped', 'failed', 'standardError', 'standardOut'
     }
 }
 

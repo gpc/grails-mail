@@ -6,7 +6,7 @@ groovy = '4.0.23'
 gsp = '7.0.0-SNAPSHOT'
 javamail = '2.0.1'
 servlet-api = '6.0.0'
-slf4j = '1.7.36'
+slf4j = '2.0.16'
 spring = '6.1.13'
 springboot = '3.3.4'
 spock = '2.3-groovy-4.0'
@@ -31,6 +31,7 @@ spring-beans = { module = 'org.springframework:spring-beans', version.ref = 'spr
 spring-context = { module = 'org.springframework:spring-context', version.ref = 'spring' }
 spring-context-support = { module = 'org.springframework:spring-context-support', version.ref = 'spring' }
 spring-web = { module = 'org.springframework:spring-web', version.ref = 'spring' }
+slf4j-simple = { module = 'org.slf4j:slf4j-simple', version.ref = 'slf4j' }
 springboot-autoconfigure = { module = 'org.springframework.boot:spring-boot-autoconfigure', version.ref = 'springboot' }
 springboot-starter-tomcat = { module = 'org.springframework.boot:spring-boot-starter-tomcat', version.ref = 'springboot' }
 spock-core = { module = 'org.spockframework:spock-core', version.ref = 'spock' }

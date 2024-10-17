@@ -13,4 +13,7 @@
 
     <root level="ERROR"><appender-ref ref="STDOUT"/></root>
 
+    <logger name="com.icegreen.greenmail" level="DEBUG" additivity="false"><appender-ref ref="STDOUT"/></logger>
+    <logger name="grails.plugins.mail" level="DEBUG" additivity="false"><appender-ref ref="STDOUT"/></logger>
+
 </configuration>
