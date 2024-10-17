@@ -21,16 +21,18 @@ repositories {
 
 dependencies {
 
-    api libs.groovy.core // Used in public api
+    compileOnly libs.grails.core // Used in public api, but provided
+    compileOnly libs.groovy.core // Used in public api, but provided
+    compileOnly libs.servlet.api // Provided
+
     api libs.javamail.api // Used in public api
     api libs.spring.context // Used in public api
     api libs.spring.context.support // Used in public api
 
-    // These three libraries are used in public api, but not in a way
+    // These two libraries are used in public api, but not in a way
     // that is meant to be consumed by users of the plugin.
     // Therefore they are set to implementation to not expose unnecessarily
     // to the compileClasspath of plugin users.
-    implementation libs.grails.core
     implementation libs.grails.gsp
     implementation libs.grails.web.common
 
@@ -40,6 +42,7 @@ dependencies {
     implementation libs.springboot.autoconfigure
 
     testImplementation libs.grails.testing.support.core
+    testImplementation libs.servlet.api
     testImplementation libs.spock.core
 
     integrationTestImplementation libs.groovy.xml

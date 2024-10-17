@@ -5,6 +5,7 @@ greenmail = '2.0.1'
 groovy = '4.0.23'
 gsp = '7.0.0-SNAPSHOT'
 javamail = '2.0.1'
+servlet-api = '6.0.0'
 slf4j = '1.7.36'
 spring = '6.1.13'
 springboot = '3.3.4'
@@ -22,6 +23,7 @@ groovy-core = { module = 'org.apache.groovy:groovy', version.ref = 'groovy' }
 grails-docs = { module = 'org.grails:grails-docs', version.ref = 'grails' }
 groovy-templates = { module = 'org.apache.groovy:groovy-templates', version.ref = 'groovy' }
 groovy-xml = { module = 'org.apache.groovy:groovy-xml', version.ref = 'groovy' }
+servlet-api = { module = 'jakarta.servlet:jakarta.servlet-api', version.ref = 'servlet-api' }
 javamail-api = { module = 'jakarta.mail:jakarta.mail-api', version.ref = 'javamail' }
 javamail-impl = { module = 'com.sun.mail:jakarta.mail', version.ref = 'javamail' }
 slf4j-nop = { module = 'org.slf4j:slf4j-nop', version.ref = 'slf4j' }
