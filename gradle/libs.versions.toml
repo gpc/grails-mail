@@ -9,13 +9,26 @@ springboot = '3.3.4'
 
 [libraries]
 grails-bom = { module = 'org.grails:grails-bom', version.ref = 'grails' }
+grails-core = { module = 'org.grails:grails-core' }
 greenmail = { module = 'com.icegreen:greenmail', version.ref = 'greenmail' }
 grails-docs = { module = 'org.grails:grails-docs', version.ref = 'grails' }
+grails-testing-support-core = { module = 'org.grails:grails-testing-support' }
+grails-testing-support-web = { module = 'org.grails:grails-web-testing-support' }
+grails-web-common = { module = 'org.grails:grails-web-common' }
+grails-web-urlmappings = { module = 'org.grails:grails-web-url-mappings' }
+groovy-core = { module = 'org.apache.groovy:groovy' }
 groovy-templates = { module = 'org.apache.groovy:groovy-templates', version.ref = 'groovy' }
+groovy-xml = { module = 'org.apache.groovy:groovy-xml' }
+gsp = { module = 'org.grails.plugins:gsp' }
 servlet-api = { module = 'jakarta.servlet:jakarta.servlet-api', version.ref = 'servlet-api' }
 javamail-api = { module = 'jakarta.mail:jakarta.mail-api', version.ref = 'javamail' }
 javamail-impl = { module = 'com.sun.mail:jakarta.mail', version.ref = 'javamail' }
 slf4j-nop = { module = 'org.slf4j:slf4j-nop', version.ref = 'slf4j' }
 slf4j-simple = { module = 'org.slf4j:slf4j-simple', version.ref = 'slf4j' }
+spock-core = { module = 'org.spockframework:spock-core' }
+spring-beans = { module = 'org.springframework:spring-beans' }
+spring-context = { module = 'org.springframework:spring-context' }
+spring-context-support = { module = 'org.springframework:spring-context-support' }
+spring-web = { module = 'org.springframework:spring-web' }
 springboot-autoconfigure = { module = 'org.springframework.boot:spring-boot-autoconfigure', version.ref = 'springboot' }
 springboot-starter-tomcat = { module = 'org.springframework.boot:spring-boot-starter-tomcat', version.ref = 'springboot' }
