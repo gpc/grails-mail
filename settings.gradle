@@ -1,23 +1,25 @@
 plugins {
-    id 'com.gradle.develocity' version '3.17.1'
-    id 'com.gradle.common-custom-user-data-gradle-plugin' version '2.0'
+    id 'com.gradle.develocity' version '3.18.1'
+    id 'com.gradle.common-custom-user-data-gradle-plugin' version '2.0.2'
 }
 
-def isCI = System.getenv('CI') == 'true'
+def isCI = System.getenv('CI') != null
+def isLocal = !isCI
+def isAuthenticated = System.getenv('DEVELOCITY_ACCESS_KEY') != null
 
 develocity {
     server = 'https://ge.grails.org'
     buildScan {
-        publishing.onlyIf { isCI }
-        uploadInBackground = !isCI
+        publishing.onlyIf { isAuthenticated }
+        uploadInBackground = isLocal
     }
 }
 
 buildCache {
-    local { enabled = !isCI }
+    local { enabled = isLocal }
     remote(develocity.buildCache) {
+        push = isCI && isAuthenticated
         enabled = true
-        push = isCI && System.getenv('DEVELOCITY_ACCESS_KEY')
     }
 }
 
