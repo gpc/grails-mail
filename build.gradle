@@ -36,7 +36,7 @@ dependencies {
     // that is meant to be consumed by users of the plugin.
     // Therefore they are set to implementation to not expose unnecessarily
     // to the compileClasspath of plugin users.
-    implementation libs.gsp
+    implementation libs.grails.gsp
     implementation libs.grails.web.common
 
     implementation libs.javamail.impl // Needs to be implementation (not runtimeOnly), as SMTPMessage is used in MailMessageBuilder

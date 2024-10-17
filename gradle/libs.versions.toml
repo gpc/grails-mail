@@ -11,6 +11,7 @@ grails-bom = { module = 'org.grails:grails-bom', version.ref = 'grails' }
 grails-core = { module = 'org.grails:grails-core' }
 greenmail = { module = 'com.icegreen:greenmail', version.ref = 'greenmail' }
 grails-docs = { module = 'org.grails:grails-docs' }
+grails-gsp = { module = 'org.grails.plugins:gsp' }
 grails-testing-support-core = { module = 'org.grails:grails-testing-support' }
 grails-testing-support-web = { module = 'org.grails:grails-web-testing-support' }
 grails-web-common = { module = 'org.grails:grails-web-common' }
@@ -18,7 +19,6 @@ grails-web-urlmappings = { module = 'org.grails:grails-web-url-mappings' }
 groovy-core = { module = 'org.apache.groovy:groovy' }
 groovy-templates = { module = 'org.apache.groovy:groovy-templates' }
 groovy-xml = { module = 'org.apache.groovy:groovy-xml' }
-gsp = { module = 'org.grails.plugins:gsp' }
 servlet-api = { module = 'jakarta.servlet:jakarta.servlet-api', version.ref = 'servlet-api' }
 javamail-api = { module = 'jakarta.mail:jakarta.mail-api', version.ref = 'javamail' }
 javamail-impl = { module = 'com.sun.mail:jakarta.mail', version.ref = 'javamail' }
