@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package grails.plugins.mail
 
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetupTest
 import grails.testing.mixin.integration.Integration
 import groovy.xml.XmlSlurper
+import jakarta.inject.Inject
+import jakarta.mail.Message
+import jakarta.mail.internet.MimeBodyPart
+import jakarta.mail.internet.MimeMessage
+import jakarta.mail.internet.MimeMultipart
 import org.grails.io.support.ClassPathResource
 import org.springframework.core.io.FileSystemResource
 import org.springframework.mail.MailMessage
 import org.springframework.mail.MailSender
 import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.javamail.JavaMailSenderImpl
+import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMailMessage
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.web.context.request.RequestContextHolder
@@ -33,14 +37,11 @@ import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
-import jakarta.mail.Message
-import jakarta.mail.internet.MimeBodyPart
-import jakarta.mail.internet.MimeMessage
-import jakarta.mail.internet.MimeMultipart
-
 @Integration
 class MailServiceSpec extends Specification  {
 
+    @Inject
+    JavaMailSender mimeMailSender
     MailService mimeCapableMailService
     MailService nonMimeCapableMailService
     MailMessageContentRenderer mailMessageContentRenderer
@@ -49,7 +50,7 @@ class MailServiceSpec extends Specification  {
     GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP)
 
     def setupSpec() {
-      greenMail.start()
+        greenMail.start()
     }
 
     def cleanupSpec() {
@@ -57,14 +58,14 @@ class MailServiceSpec extends Specification  {
     }
 
     def setup() {
-        def mimeMailSender = new JavaMailSenderImpl(host: "localhost", port: ServerSetupTest.SMTP.port)
         MailMessageBuilderFactory mimeMessageBuilderFactor = new MailMessageBuilderFactory(
             mailSender: mimeMailSender,
             mailMessageContentRenderer: mailMessageContentRenderer
         )
         mimeCapableMailService = new MailService(
             mailMessageBuilderFactory: mimeMessageBuilderFactor,
-                mailConfigurationProperties: new MailConfigurationProperties())
+            mailConfigurationProperties: new MailConfigurationProperties()
+        )
         mimeCapableMailService.afterPropertiesSet()
 
         MailSender simpleMailSender = new SimpleMailSender()
@@ -74,7 +75,8 @@ class MailServiceSpec extends Specification  {
         )
         nonMimeCapableMailService = new MailService(
             mailMessageBuilderFactory: simpleMessageBuilderFactory,
-                mailConfigurationProperties: new MailConfigurationProperties())
+            mailConfigurationProperties: new MailConfigurationProperties()
+        )
         nonMimeCapableMailService.afterPropertiesSet()
     }
 
@@ -202,7 +204,6 @@ class MailServiceSpec extends Specification  {
 
     void testSendMailWithEnvelopeFrom() {
       given:
-
         def message = mimeCapableMailService.sendMail {
             to "fred@g2one.com"
             title "Hello John"
@@ -584,7 +585,8 @@ class MailServiceSpec extends Specification  {
         msg.getRecipients(Message.RecipientType.BCC)*.toString()
     }
 }
-class SimpleMailSender implements  MailSender {
+
+class SimpleMailSender implements MailSender {
     void send(SimpleMailMessage simpleMessage) {}
     void send(SimpleMailMessage[] simpleMessages) {}
 }
