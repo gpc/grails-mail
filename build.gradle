@@ -28,6 +28,7 @@ dependencies {
     compileOnly 'org.apache.groovy:groovy' // Used in public api, but Groovy is always provided
 
     compileOnlyApi libs.javamail.api // Used in public api
+
     api 'org.springframework:spring-context' // Used in public api
     api 'org.springframework:spring-context-support' // Used in public api
 
@@ -44,6 +45,7 @@ dependencies {
     implementation 'org.springframework:spring-beans'
 
     testRuntimeOnly libs.slf4j.simple
+
     testImplementation libs.servlet.api
     testImplementation 'org.grails:grails-testing-support'
     testImplementation 'org.spockframework:spock-core'
