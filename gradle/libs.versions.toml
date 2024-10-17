@@ -1,7 +1,6 @@
 [versions]
 grails = '7.0.0-SNAPSHOT'
 greenmail = '2.0.1'
-groovy = '4.0.23'
 javamail = '2.0.1'
 servlet-api = '6.0.0'
 slf4j = '2.0.16'
@@ -11,13 +10,13 @@ springboot = '3.3.4'
 grails-bom = { module = 'org.grails:grails-bom', version.ref = 'grails' }
 grails-core = { module = 'org.grails:grails-core' }
 greenmail = { module = 'com.icegreen:greenmail', version.ref = 'greenmail' }
-grails-docs = { module = 'org.grails:grails-docs', version.ref = 'grails' }
+grails-docs = { module = 'org.grails:grails-docs' }
 grails-testing-support-core = { module = 'org.grails:grails-testing-support' }
 grails-testing-support-web = { module = 'org.grails:grails-web-testing-support' }
 grails-web-common = { module = 'org.grails:grails-web-common' }
 grails-web-urlmappings = { module = 'org.grails:grails-web-url-mappings' }
 groovy-core = { module = 'org.apache.groovy:groovy' }
-groovy-templates = { module = 'org.apache.groovy:groovy-templates', version.ref = 'groovy' }
+groovy-templates = { module = 'org.apache.groovy:groovy-templates' }
 groovy-xml = { module = 'org.apache.groovy:groovy-xml' }
 gsp = { module = 'org.grails.plugins:gsp' }
 servlet-api = { module = 'jakarta.servlet:jakarta.servlet-api', version.ref = 'servlet-api' }
