@@ -13,7 +13,7 @@ dependencies {
 
     add('guideConfiguration', libs.grails.docs)
     add('guideConfiguration', libs.groovy.templates)
-    add('guideConfiguration', libs.slf4j.nop) // Get rid of warning about missing slf4j implementation during docs task
+    add('guideConfiguration', libs.slf4j.nop) // Get rid of logs during guide generation
 }
 
 tasks.withType(Groovydoc).configureEach {
